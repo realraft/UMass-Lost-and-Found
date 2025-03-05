@@ -25,7 +25,7 @@ Role(s): Notetaker, Front-end developer\
 Role(s) Description: Will be taking down notes, and recording what my teammates do in regards to the website. Will also offer suggestions and implement them when necessary. Will mainly work on the front-end.\
 Issues to work on: TBD
 
-**Jacob Taylor **\
+**Jacob Taylor**\
 Role(s): TBD\
 Role(s) Description: \
 Issues to work on: TBD
