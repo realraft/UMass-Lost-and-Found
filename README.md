@@ -2,10 +2,14 @@
 ## CS326 Group 16 Project
 
 ### Description
-    **Problem:** Clearly define the problem your application aims to solve.
-    **Solution:** Describe how your application addresses the problem.
-    **Key Features:** Outline essential functionalities of your application.
-    **Why This Project?:** Explain the real-world impact and user pain points.
+    **Problem:** It is common for UMass students to misplace important belongings like UCards, water bottles, and academic utensils. There currently doesn't exist an organized place for students to communicate what items they may have lost or found.
+    **Solution:** UMass Lost and Found intends to be the first and best place for students to go to communicate with each other items they are looking for or have found. Our web app is organized and easy to use and provides users with all the tools and information they need to find lost items or share items they found.
+    **Key Features:**
+        - Home page containing all found item posts
+        - Posting features such as images and GPS location to help users locate items
+        - Sorting, filtering, and searching options to narrow down posts
+        - Messaging system for communication between posters and users
+    **Why This Project?:** UMass Lost and Found hopes to help navigate the financial, mental, and academic struggles that come with losing an everyday item on campus.
 ### Team Member List:
     **Owen Raftery**
     Role: TBD
