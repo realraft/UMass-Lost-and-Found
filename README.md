@@ -17,8 +17,10 @@
 ### Team Member List:
 **Owen Raftery**\
 Role(s): TBD\
+Role(s) Description: 
 Issues to work on: TBD
 
 **Nathan Dennis**\
-Role(s): Notetaker\
-Issues to work on: Front-end
+Role(s): Notetaker, Front-end developer\
+Role(s) Description: Will be taking down notes, and recording what my teammates do in regards to the website. Will also offer suggestions and implement them when necessary. Will mainly work on the front-end.
+Issues to work on: TBD
