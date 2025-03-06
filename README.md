@@ -17,7 +17,7 @@
 ### Team Member List:
 **Owen Raftery**\
 Role(s): Project-Manager\
-Role(s) Description: Will be leading the team during meetings and give instructions on what to code. 
+Role(s) Description: Will be leading the team during meetings and give instructions on what to code. \
 Issues to work on: TBD
 
 **Nathan Dennis**\
@@ -27,7 +27,7 @@ Issues to work on: TBD
 
 **Jacob Taylor**\
 Role(s): Time-keeper\
-Role(s) Description: Will organize meetings, keep track of what's missing, and come up with deadlines to the issues. 
+Role(s) Description: Will organize meetings, keep track of what's missing, and come up with deadlines to the issues. \
 Issues to work on: TBD
 
 **Roberto Rubio**\
