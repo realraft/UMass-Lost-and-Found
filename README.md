@@ -18,7 +18,7 @@
 **Owen Raftery**\
 Role(s): Project-Manager\
 Role(s) Description: Will be leading the team during meetings and give instructions on what to code. \
-Issues to work on: TBD
+Issues to work on: Research on if we can use UMass email api, in our platform
 
 **Nathan Dennis**\
 Role(s): Notetaker, Front-end developer\
@@ -28,7 +28,7 @@ Issues to work on: General front end. Skeleton HTML and CSS.
 **Jacob Taylor**\
 Role(s): Time-keeper\
 Role(s) Description: Will organize meetings, keep track of what's missing, and come up with deadlines to the issues. \
-Issues to work on: TBD
+Issues to work on: Research databases and ways we can host our site
 
 **Roberto Rubio**\
 Role(s): Communicator\
