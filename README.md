@@ -33,4 +33,4 @@ Issues to work on: Research databases and ways we can host our site
 **Roberto Rubio**\
 Role(s): Communicator\
 Role(s) Description: Will make sure the Backend and Frontend are syncronized and will code for both. \
-Issues to work on: TBD
+Issues to work on: research about the GPS API (costs, keys, and how to implement). 
