@@ -23,7 +23,7 @@ Issues to work on: TBD
 **Nathan Dennis**\
 Role(s): Notetaker, Front-end developer\
 Role(s) Description: Will be taking down notes, and recording what my teammates do in regards to the website. Will also offer suggestions and implement them when necessary. Will mainly work on the front-end.\
-Issues to work on: TBD
+Issues to work on: General front end. Skeleton HTML and CSS.
 
 **Jacob Taylor**\
 Role(s): Time-keeper\
