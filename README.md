@@ -31,6 +31,6 @@ Role(s) Description: Will organize meetings, keep track of what's missing, and c
 Issues to work on: TBD
 
 **Roberto Rubio**\
-Role(s): TBD\
-Role(s) Description: \
+Role(s): Communicator\
+Role(s) Description: Will make sure the Backend and Frontend are syncronized and will code for both. \
 Issues to work on: TBD
