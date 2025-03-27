@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMass Lost And Found</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Navigation Buttons -->
+<div class="button-container">
+    <a href="frontpage.html">
+        <button>Back to Home Page</button>
+    </a>
+    <button>Post</button>
+    <button class="report-button">Report</button>
+</div>
+
+        <!-- Summary Section -->
+        <div class="summary">
+            <h2>UMass Lost and Found. Find and report lost items here.</h2>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="sort-filter">
+            <div class="sort-by">
+                <h3>Sort By</h3>
+                <input type="radio" id="date-posted" name="sort" value="date-posted">
+                <label for="date-posted">Date Posted</label><br>
+                <input type="radio" id="relevance" name="sort" value="relevance">
+                <label for="relevance">Relevance</label>
+            </div>
+            <div class="filters">
+                <h3>Filters</h3>
+                <label>
+                    <input type="checkbox" name="filter" value="location" checked>
+                    Location
+                </label><br>
+                <label>
+                    <input type="checkbox" name="filter" value="time-date" checked>
+                    Time/Date
+                </label><br>
+                <label>
+                    <input type="checkbox" name="filter" value="tags" checked>
+                    Tags
+                </label>
+            </div>
+        </div>
+
+        <!-- Listings Section -->
+        <div class="listing-container" style="height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">
+            <!-- Listing 1 -->
+            <div class="listing" style="padding: 10px; border-bottom: 1px solid #ddd;">
+                <h3>Lost Item 1</h3>
+                <img src="placeholder1.png" alt="Lost Item 1 Image">
+                <p>Date Found: March 15, 2025</p>
+                <p>Location: Library</p>
+                <p>Category: Electronics</p>
+                <p>Poster: Anonymous</p>
+            </div>
+
+            <!-- Listing 2 -->
+            <div class="listing" style="padding: 10px; border-bottom: 1px solid #ddd;">
+                <h3>Lost Item 2</h3>
+                <img src="placeholder2.png" alt="Lost Item 2 Image">
+                <p>Date Found: March 20, 2025</p>
+                <p>Location: Gym</p>
+                <p>Category: Clothing</p>
+                <p>Poster: John Doe</p>
+            </div>
+
+            <!-- Listing 3 -->
+            <div class="listing" style="padding: 10px; border-bottom: 1px solid #ddd;">
+                <h3>Lost Item 3</h3>
+                <img src="placeholder3.png" alt="Lost Item 3 Image">
+                <p>Date Found: March 22, 2025</p>
+                <p>Location: Cafeteria</p>
+                <p>Category: Accessories</p>
+                <p>Poster: Jane Doe</p>
+            </div>
+
+            <!-- Listing 4 -->
+            <div class="listing" style="padding: 10px; border-bottom: 1px solid #ddd;">
+                <h3>Lost Item 4</h3>
+                <img src="placeholder4.png" alt="Lost Item 4 Image">
+                <p>Date Found: March 23, 2025</p>
+                <p>Location: Parking Lot</p>
+                <p>Category: Bags</p>
+                <p>Poster: Anonymous</p>
+            </div>
+
+            <!-- Listing 5 -->
+            <div class="listing" style="padding: 10px; border-bottom: 1px solid #ddd;">
+                <h3>Lost Item 5</h3>
+                <img src="placeholder5.png" alt="Lost Item 5 Image">
+                <p>Date Found: March 25, 2025</p>
+                <p>Location: Science Building</p>
+                <p>Category: Books</p>
+                <p>Poster: Alice Smith</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
