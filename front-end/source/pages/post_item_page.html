@@ -1,22 +1,61 @@
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dev-post-item_page</title>
-    <link rel="stylesheet" type="text/css" href="post_item_page.css">
-</head>
-<body>
-
-    <!--Add it so we change the standard defintiions like in the html tutorial check my github-->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="post_item_page.css" />
+  </head>
+  <body>
     <header class="header-container">
-
-
-
-
-
+      <div class="name-container">
+        <h1 id="header-text">UMass Lost and Found</h1>
+      </div>
+      <div class="search-container">
+        <form class="search-bar" action="/search" method="get">
+          <input
+            type="search"
+            name="q"
+            placeholder="Search…"
+            aria-label="Search"
+          />
+          <button type="submit">🔍</button>
+        </form>
+      </div>
+      <div class="post-button-container">
+        <button class="post-button">POST</button>
+      </div>
     </header>
-
-
-    
-</body>
+    <main>
+      <div class="left-content-container">
+        <div class="post-img-container">
+          <img src="placeholder.jpg" />
+        </div>
+        <div class="post-options-container">
+          <div class="date-options-container">
+            <div class="date-found-option">
+                <p>Date Found:</p>
+            </div>
+            <div class="date-picker">
+              <input type="date" class="date-input" />
+              <button
+                type="button"
+                class="calendar-btn"
+                aria-label="Open calendar"
+              >
+                📅
+              </button>
+            </div>
+          </div>
+          <div class="anonymous-options-container">
+            <div class="anonymous-text">
+                <p>Anonymous Listing?</p>
+            </div>
+            <div class="anonymous-button"></div>
+          </div>
+        </div>
+      </div>
+      <div class="right-content"></div>
+    </main>
+  </body>
 </html>
