@@ -66,13 +66,14 @@
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.left-content-container,.right-content-container {
+.left-content-container,
+.right-content-container {
   width: 360px;
   height: 100vh;
   margin: 50px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 30px;
 }
 
 .post-img-container {
@@ -81,19 +82,20 @@
   align-items: center;
   border: 2px solid black;
 }
-.post-img-container img {
+.post-img-container img,.GPS-map-container img {
   width: 100%;
   height: 100%;
   object-fit: contain; /* scales image to fit inside, letterboxing if needed */
+
 }
 
 .post-options-container {
   display: flex;
   flex-direction: column;
   height: 200px;
-  border: 2px solid black;
+  /* border: 2px solid black; */
   justify-content: center;
-  gap:10px;
+  gap: 10px;
 }
 .date-options-container,
 .anonymous-options-container {
@@ -102,7 +104,9 @@
 }
 
 .date-found-option,
-.date-picker,.anonymous-text,.anonymous-button {
+.date-picker,
+.anonymous-text,
+.anonymous-button {
   width: 175px;
   height: 45px;
   border: 2px solid black;
@@ -111,9 +115,54 @@
   align-items: center;
 }
 
-main{
-    display: flex;
+main {
+  display: flex;
+  justify-content: space-around;
+}
 
+.description-box {
+  width: 100%; /* Fill its parent container */
+  max-width: 600px; /* Optional limit */
+  height: 150px; /* Control vertical size */
+  padding: 0.75rem; /* Space inside the box */
+  font-size: 1rem; /* Readable text size */
+  border: 1px solid #ccc; /* Light border */
+  border-radius: 4px;
+  resize: vertical; /* Allow user to resize height only */
+  box-sizing: border-box; /* Include padding/border in width */
+}
+.description-box-input-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tag-input-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 150px; /* adjust as needed */
+  padding: 0.5rem 1rem;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.tag-icon {
+  font-size: 1.25rem;
+  margin-right: 0.75rem;
+}
+
+.tag-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  outline: none;
+}
+
+.GPS-map-container img{
+    border: 2px solid black;
 }
 
 
