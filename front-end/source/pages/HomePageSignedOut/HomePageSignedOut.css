@@ -29,7 +29,6 @@ body {
 }
 .description {
     width: 80%; /* Responsive width */
-    max-width: 600px;
     margin: 20px 0;
     font-size: 1.2em;
     color: #333;
