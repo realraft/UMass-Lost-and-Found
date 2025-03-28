@@ -25,7 +25,6 @@ Role(s): Notetaker, Front-end developer\
 Role(s) Description: Will be taking down notes, and recording what my teammates do in regards to the website. Will also offer suggestions and implement them when necessary. Will mainly work on the front-end.\
 Issues to work on: General front end. Skeleton HTML and CSS.
 
-https://docs.google.com/presentation/d/1VxEBwYmmBteF5LXfmwFQeWq8gb_28MRRneF0ujywP20/edit?slide=id.g345c19cf8aa_2_60#slide=id.g345c19cf8aa_2_60
 
 **Jacob Taylor**\
 Role(s): Time-keeper\
