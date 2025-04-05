@@ -16,6 +16,7 @@
             <button>Back to Home Page</button>
         </a>
         <button>Post</button>
+        <button id="adminButton">Administrator</button>
     </div>
 
     <!-- Summary Section -->
@@ -114,14 +115,22 @@
     <!-- Modal Overlay -->
     <div class="overlay" id="overlay"></div>
     <!-- Report Modal -->
-    <div class="modal" id="reportModal">
-        <span class="close">&times;</span>
-        <h2 id="reportTitle">Report XYZ</h2>
-        <textarea placeholder="Write reason for reporting here"></textarea>
-        <button id="submitReport">Submit</button>
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Report</h2> 
+            <form id="reportForm">
+                <label for="reportReason">Reason for reporting:</label>
+                <textarea id="reportReason" required></textarea>
+                <button type="submit">Submit Report</button>
     </div>
 
     <script src="ReportWindow.js"></script>
+    <script>
+        document.getElementById("adminButton").addEventListener("click", function () {
+            window.location.href = "Administrator.html";
+        });
+    </script>
 </body>
 
 </html>

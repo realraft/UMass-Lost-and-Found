@@ -6,6 +6,8 @@
     "anon_listing": "temp",
     "tags": ["temp1", "temp2"]
 }],
+
+//Implement this for server with dummy data
 "reports": [{
     "id": "temp",
     "post_id": "temp",

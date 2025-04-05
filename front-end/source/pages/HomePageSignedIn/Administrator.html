@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator Panel - UMass Lost and Found</title>
+    <link rel="stylesheet" href="HomePageSignedIn.css">
+</head>
+<body>
+
+    <!-- Navigation Buttons -->
+    <div class="button-container">
+        <a href="HomePageSignedIn.html">
+            <button>Back to User View</button>
+        </a>
+    </div>
+
+    <!-- Admin Header -->
+    <div class="summary">
+        <h2>Administrator Panel</h2>
+        <p>Review reports submitted by users. You may choose to delete or retain reported listings.</p>
+    </div>
+
+    <!-- Reported Listings Section (starts blank) -->
+    <div class="listing-container" id="adminReports" style="height: 400px; overflow-y: scroll;">
+        <!-- Reported posts will be loaded here from IndexedDB -->
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
