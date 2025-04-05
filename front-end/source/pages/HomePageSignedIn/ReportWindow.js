@@ -4,11 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const overlay = document.getElementById("overlay");
     const closeButton = document.querySelector(".close");
     const reportTitle = modal.querySelector("h2");
-    const reportForm = document.getElementById("reportForm"); // assuming there's a form element
-    const reasonInput = document.getElementById("reportReason"); // assuming a textarea/input for reason
+    const reportForm = document.getElementById("reportForm");
+    const reasonInput = document.getElementById("reportReason"); 
     let currentItem = null;
 
-    // --- IndexedDB Setup ---
     const dbRequest = indexedDB.open("LostAndFoundDB", 1);
 
     dbRequest.onupgradeneeded = (event) => {
