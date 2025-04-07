@@ -1,10 +1,9 @@
-const { error } = require("console");
-const fs = require("fs");
+import fs from "fs";
 
 const FILE_PATH = "../Fake-Server/server.json";
 
 /**
- * this function reads from  server.json and returns the json representation of the contents.
+ * this function reads from server.json and returns a javascript object of the contents.
  *
  * @returns {JSON}
  */
@@ -21,17 +20,17 @@ function fetch_server_data() {
 /**
  * Given a json representation of a post, this function appends the new post data to server.json
  *
- * @param {JSON} new_post post data formatted in JSON
+ * @param {Object} new_post
  * @returns {void}
  */
 function append_new_post(new_post) {
-  const jsonData = transverse_post_data();
+  const jsonData = fetch_server_data();
 
   if (Array.isArray(jsonData.posts)) {
-    jsonData.posts.push(newPost);
+    jsonData.posts.push(new_post);
   } else {
     // If posts doesn't exist or isn't an array, initialize it
-    jsonData.posts = [newPost];
+    jsonData.posts = [new_post];
   }
 
   const updatedJson = JSON.stringify(jsonData, null, 2);
@@ -44,28 +43,50 @@ function append_new_post(new_post) {
 }
 
 /**
- * Given a json representation of a post, this function deletes the post from  server.json
+ * given the array from the post array in server.json, and the id of the post to remove.
+ * This function returns the post object to remove, null if it does not exist.
  *
- * @param {JSON} new_post post data formatted in JSON
- * @returns {void}
+ * @param {Array} arr
+ * @param {number} id
+ * @returns {Object | null}
  */
-function remove_post(post) {
-  const jsonData = transverse_post_data();
-
-  let index = jsonData.posts.indexOf(post);
-
-  if (Array.isArray(jsonData.posts) && index !== -1) {
-    jsonData.posts.splice(index, 1);
-  } else {
-    console.log("Posts array does not exist");
+function find_post_with_id(arr, id) {
+  for (const element of arr) {
+    if (element["id"] && element["id"] === id) {
+      return element;
+    }
   }
 
-  const updatedJson = JSON.stringify(jsonData, null, 2);
+  return null;
+}
 
-  try {
-    fs.writeFileSync(FILE_PATH, updatedJson, "utf-8");
-  } catch (error) {
-    console.log(`Error writing to file:${error}`);
+/**
+ * Removes post with given id, if the post exists.
+ *
+ * @param {number} post_id
+ * @returns {void}
+ */
+function remove_post(post_id) {
+  const jsonData = fetch_server_data();
+
+  const post_to_remove = find_post_with_id(jsonData.posts, post_id);
+
+  if (post_to_remove === null) {
+    return; //post is not in the server;
+  }
+
+  if (Array.isArray(jsonData.posts)) {
+    jsonData.posts = jsonData.posts.filter(
+      (element) => element !== post_to_remove
+    );
+
+    const updatedJson = JSON.stringify(jsonData, null, 2);
+
+    try {
+      fs.writeFileSync(FILE_PATH, updatedJson, "utf-8");
+    } catch (error) {
+      console.log(`Error writing to file:${error}`);
+    }
   }
 }
 
