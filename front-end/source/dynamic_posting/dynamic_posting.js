@@ -94,6 +94,6 @@ function remove_post(post_id) {
  * this function reads from server.json and dynamically generates posts to our posting page.
  * @returns {void}
  */
-function generate_posts() {
+function render_posts() {
   const json_data = fetch_server_data();
 }
