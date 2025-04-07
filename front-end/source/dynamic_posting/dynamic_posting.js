@@ -3,7 +3,7 @@ const fs = require("fs");
 const FILE_PATH = "../Fake-Server/server.json";
 
 /**
- * this function reads from the fake_server.json file and returns the json representation of it.
+ * this function reads from the fake_server.json and returns the json representation of the contents.
  *
  * @returns {JSON}
  */
@@ -18,7 +18,7 @@ function fetch_server_data() {
 }
 
 /**
- * Given a json representation of a post, this function appends the new post data to the fake_server.json file
+ * Given a json representation of a post, this function appends the new post data to server.json
  *
  * @param {JSON} input_post_data post data formatted in JSON
  * @returns {void}
