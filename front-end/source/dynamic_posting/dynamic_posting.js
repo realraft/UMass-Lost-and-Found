@@ -5,7 +5,7 @@ const FILE_PATH = "../Fake-Server/server.json";
 /**
  * this function reads from server.json and returns a javascript object of the contents.
  *
- * @returns {JSON}
+ * @returns {object}
  */
 function fetch_server_data() {
   try {
@@ -20,7 +20,7 @@ function fetch_server_data() {
 /**
  * Given an object representation of a post, this function appends the new post data to server.json
  *
- * @param {Object} new_post
+ * @param {object} new_post
  * @returns {void}
  */
 function append_post(new_post) {
@@ -48,7 +48,7 @@ function append_post(new_post) {
  *
  * @param {Array} arr
  * @param {number} id
- * @returns {Object | undefined}
+ * @returns {object | undefined}
  */
 function find_post_with_id(arr, id) {
   for (const element of arr) {
@@ -64,7 +64,7 @@ function find_post_with_id(arr, id) {
  * Removes post with given id if it exists, and returns the post that was removed, null otherwise.
  *
  * @param {number} post_id
- * @returns {Object | undefined}
+ * @returns {object | undefined}
  */
 function remove_post(post_id) {
   const jsonData = fetch_server_data();
