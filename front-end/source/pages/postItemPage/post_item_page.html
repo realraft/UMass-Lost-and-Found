@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="post_item_page.css" />
+  </head>
+  <body>
+    <header class="header-container">
+      <div class="name-container">
+        <h1 id="header-text">UMass Lost and Found</h1>
+      </div>
+      <div class="search-container">
+        <form class="search-bar" action="/search" method="get">
+          <input
+            type="search"
+            name="q"
+            placeholder="Search…"
+            aria-label="Search"
+          />
+          <button type="submit">🔍</button>
+        </form>
+      </div>
+      <div class="post-button-container">
+        <button class="post-button">POST</button>
+      </div>
+    </header>
+    <main>
+      <div class="left-content-container">
+        <div class="post-img-container">
+          <img src="placeholder.jpg" />
+        </div>
+        <div class="post-options-container">
+          <div class="date-options-container">
+            <div class="date-found-option">
+              <p>Date Found:</p>
+            </div>
+            <div class="date-picker">
+              <input type="date" class="date-input" />
+              <button
+                type="button"
+                class="calendar-btn"
+                aria-label="Open calendar"
+              >
+                📅
+              </button>
+            </div>
+          </div>
+            <!--Add a boolean anonymous switch true or false-->
+          <div class="anonymous-options-container">
+            <div class="anonymous-text">
+              <p>Anonymous Listing?</p>
+            </div>
+            <div class="anonymous-button"></div>
+          </div>
+        </div>
+      </div>
+      <div class="right-content-container">
+        <div class="description-box-input-container">
+          <label for="description" class="sr-only"></label>
+          <textarea
+            id="description"
+            class="description-box"
+            placeholder="Description..."
+          ></textarea>
+        </div>
+            <!--This tag input bo does not scale to multiple input types-->
+
+        <div class="tag-input-container">
+          <span class="tag-icon">🏷️</span>
+          <input
+            type="text"
+            class="tag-input"
+            placeholder="Tag(s)"
+            aria-label="Add tags"
+          />
+        </div>
+
+        <div class="GPS-map-container">
+
+            <!--This will be where we use the google maps api-->
+          <img src="Googlemapsplaceholder.png" alt="google-maps-placeholder" /> 
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
