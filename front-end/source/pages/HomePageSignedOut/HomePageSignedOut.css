@@ -1,0 +1,62 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-color: #f4f4f4;
+}
+.header {
+    background-color: #8C1515; /* UMass Crimson */
+    color: white;
+    width: 100%;
+    padding: 20px 0;
+    font-size: 2.5em;
+    font-weight: bold;
+}
+.image-container {
+    width: 60%; /* Responsive width */
+    max-width: 400px; /* Maximum size */
+    margin: 30px 0;
+}
+.image-container img {
+    width: 100%;
+    height: auto; /* This ensures the full image is visible */
+    max-height: 300px; /* Limit maximum height */
+    object-fit: contain; /* This ensures the entire image is shown */
+}
+.description {
+    width: 80%; /* Responsive width */
+    margin: 20px 0;
+    font-size: 1.2em;
+    color: #333;
+}
+.sign-in-button {
+    background-color: #8C1515; /* UMass Crimson */
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.sign-in-button:hover {
+    background-color: #6C1010;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header {
+        font-size: 2em;
+    }
+    .image-container {
+        width: 80%;
+    }
+    .description {
+        width: 90%;
+        font-size: 1em;
+    }
+}
