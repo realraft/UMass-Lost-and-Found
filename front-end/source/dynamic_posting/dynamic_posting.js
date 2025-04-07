@@ -48,7 +48,7 @@ function append_post(new_post) {
  *
  * @param {Array} arr
  * @param {number} id
- * @returns {Object | null}
+ * @returns {Object | undefined}
  */
 function find_post_with_id(arr, id) {
   for (const element of arr) {
@@ -57,22 +57,22 @@ function find_post_with_id(arr, id) {
     }
   }
 
-  return null;
+  return undefined;
 }
 
 /**
- * Removes post with given id, if the post exists.
+ * Removes post with given id if it exists, and returns the post that was removed, null otherwise.
  *
  * @param {number} post_id
- * @returns {void}
+ * @returns {Object | undefined}
  */
 function remove_post(post_id) {
   const jsonData = fetch_server_data();
 
   const post_to_remove = find_post_with_id(jsonData.posts, post_id);
 
-  if (post_to_remove === null) {
-    return; //post is not in the server;
+  if (post_to_remove === undefined) {
+    return undefined; //post is not in the server;
   }
 
   if (Array.isArray(jsonData.posts)) {
@@ -84,6 +84,7 @@ function remove_post(post_id) {
 
     try {
       fs.writeFileSync(FILE_PATH, updatedJson, "utf-8");
+      return post_to_remove;
     } catch (error) {
       console.log(`Error writing to file:${error}`);
     }
@@ -97,3 +98,4 @@ function remove_post(post_id) {
 function render_posts() {
   const json_data = fetch_server_data();
 }
+
