@@ -100,7 +100,6 @@ function render_posts() {
 
   for (const post of json_data["posts"]) {
     const posts_container = document.querySelector(
-      "Placeholder for divs of posts"
     );
 
     const new_post = document.createElement("div"); // sudo code. 
