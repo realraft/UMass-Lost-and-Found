@@ -97,5 +97,14 @@ function remove_post(post_id) {
  */
 function render_posts() {
   const json_data = fetch_server_data();
-}
 
+  for (const post of json_data["posts"]) {
+    const posts_container = document.querySelector(
+      "Placeholder for divs of posts"
+    );
+
+    const new_post = document.createElement("div"); // sudo code. 
+
+    posts_container.appendChild(new_post);
+  }
+}
