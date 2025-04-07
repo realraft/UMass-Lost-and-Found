@@ -104,6 +104,10 @@ function render_posts() {
 
     const new_post = document.createElement("div"); // sudo code. 
 
-    posts_container.appendChild(new_post);
+    posts_container.appendChild(new_post); 
+
+    // when we create a new div post we need to assign it a unique id thats in the server.
+
+    
   }
 }
