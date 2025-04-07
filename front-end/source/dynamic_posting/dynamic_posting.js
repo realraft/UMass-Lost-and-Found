@@ -18,12 +18,12 @@ function fetch_server_data() {
 }
 
 /**
- * Given a json representation of a post, this function appends the new post data to server.json
+ * Given an object representation of a post, this function appends the new post data to server.json
  *
  * @param {Object} new_post
  * @returns {void}
  */
-function append_new_post(new_post) {
+function append_post(new_post) {
   const jsonData = fetch_server_data();
 
   if (Array.isArray(jsonData.posts)) {
