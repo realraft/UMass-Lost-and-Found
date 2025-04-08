@@ -1,93 +1,31 @@
-import fs from "fs";
+// import fs from "fs";
 
-const FILE_PATH = "../Fake-Server/server.json";
+const FILE_PATH = "../../Fake-Server/server.json";
 
 /**
  * this function reads from server.json and returns a javascript object of the contents.
  *
  * @returns {object}
  */
-function fetch_server_data() {
+async function fetch_server_data() {
   try {
-    const data = fs.readFileSync(FILE_PATH, "utf8");
-    const jsonData = JSON.parse(data);
-    return jsonData;
-  } catch (err) {
-    console.error("Error reading File:", err);
-  }
-}
+    // Make the GET request for the JSON file. Adjust the path if needed.
+    const response = await fetch(FILE_PATH);
 
-/**
- * Given an object representation of a post, this function appends the new post data to server.json
- *
- * @param {object} new_post
- * @returns {void}
- */
-function append_post(new_post) {
-  const jsonData = fetch_server_data();
+    // Check if the response was successful
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-  if (Array.isArray(jsonData.posts)) {
-    jsonData.posts.push(new_post);
-  } else {
-    // If posts doesn't exist or isn't an array, initialize it
-    jsonData.posts = [new_post];
-  }
+    // Parse the JSON content from the response
+    const data = await response.json();
 
-  const updatedJson = JSON.stringify(jsonData, null, 2);
+    // Do something with the data (for instance, log it to the console)
+    console.log("Data fetched", data);
 
-  try {
-    fs.writeFileSync(FILE_PATH, updatedJson, "utf-8");
+    return data;
   } catch (error) {
-    console.log(`Error writing to file:${error}`);
-  }
-}
-
-/**
- * given the array from the post array in server.json, and the id of the post to remove.
- * This function returns the post object to remove, null if it does not exist.
- *
- * @param {Array} arr
- * @param {number} id
- * @returns {object | undefined}
- */
-function find_post_with_id(arr, id) {
-  for (const element of arr) {
-    if (element["id"] && element["id"] === id) {
-      return element;
-    }
-  }
-
-  return undefined;
-}
-
-/**
- * Removes post with given id if it exists, and returns the post that was removed, null otherwise.
- *
- * @param {number} post_id
- * @returns {object | undefined}
- */
-function remove_post(post_id) {
-  const jsonData = fetch_server_data();
-
-  const post_to_remove = find_post_with_id(jsonData.posts, post_id);
-
-  if (post_to_remove === undefined) {
-    return undefined; //post is not in the server;
-  }
-
-  if (Array.isArray(jsonData.posts)) {
-    jsonData.posts = jsonData.posts.filter(
-      (element) => element !== post_to_remove
-    );
-
-    const updatedJson = JSON.stringify(jsonData, null, 2);
-
-    try {
-      fs.writeFileSync(FILE_PATH, updatedJson, "utf-8");
-      return post_to_remove;
-    } catch (error) {
-      console.log(`Error writing to file:${error}`);
-    }
+    console.error("Error fetching JSON file:", error);
   }
 }
 
@@ -95,19 +33,25 @@ function remove_post(post_id) {
  * this function reads from server.json and dynamically generates posts to our posting page.
  * @returns {void}
  */
-function render_posts() {
-  const json_data = fetch_server_data();
+async function render_posts() {
+  const json_data = await fetch_server_data();
 
+
+  // might need to change how we update this!!!!
   for (const post of json_data["posts"]) {
-    const posts_container = document.querySelector(
-    );
+    const targetDiv = document.querySelector("div.posts-container");
 
-    const new_post = document.createElement("div"); // sudo code. 
+    const new_post = document.querySelector("div.post").cloneNode(true);
 
-    posts_container.appendChild(new_post); 
+    new_post.id = post["id"];
+
+    // we need to change the ids of the stuff were generating for the boxes
+
+
+    targetDiv.appendChild(new_post);
 
     // when we create a new div post we need to assign it a unique id thats in the server.
-
-    
   }
 }
+
+render_posts();
