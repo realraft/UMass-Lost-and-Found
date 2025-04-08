@@ -38,8 +38,34 @@ async function render_posts() {
 
   // might need to change how we update this!!!!
   for (const post of json_data["posts"]) {
-    
+    const listings_container = document.querySelector("div.listing-container");
 
+    const new_post = document.querySelector("div.listing").cloneNode(true);
+
+    new_post.id = post["id"];
+
+    new_post.querySelector("h3.title").innerHTML = post["title"]
+      ? post["title"]
+      : "Title: Not Supplied";
+    new_post.querySelector("p.date-found").innerHTML = post["date"]
+      ? "Date found: " + post["date"]
+      : "Date: Not supplied";
+
+    new_post.querySelector("p.location").innerHTML = post["location"]
+      ? "Location: " + post["location"]
+      : "Location: Not supplied";
+
+    new_post.querySelector("p.category").innerHTML = post["category"]
+      ? "Category: " + post["category"]
+      : "Category: Not supplied";
+
+    new_post.querySelector("p.poster").innerHTML = post["anon_listing"]
+      ? "Poster: Anonymous"
+      : "Poster:" + post["user"];
+
+    new_post.querySelector("button.report-button").dataset.item = post["title"]; // need to fix functionality with report button ask nathan.
+
+    listings_container.appendChild(new_post);
   }
 }
 
