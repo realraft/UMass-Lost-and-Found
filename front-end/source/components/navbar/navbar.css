@@ -1,0 +1,71 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #8C1515; /* UMass Crimson */
+    color: white;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-brand h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .navbar-search {
+    flex: 1;
+    max-width: 400px;
+    margin: 0 20px;
+  }
+  
+  .search-form {
+    display: flex;
+  }
+  
+  .search-form input {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px 0 0 4px;
+    font-size: 14px;
+  }
+  
+  .search-form button {
+    padding: 8px 12px;
+    border: none;
+    background: white;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+  }
+  
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .nav-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .nav-link:hover {
+    text-decoration: underline;
+  }
+  
+  .profile-button {
+    background-color: white;
+    color: #8C1515;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 15px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .profile-button:hover {
+    background-color: #f0f0f0;
+  }
