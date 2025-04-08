@@ -36,7 +36,6 @@ async function fetch_server_data() {
 async function render_posts() {
   const json_data = await fetch_server_data();
 
-
   // might need to change how we update this!!!!
   for (const post of json_data["posts"]) {
     const targetDiv = document.querySelector("div.posts-container");
@@ -45,8 +44,8 @@ async function render_posts() {
 
     new_post.id = post["id"];
 
+    
     // we need to change the ids of the stuff were generating for the boxes
-
 
     targetDiv.appendChild(new_post);
 
