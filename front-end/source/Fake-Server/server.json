@@ -1,14 +1,71 @@
-{"posts": [{
-    "id": "temp",
-    "title": "temp",
-    "description": "temp",
-    "date": "temp",
-    "anon_listing": "temp",
-    "tags": ["temp1", "temp2"]
-}],
-"reports": [{
-    "id": "temp",
-    "post_id": "temp",
-    "report_text": "temp"
-}]
+{
+  "posts": [
+    {
+      "id": 1,
+      "title": "Lost Watch",
+      "description": "A silver watch was lost near the Central Park fountain.",
+      "date": "2025-04-01",
+      "anon_listing": true,
+      "location": "Central Park",
+      "category": "Accessories",
+      "user": "Alice"
+    },
+    {
+      "id": 2,
+      "title": "Found Keys",
+      "description": "Set of keys found outside the library.",
+      "date": "2025-03-30",
+      "anon_listing": false,
+      "location": "City Library",
+      "category": "Miscellaneous",
+      "user": "Bob"
+    },
+    {
+      "id": 3,
+      "title": "Lost Phone",
+      "user": "Charlie"
+    },
+    {
+      "id": 4,
+      "title": "Missing Sunglasses",
+      "description": "Pair of Ray-Ban sunglasses lost at the downtown cafe.",
+      "date": "2025-04-05",
+      "anon_listing": false,
+      "location": "Downtown Cafe",
+      "category": "Accessories",
+      "user": "Diana"
+    },
+    {
+      "id": 5,
+      "title": "Found Backpack",
+      "date": "2025-04-03",
+      "location": "Train Station",
+      "user": "Eve"
+    },
+    {
+      "id": 6,
+      "title": "Lost Laptop",
+      "description": "Black laptop left on a bus. Might have sensitive data.",
+      "anon_listing": false,
+      "category": "Electronics",
+      "user": "Frank"
+    },
+    {
+      "id": 7,
+      "title": "Found Wallet",
+      "description": "Brown leather wallet found at City Park.",
+      "date": "2025-04-07",
+      "anon_listing": false,
+      "location": "City Park",
+      "user": "Grace"
+    }
+  ],
+
+  "reports": [
+    {
+      "id": "temp",
+      "post_id": "temp",
+      "report_text": "temp"
+    }
+  ]
 }
