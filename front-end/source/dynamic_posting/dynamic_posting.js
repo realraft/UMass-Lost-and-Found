@@ -38,18 +38,8 @@ async function render_posts() {
 
   // might need to change how we update this!!!!
   for (const post of json_data["posts"]) {
-    const targetDiv = document.querySelector("div.posts-container");
-
-    const new_post = document.querySelector("div.post").cloneNode(true);
-
-    new_post.id = post["id"];
-
     
-    // we need to change the ids of the stuff were generating for the boxes
 
-    targetDiv.appendChild(new_post);
-
-    // when we create a new div post we need to assign it a unique id thats in the server.
   }
 }
 
