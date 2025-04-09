@@ -10,42 +10,43 @@
   </head>
 
   <body>
-    <!-- Filters Section -->
-    <div class="sort-filter">
-      <div class="sort-by">
-        <h3>Sort By</h3>
-        <input type="radio" id="date-posted" name="sort" value="date-posted" />
-        <label for="date-posted">Date Posted</label><br />
-        <input type="radio" id="relevance" name="sort" value="relevance" />
-        <label for="relevance">Relevance</label>
-      </div>
-      <div class="filters">
-        <h3>Filters</h3>
-        <div class="filter-group">
-          <h4 class="filter-section-title">Location</h4>
-          <div class="filter-options" id="location-filters">
-            <!-- Location options will be populated dynamically -->
+    <!-- Page layout container -->
+    <div class="page-container">
+      <!-- Left Sidebar with Filters -->
+      <div class="sidebar">
+        <div class="sort-by">
+          <h3>Sort By</h3>
+          <input type="radio" id="date-posted" name="sort" value="date-posted" />
+          <label for="date-posted">Date Posted</label><br />
+          <input type="radio" id="relevance" name="sort" value="relevance" />
+          <label for="relevance">Relevance</label>
+        </div>
+        <div class="filters">
+          <h3>Filters</h3>
+          <div class="filter-group">
+            <h4 class="filter-section-title">Location</h4>
+            <div class="filter-options" id="location-filters">
+              <!-- Location options will be populated dynamically -->
+            </div>
+          </div>
+          <div class="filter-group">
+            <h4 class="filter-section-title">Tags</h4>
+            <div class="filter-options" id="tag-filters">
+              <!-- Tag options will be populated dynamically -->
+            </div>
           </div>
         </div>
-        <div class="filter-group">
-          <h4 class="filter-section-title">Tags</h4>
-          <div class="filter-options" id="tag-filters">
-            <!-- Tag options will be populated dynamically -->
-          </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="main-content">
+        <!-- Listings Section -->
+        <div class="listing-container">
+          <!-- Listings will be populated dynamically -->
         </div>
       </div>
     </div>
 
-    <!-- Listings Section -->
-    <div
-      class="listing-container"
-      style="
-        height: 400px;
-        overflow-y: scroll;
-        border: 1px solid #ccc;
-        padding: 10px;
-      "
-    ></div>
     <!-- Modal Overlay -->
     <div class="overlay" id="overlay"></div>
     <!-- Report Modal -->
