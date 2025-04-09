@@ -206,3 +206,7 @@ footer {
 .modal button:hover {
   background-color: #042a7d;
 }
+
+.listing.hidden {
+  display: none;
+}
