@@ -1,23 +1,26 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if we have a search query in the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchQuery = urlParams.get('search');
-    
-    if (searchQuery) {
-      // Set the relevance radio button
-      const relevanceRadio = document.getElementById('relevance');
-      if (relevanceRadio) {
-        relevanceRadio.checked = true;
-      }
-      
-      // Trigger search functionality
-      filterListingsByRelevance(searchQuery);
+  // Check if we have a search query in the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchQuery = urlParams.get('search');
+  
+  if (searchQuery) {
+    // Set the relevance radio button
+    const relevanceRadio = document.getElementById('relevance');
+    if (relevanceRadio) {
+      relevanceRadio.checked = true;
     }
     
-    // Listen for search events from navbar
-    document.addEventListener('search-query', function(e) {
-      filterListingsByRelevance(e.detail.query);
-    });
+    // Add a small delay to ensure the listings are loaded before filtering
+    setTimeout(() => {
+      // Trigger search functionality
+      filterListingsByRelevance(searchQuery);
+    }, 300);
+  }
+  
+  // Listen for search events from navbar
+  document.addEventListener('search-query', function(e) {
+    filterListingsByRelevance(e.detail.query);
+  });
 });
   
 function filterListingsByRelevance(query) {
