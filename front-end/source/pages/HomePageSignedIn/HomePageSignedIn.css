@@ -6,12 +6,6 @@ body {
   color: #333;
 }
 
-h1,
-h2,
-h3 {
-  color: #007bff;
-}
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -211,4 +205,8 @@ footer {
 
 .modal button:hover {
   background-color: #042a7d;
+}
+
+.listing.hidden {
+  display: none;
 }
