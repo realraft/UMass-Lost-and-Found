@@ -40,30 +40,57 @@ async function render_posts() {
   for (const post of json_data["posts"]) {
     const listings_container = document.querySelector("div.listing-container");
 
-    const new_post = document.querySelector("div.listing").cloneNode(true);
+    const new_post = document.createElement("div");
+    new_post.classList.add("listing");
 
     new_post.id = post["id"];
 
-    new_post.querySelector("h3.title").innerHTML = post["title"]
+    const h3_element = document.createElement("h3");
+    h3_element.classList.add("listing");
+    h3_element.innerHTML = post["title"]
       ? post["title"]
       : "Title: Not Supplied";
-    new_post.querySelector("p.date-found").innerHTML = post["date"]
+    new_post.appendChild(h3_element);
+
+    const p_element = document.createElement("p");
+    p_element.classList.add("date");
+    p_element.innerHTML = post["date"]
       ? "Date found: " + post["date"]
       : "Date: Not supplied";
+    new_post.appendChild(p_element);
 
-    new_post.querySelector("p.location").innerHTML = post["location"]
-      ? "Location: " + post["location"]
-      : "Location: Not supplied";
+    const p_element2 = document.createElement("p");
+    p_element2.classList.add("description");
 
-    new_post.querySelector("p.category").innerHTML = post["category"]
+    p_element2.innerHTML = post["description"]
+      ? "Description: " + post["description"]
+      : "Description: Not supplied";
+    new_post.appendChild(p_element2);
+
+    const p_element3 = document.createElement("p");
+    p_element3.classList.add("category");
+    p_element3.innerHTML = post["category"]
       ? "Category: " + post["category"]
       : "Category: Not supplied";
+    new_post.appendChild(p_element3);
 
-    new_post.querySelector("p.poster").innerHTML = post["anon_listing"]
+    const p_element4 = document.createElement("p");
+    p_element4.classList.add("poster");
+    p_element4.innerHTML = post["anon_listing"]
       ? "Poster: Anonymous"
       : "Poster:" + post["user"];
+    new_post.appendChild(p_element4);
 
-    new_post.querySelector("button.report-button").dataset.item = post["title"]; // need to fix functionality with report button ask nathan.
+    const button_element = document.createElement("button");
+    button_element.classList.add("report-button");
+
+    button_element.innerHTML = "Report Listing";
+    button_element.dataset.item = post["title"]; // need to fix functionality with report button ask nathan.
+    button_element.addEventListener("click", function () {
+      alert("Reporting: " + button_element.dataset.item);
+    });
+
+    new_post.appendChild(button_element);
 
     listings_container.appendChild(new_post);
   }
