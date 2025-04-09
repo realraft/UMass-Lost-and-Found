@@ -4,72 +4,85 @@ document.addEventListener("DOMContentLoaded", () => {
     const overlay = document.getElementById("overlay");
     const closeButton = document.querySelector(".close");
     const reportTitle = modal.querySelector("h2");
-    const reportForm = document.getElementById("reportForm"); // assuming there's a form element
-    const reasonInput = document.getElementById("reportReason"); // assuming a textarea/input for reason
-    let currentItem = null;
+    const reportForm = document.getElementById("reportForm");
+    const reportReasonInput = document.getElementById("reportReason");
 
-    // --- IndexedDB Setup ---
-    const dbRequest = indexedDB.open("LostAndFoundDB", 1);
+    const request = indexedDB.open("LostAndFoundDB", 1);
 
-    dbRequest.onupgradeneeded = (event) => {
+    request.onupgradeneeded = function(event) {
         const db = event.target.result;
         if (!db.objectStoreNames.contains("reports")) {
-            db.createObjectStore("reports", { keyPath: "id", autoIncrement: true });
+            db.createObjectStore("reports", { keyPath: "timestamp" });
         }
     };
 
-    let db;
-    dbRequest.onsuccess = (event) => {
-        db = event.target.result;
+    request.onerror = function() {
+        console.error("Error opening IndexedDB.");
     };
 
-    dbRequest.onerror = (event) => {
-        console.error("IndexedDB error:", event.target.errorCode);
-    };
+    reportForm.addEventListener("submit", (event) => {
+        event.preventDefault();
 
-    // --- Open Report Modal ---
+        const reportReason = reportReasonInput.value.trim();
+        const itemName = reportTitle.textContent.replace("Report ", "");
+
+        if (reportReason === "") {
+            alert("Please provide a reason for reporting.");
+            return;
+        }
+
+        const dbRequest = indexedDB.open("LostAndFoundDB", 1);
+
+        dbRequest.onsuccess = function(event) {
+            const db = event.target.result;
+            const transaction = db.transaction("reports", "readwrite");
+            const store = transaction.objectStore("reports");
+
+            const report = {
+                itemName: itemName,
+                reason: reportReason,
+                timestamp: new Date().toISOString()
+            };
+
+            const addRequest = store.add(report);
+
+            addRequest.onsuccess = function() {
+                console.log("Report saved successfully.");
+             
+                modal.style.display = "none";
+                overlay.style.display = "none";
+                reportReasonInput.value = ""; 
+            };
+
+            addRequest.onerror = function() {
+                console.error("Error saving report to IndexedDB.");
+            };
+        };
+
+        dbRequest.onerror = function() {
+            console.error("Error accessing IndexedDB.");
+        };
+    });
+
     reportButtons.forEach(button => {
         button.addEventListener("click", () => {
-            currentItem = button.getAttribute("data-item");
-            reportTitle.textContent = `Report ${currentItem}`;
+            const itemName = button.getAttribute("data-item");
+            reportTitle.textContent = `Report ${itemName}`;
             modal.style.display = "block";
             overlay.style.display = "block";
         });
     });
 
-    // --- Close Modal ---
-    const closeModal = () => {
+ 
+    closeButton.addEventListener("click", () => {
         modal.style.display = "none";
         overlay.style.display = "none";
-        reportForm.reset();
-    };
+        reportReasonInput.value = ""; // Reset input
+    });
 
-    closeButton.addEventListener("click", closeModal);
-    overlay.addEventListener("click", closeModal);
-
-    // --- Submit Report ---
-    reportForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const reason = reasonInput.value.trim();
-
-        if (db && currentItem && reason) {
-            const tx = db.transaction("reports", "readwrite");
-            const store = tx.objectStore("reports");
-            const report = {
-                item: currentItem,
-                reason: reason,
-                timestamp: new Date().toISOString()
-            };
-            store.add(report);
-
-            tx.oncomplete = () => {
-                alert("Report submitted.");
-                closeModal();
-            };
-
-            tx.onerror = () => {
-                console.error("Failed to submit report");
-            };
-        }
+    overlay.addEventListener("click", () => {
+        modal.style.display = "none";
+        overlay.style.display = "none";
+        reportReasonInput.value = ""; 
     });
 });
