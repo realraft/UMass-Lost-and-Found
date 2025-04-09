@@ -80,10 +80,14 @@ function setupSearch(pathPrefix) {
               detail: { query: searchQuery }
             });
             document.dispatchEvent(searchEvent);
+            
+            // Clear the search input after searching
+            searchInput.value = '';
           }
         } else {
           // Redirect to the home page with the search query as a parameter
           window.location.href = `${pathPrefix}pages/HomePageSignedIn/HomePageSignedIn.html?search=${encodeURIComponent(searchQuery)}`;
+          // No need to clear input here as page will be redirected
         }
       }
     });

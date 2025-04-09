@@ -7,6 +7,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Trigger search functionality
     initializeFilters();
     setupToggleButtons();
+
+    // Set date-posted as default and sort listings
+    const dateRadio = document.getElementById('date-posted');
+    if (dateRadio) {
+      dateRadio.checked = true;
+      sortListingsByDate();
+    }
   }, 300);
 
   if (searchQuery) {
@@ -19,13 +26,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add a small delay to ensure the listings are loaded before filtering
     setTimeout(() => {
       // Trigger search functionality
-      filterListingsByRelevance(searchQuery);
+      sortListingsByRelevance(searchQuery);
     }, 300);
   }
   
   // Listen for search events from navbar
   document.addEventListener('search-query', function(e) {
-    filterListingsByRelevance(e.detail.query);
+    sortListingsByRelevance(e.detail.query);
   });
 
   // Add event listeners for sort radio buttons
@@ -46,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const searchBox = document.querySelector('.search-box input');
         const query = searchBox ? searchBox.value : '';
         if (query.trim()) {
-          filterListingsByRelevance(query);
+          sortListingsByRelevance(query);
         }
       }
     });
@@ -281,13 +288,13 @@ function sortListingsByDate() {
   });
 }
   
-function filterListingsByRelevance(query) {
+function sortListingsByRelevance(query) {
   // Normalize the query
   query = query.toLowerCase();
   
   // Get all current listings from the container
   const listingContainer = document.querySelector('.listing-container');
-  
+
   // CHANGE: Instead of making all hidden listings visible, only work with visible listings
   // to maintain applied filters
   const listings = listingContainer.querySelectorAll('.listing:not(.hidden)');
@@ -329,12 +336,6 @@ function filterListingsByRelevance(query) {
   
   // Sort listings by relevance score (highest first)
   listingScores.sort((a, b) => b.score - a.score);
-  
-  // Remove any previous "no results" message
-  const existingNoResults = listingContainer.querySelector('.no-results');
-  if (existingNoResults) {
-    listingContainer.removeChild(existingNoResults);
-  }
   
   // Reorder listings based on score
   listingScores.forEach(item => {
