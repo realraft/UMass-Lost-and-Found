@@ -22,6 +22,34 @@ document.addEventListener('DOMContentLoaded', function() {
       link.rel = 'stylesheet';
       link.href = `${pathPrefix}components/navbar/navbar.css`;
       document.head.appendChild(link);
+      
+      // Add click event listener to dropdown button
+      setupDropdown();
     })
     .catch(error => console.error('Error loading navbar:', error));
 });
+
+function setupDropdown() {
+  const dropdownButton = document.querySelector('.dropdown-button');
+  const dropdownContent = document.querySelector('.dropdown-content');
+  
+  if (dropdownButton && dropdownContent) {
+    // Toggle dropdown when button is clicked
+    dropdownButton.addEventListener('click', function(e) {
+      e.stopPropagation();
+      dropdownContent.classList.toggle('show');
+    });
+    
+    // Close dropdown when clicking elsewhere
+    document.addEventListener('click', function() {
+      if (dropdownContent.classList.contains('show')) {
+        dropdownContent.classList.remove('show');
+      }
+    });
+    
+    // Prevent dropdown from closing when clicking inside it
+    dropdownContent.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+  }
+}
