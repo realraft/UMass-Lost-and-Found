@@ -52,8 +52,8 @@ async function render_posts() {
       : "Date: Not supplied";
 
     new_post.querySelector("p.location").innerHTML = post["location"]
-      ? "Location: " + post["location"]
-      : "Location: Not supplied";
+      ? "Location: " + post["location"] 
+      : "Location: Not supplied"; 
 
     new_post.querySelector("p.category").innerHTML = post["category"]
       ? "Category: " + post["category"]

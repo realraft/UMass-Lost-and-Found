@@ -6,10 +6,10 @@
           "description": "A silver watch was lost near the Central Park fountain.",
           "date": "2025-04-01",
           "anon_listing": true,
-          "location": "Central Park",
+          "location": "Central Park", 
           "category": "Accessories",
           "user": "Alice"
-        },
+        }, 
         {
           "id": 2,
           "title": "Found Keys",
@@ -20,12 +20,12 @@
           "category": "Miscellaneous",
           "user": "Bob" 
         },
-        {
+        {  
           "id": 3,
           "title": "Lost Phone",
           "user": "Charlie"
         },
-        {
+        { 
           "id": 4,
           "title": "Missing Sunglasses",
           "description": "Pair of Ray-Ban sunglasses lost at the downtown cafe.",
@@ -35,7 +35,7 @@
           "category": "Accessories",
           "user": "Diana"
         },
-        {
+        {  
           "id": 5,
           "title": "Found Backpack",
           "date": "2025-04-03",

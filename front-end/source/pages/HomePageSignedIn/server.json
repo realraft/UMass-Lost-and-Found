@@ -45,12 +45,12 @@
         {
           "id": 6,
           "title": "Lost Laptop",
-          "description": "Black laptop left on a bus. Might have sensitive data.",
+          "description": "Black laptop left on a bus. Might have sensitive data.", 
           "anon_listing": false,
           "category": "Electronics",
           "user": "Frank"
         },
-        {
+        { 
           "id": 7,
           "title": "Found Wallet",
           "description": "Brown leather wallet found at City Park.",

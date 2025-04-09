@@ -65,9 +65,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function closeModal() {
         // Hide modal and overlay
-        document.getElementById("postOverlay").style.display = "none";
+        document.getElementById("postOverlay").style.display = "none"; 
         document.getElementById("postModal").style.display = "none";
-    }
+    } 
 
     function handleDelete() {
         // Logic to delete post

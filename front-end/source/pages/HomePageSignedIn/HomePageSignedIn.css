@@ -103,7 +103,7 @@ a button {
 }  
 
 /* Modal Styles */
-.overlay {
+.overlay { 
     display: none;
     position: fixed;
     top: 0;
