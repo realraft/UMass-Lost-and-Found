@@ -5,62 +5,102 @@
       "title": "Lost Watch",
       "description": "A silver watch was lost near the Central Park fountain.",
       "date": "2025-04-01",
-      "anon_listing": true,
+      "anon": true,
       "location": "Central Park",
-      "category": "Accessories",
-      "user": "Alice"
+      "tags": ["Accessories"],
+      "user_id": 101
     },
     {
       "id": 2,
       "title": "Found Keys",
       "description": "Set of keys found outside the library.",
       "date": "2025-03-30",
-      "anon_listing": false,
+      "anon": false,
       "location": "City Library",
-      "category": "Miscellaneous",
-      "user": "Bob"
+      "tags": ["Miscellaneous"],
+      "user_id": 102
     },
     {
       "id": 3,
       "title": "Lost Phone",
-      "user": "Charlie"
+      "description": "",
+      "date": "2025-04-02",
+      "anon": false,
+      "location": "",
+      "tags": [],
+      "user_id": 103
     },
     {
       "id": 4,
       "title": "Missing Sunglasses",
       "description": "Pair of Ray-Ban sunglasses lost at the downtown cafe.",
       "date": "2025-04-05",
-      "anon_listing": false,
+      "anon": false,
       "location": "Downtown Cafe",
-      "category": "Accessories",
-      "user": "Diana"
+      "tags": ["Accessories"],
+      "user_id": 104
     },
     {
       "id": 5,
       "title": "Found Backpack",
+      "description": "",
       "date": "2025-04-03",
+      "anon": false,
       "location": "Train Station",
-      "user": "Eve"
+      "tags": [],
+      "user_id": 105
     },
     {
       "id": 6,
       "title": "Lost Laptop",
       "description": "Black laptop left on a bus. Might have sensitive data.",
-      "anon_listing": false,
-      "category": "Electronics",
-      "user": "Frank"
+      "date": "2025-04-04",
+      "anon": false,
+      "location": "",
+      "tags": ["Electronics"],
+      "user_id": 106
     },
     {
       "id": 7,
       "title": "Found Wallet",
       "description": "Brown leather wallet found at City Park.",
       "date": "2025-04-07",
-      "anon_listing": false,
+      "anon": false,
       "location": "City Park",
-      "user": "Grace"
+      "tags": [],
+      "user_id": 107
+    },
+    {
+      "id": 8,
+      "title": "Lost Headphones",
+      "description": "Wireless earbuds dropped on the subway platform.",
+      "date": "2025-04-06",
+      "anon": false,
+      "location": "Subway Station",
+      "tags": ["Electronics", "Audio"],
+      "user_id": 108
+    },
+    {
+      "id": 9,
+      "title": "Found Jacket",
+      "description": "Black North Face jacket found at the gym locker room.",
+      "date": "2025-04-08",
+      "anon": true,
+      "location": "Community Gym",
+      "tags": ["Clothing"],
+      "user_id": 109
+    },
+    {
+      "id": 10,
+      "title": "Lost Notebook",
+      "description": "A red spiral-bound notebook with physics notes.",
+      "date": "2025-04-05",
+      "anon": false,
+      "location": "University Campus",
+      "tags": ["Stationery"],
+      "user_id": 110
     }
   ],
-
   "reports": [
     {
       "id": "temp",
