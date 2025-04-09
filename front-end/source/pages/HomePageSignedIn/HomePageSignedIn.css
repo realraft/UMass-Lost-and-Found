@@ -100,7 +100,7 @@ a button {
     flex-direction: column; /* Stack buttons vertically */
     gap: 10px;
     justify-content: flex-end;
-}
+}  
 
 /* Modal Styles */
 .overlay {

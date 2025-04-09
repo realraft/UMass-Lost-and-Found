@@ -1,6 +1,6 @@
 // import fs from "fs";
 
-const FILE_PATH = "./source/Fake-Server/server.json";
+const FILE_PATH = "../../Fake-Server/server.json";
 
 /**
  * this function reads from server.json and returns a javascript object of the contents.
@@ -69,4 +69,4 @@ async function render_posts() {
   }
 }
 
-render_posts();
+render_posts();   

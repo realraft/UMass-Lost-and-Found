@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Fetch posts from server and store in IndexedDB
         fetchPostsAndStore(db);
-
+ 
         // Render posts from IndexedDB after fetching
         renderPostsFromIndexedDB(db);
     };

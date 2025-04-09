@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const db = event.target.result;
         if (!db.objectStoreNames.contains("reports")) {
             db.createObjectStore("reports", { keyPath: "timestamp" });
-        }
+        } 
     };
 
     request.onerror = function() {
