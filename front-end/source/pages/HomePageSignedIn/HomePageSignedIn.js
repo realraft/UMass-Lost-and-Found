@@ -28,7 +28,6 @@ function filterListingsByRelevance(query) {
     const listingContainer = document.querySelector('.listing-container');
     
     // First, make all listings visible if they were hidden by a previous filter
-    // This ensures we search through all available listings
     const hiddenListings = document.querySelectorAll('.listing.hidden');
     hiddenListings.forEach(listing => {
       listing.classList.remove('hidden');
@@ -36,6 +35,16 @@ function filterListingsByRelevance(query) {
     
     // Now get the full set of visible listings
     const listings = listingContainer.querySelectorAll('.listing');
+    
+    // If no query, just show all listings in original order and return
+    if (!query.trim()) {
+      // Remove any previous "no results" message
+      const existingNoResults = listingContainer.querySelector('.no-results');
+      if (existingNoResults) {
+        listingContainer.removeChild(existingNoResults);
+      }
+      return;
+    }
     
     // Calculate relevance score for each listing
     const listingScores = [];
@@ -58,31 +67,15 @@ function filterListingsByRelevance(query) {
     // Sort listings by relevance score (highest first)
     listingScores.sort((a, b) => b.score - a.score);
     
-    // Hide all listings first
-    listings.forEach(listing => {
-      listing.classList.add('hidden');
-    });
-    
     // Remove any previous "no results" message
     const existingNoResults = listingContainer.querySelector('.no-results');
     if (existingNoResults) {
       listingContainer.removeChild(existingNoResults);
     }
     
-    // Show only relevant listings
+    // Reorder listings based on score
     listingScores.forEach(item => {
-      // Only show listings with some relevance
-      if (item.score > 0) {
-        item.listing.classList.remove('hidden');
-      }
+      // Append each listing to move it to the end in sorted order
+      listingContainer.appendChild(item.listing);
     });
-    
-    // If no results found, show a message
-    const visibleListings = listingContainer.querySelectorAll('.listing:not(.hidden)');
-    if (visibleListings.length === 0) {
-      const noResults = document.createElement('div');
-      noResults.classList.add('no-results');
-      noResults.textContent = `No results found for "${query}"`;
-      listingContainer.appendChild(noResults);
-    }
 }
