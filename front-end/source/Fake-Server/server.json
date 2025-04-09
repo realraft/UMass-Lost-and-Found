@@ -1,71 +1,86 @@
 {
   "posts": [
-    {
-      "id": 1,
-      "title": "Lost Watch",
-      "description": "A silver watch was lost near the Central Park fountain.",
-      "date": "2025-04-01",
-      "anon_listing": true,
-      "location": "Central Park",
-      "category": "Accessories",
-      "user": "Alice"
-    },
-    {
-      "id": 2,
-      "title": "Found Keys",
-      "description": "Set of keys found outside the library.",
-      "date": "2025-03-30",
-      "anon_listing": false,
-      "location": "City Library",
-      "category": "Miscellaneous",
-      "user": "Bob"
-    },
-    {
-      "id": 3,
-      "title": "Lost Phone",
-      "user": "Charlie"
-    },
-    {
-      "id": 4,
-      "title": "Missing Sunglasses",
-      "description": "Pair of Ray-Ban sunglasses lost at the downtown cafe.",
-      "date": "2025-04-05",
-      "anon_listing": false,
-      "location": "Downtown Cafe",
-      "category": "Accessories",
-      "user": "Diana"
-    },
-    {
-      "id": 5,
-      "title": "Found Backpack",
-      "date": "2025-04-03",
-      "location": "Train Station",
-      "user": "Eve"
-    },
-    {
-      "id": 6,
-      "title": "Lost Laptop",
-      "description": "Black laptop left on a bus. Might have sensitive data.",
-      "anon_listing": false,
-      "category": "Electronics",
-      "user": "Frank"
-    },
-    {
-      "id": 7,
-      "title": "Found Wallet",
-      "description": "Brown leather wallet found at City Park.",
-      "date": "2025-04-07",
-      "anon_listing": false,
-      "location": "City Park",
-      "user": "Grace"
-    }
+      {
+          "id": 1,
+          "title": "Lost Watch",
+          "description": "A silver watch was lost near the Central Park fountain.",
+          "date": "2025-04-01",
+          "anon_listing": true,
+          "location": "Central Park",
+          "category": "Accessories",
+          "user": "Alice"
+      },
+      {
+          "id": 2,
+          "title": "Found Keys",
+          "description": "Set of keys found outside the library.",
+          "date": "2025-03-30",
+          "anon_listing": false,
+          "location": "City Library",
+          "category": "Miscellaneous",
+          "user": "Bob"
+      },
+      {
+          "id": 3,
+          "title": "Lost Phone",
+          "description": "A lost phone, details unknown.",
+          "date": "2025-04-02",
+          "anon_listing": true,
+          "location": "Unknown",
+          "category": "Electronics",
+          "user": "Charlie"
+      },
+      {
+          "id": 4,
+          "title": "Missing Sunglasses",
+          "description": "Pair of Ray-Ban sunglasses lost at the downtown cafe.",
+          "date": "2025-04-05",
+          "anon_listing": false,
+          "location": "Downtown Cafe",
+          "category": "Accessories",
+          "user": "Diana"
+      },
+      {
+          "id": 5,
+          "title": "Found Backpack",
+          "description": "A found backpack, details unknown.",
+          "date": "2025-04-03",
+          "anon_listing": true,
+          "location": "Train Station",
+          "category": "Miscellaneous",
+          "user": "Eve"
+      },
+      {
+          "id": 6,
+          "title": "Lost Laptop",
+          "description": "Black laptop left on a bus. Might have sensitive data.",
+          "date": "2025-04-04",
+          "anon_listing": false,
+          "location": "Bus Station",
+          "category": "Electronics",
+          "user": "Frank"
+      },
+      {
+          "id": 7,
+          "title": "Found Wallet",
+          "description": "Brown leather wallet found at City Park.",
+          "date": "2025-04-07",
+          "anon_listing": false,
+          "location": "City Park",
+          "category": "Accessories",
+          "user": "Grace"
+      }
   ],
-
   "reports": [
-    {
-      "id": "temp",
-      "post_id": "temp",
-      "report_text": "temp"
-    }
+      { "id": "1", "post_id": "1", "report_text": "Report for Post 1" },
+      { "id": "2", "post_id": "2", "report_text": "Report for Post 2" },
+      { "id": "3", "post_id": "3", "report_text": "Report for Post 3" },
+      { "id": "4", "post_id": "4", "report_text": "Report for Post 4" },
+      { "id": "5", "post_id": "5", "report_text": "Report for Post 5" },
+      { "id": "6", "post_id": "6", "report_text": "Report for Post 6" },
+      { "id": "7", "post_id": "7", "report_text": "Report for Post 7" },
+      { "id": "8", "post_id": "8", "report_text": "Report for Post 8" },
+      { "id": "9", "post_id": "9", "report_text": "Report for Post 9" },
+      { "id": "10", "post_id": "10", "report_text": "Report for Post 10" }
   ]
 }

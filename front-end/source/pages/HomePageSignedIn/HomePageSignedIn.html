@@ -1,84 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>UMass Lost And Found</title>
-    <link rel="stylesheet" href="HomePageSignedIn.css" />
-  </head>
 
-  <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMass Lost And Found</title>
+    <link rel="stylesheet" href="HomePageSignedIn.css">
+</head>
+
+<body>
+
     <!-- Navigation Buttons -->
     <div class="button-container">
-      <a href="frontpage.html">
-        <button>Back to Home Page</button>
-      </a>
-      <button>Post</button>
+        <a href="frontpage.html">
+            <button>Back to Home Page</button>
+        </a>
+        <button>Post</button>
+        <button id="adminButton">Administrator</button>
     </div>
 
     <!-- Summary Section -->
     <div class="summary">
-      <h2>UMass Lost and Found. Find and report lost items here.</h2>
+        <h2>UMass Lost and Found. Find and report lost items here.</h2>
     </div>
 
     <!-- Filters Section -->
     <div class="sort-filter">
-      <div class="sort-by">
-        <h3>Sort By</h3>
-        <input type="radio" id="date-posted" name="sort" value="date-posted" />
-        <label for="date-posted">Date Posted</label><br />
-        <input type="radio" id="relevance" name="sort" value="relevance" />
-        <label for="relevance">Relevance</label>
-      </div>
-      <div class="filters">
-        <h3>Filters</h3>
-        <label>
-          <input type="checkbox" name="filter" value="location" checked />
-          Location </label
-        ><br />
-        <label>
-          <input type="checkbox" name="filter" value="time-date" checked />
-          Time/Date </label
-        ><br />
-        <label>
-          <input type="checkbox" name="filter" value="tags" checked />
-          Tags
-        </label>
-      </div>
+        <div class="sort-by">
+            <h3>Sort By</h3>
+            <input type="radio" id="date-posted" name="sort" value="date-posted">
+            <label for="date-posted">Date Posted</label><br>
+            <input type="radio" id="relevance" name="sort" value="relevance">
+            <label for="relevance">Relevance</label>
+        </div>
+        <div class="filters">
+            <h3>Filters</h3>
+            <label>
+                <input type="checkbox" name="filter" value="location" checked>
+                Location
+            </label><br>
+            <label>
+                <input type="checkbox" name="filter" value="time-date" checked>
+                Time/Date
+            </label><br>
+            <label>
+                <input type="checkbox" name="filter" value="tags" checked>
+                Tags
+            </label>
+        </div>
     </div>
 
     <!-- Listings Section -->
-    <div
-      class="listing-container"
-      style="
-        height: 400px;
-        overflow-y: scroll;
-        border: 1px solid #ccc;
-        padding: 10px;
-      "
-    >
-      <!-- Listing 1 -->
-      <div class="listing" id="1">
-        <h3 class="title">Lost Computer</h3>
-        <img src="placeholder1.png" alt="Lost Item 1 Image" />
-        <p class="date-found">Date Found: March 15, 2025</p>
-        <p class="location">Location: Library</p>
-        <p class="category">Category: Electronics</p>
-        <p class="poster">Poster: Anonymous</p>
-        <button class="report-button" data-item="Lost Computer">Report</button>
-      </div>
-    </div>
-    <!-- Modal Overlay -->
-    <div class="overlay" id="overlay"></div>
-    <!-- Report Modal -->
-    <div class="modal" id="reportModal">
-      <span class="close">&times;</span>
-      <h2 id="reportTitle">Report XYZ</h2>
-      <textarea placeholder="Write reason for reporting here"></textarea>
-      <button id="submitReport">Submit</button>
+    <div class="listing-container" id="homePosts">
+
     </div>
 
-    <script src="../../dynamic_posting/dynamic_posting.js"></script>
-    <script src="ReportWindow.js"></script>
-  </body>
+    <!-- Modal Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Report</h2> 
+            <form id="reportForm">
+                <label for="reportReason">Reason for reporting:</label>
+                <textarea id="reportReason" required></textarea>
+                <button type="submit">Submit Report</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="HomePageSignedIn.js"></script>
+    <script>
+        
+        document.getElementById("adminButton").addEventListener("click", function () {
+            window.location.href = "Administrator.html";
+        });
+
+        
+        fetch('server.json')
+            .then(response => response.json())
+            .then(data => {
+                const homePosts = document.getElementById('homePosts');
+                homePosts.innerHTML = '';
+                data.posts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.className = 'post';
+                    postElement.innerHTML = `
+                        <h2>${post.title}</h2>
+                        <p>${post.description}</p>
+                        <p><strong>Date:</strong> ${post.date}</p>
+                        <p><strong>Tags:</strong> ${post.tags.join(', ')}</p>
+                        <p><em>Listing:</em> ${post.anon_listing}</p>
+                    `;
+                    homePosts.appendChild(postElement);
+                });
+            })
+            .catch(error => {
+                const homePosts = document.getElementById('homePosts');
+                homePosts.innerHTML = `<p style="color:red;">Error fetching posts: ${error.message}</p>`;
+            });
+    </script>
+</body>
+   
 </html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator Panel - UMass Lost and Found</title>
+    <link rel="stylesheet" href="HomePageSignedIn.css">
+</head>
+<body>
+
+    <!-- Navigation Buttons -->
+    <div class="button-container">
+        <a href="HomePageSignedIn.html">
+            <button>Back to User View</button>
+        </a>
+    </div>
+
+    <!-- Admin Header -->
+    <div class="summary">
+        <h2>Administrator Page. Review reported posts for deletion.</h2>
+    </div>
+
+    <!-- Sorting Options -->
+    <div class="sort-options">
+        <label>
+            <input type="radio" name="sort" value="newest" checked> Newest First
+        </label>
+        <label>
+            <input type="radio" name="sort" value="oldest"> Oldest First
+        </label>
+    </div>
+
+    <!-- Reported Listings Section --> 
+    <div class="listing-container" id="adminReports" style="height: 400px; overflow-y: auto;">
+        <!-- Posts will be dynamically rendered here -->
+    </div>
+
+    <!-- Modal for Post Details -->
+    <div class="overlay" id="postOverlay" style="display: none;"></div>
+    <div class="modal" id="postModal" style="display: none;">
+        <span class="close" onclick="closeModal()">×</span>
+        <h3 id="modalTitle">Post Title</h3>
+        <p id="modalReason">Reason for report: Inappropriate content</p>
+        <p id="modalTimestamp">Date reported: 2025-04-07</p>
+        <div class="admin-buttons">
+            <button class="delete-button" onclick="handleDelete()">Delete</button>
+            <button class="keep-button" onclick="handleKeep()">Keep</button>
+        </div>
+    </div>
+
+    <script src="Administrator.js"></script> 
+</body>
+</html> 
