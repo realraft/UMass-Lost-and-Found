@@ -116,13 +116,6 @@ input[type="radio"] {
   margin: 5px 0;
 }
 
-.listing span {
-  display: block;
-  text-align: right;
-  color: #007bff;
-  cursor: pointer;
-}
-
 footer {
   background-color: #343a40;
   color: #fff;
@@ -209,4 +202,39 @@ footer {
 
 .listing.hidden {
   display: none;
+}
+
+.filter-group {
+  margin-bottom: 15px;
+}
+
+.filter-section-title {
+  margin: 0 0 8px 0;
+  font-weight: bold;
+  color: #333;
+}
+
+.filter-options {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.filter-option {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.filter-option label {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.filter-option input {
+  margin-right: 6px;
 }

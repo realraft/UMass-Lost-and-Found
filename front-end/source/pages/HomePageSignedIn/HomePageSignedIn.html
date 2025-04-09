@@ -21,18 +21,18 @@
       </div>
       <div class="filters">
         <h3>Filters</h3>
-        <label>
-          <input type="checkbox" name="filter" value="location" checked />
-          Location </label
-        ><br />
-        <label>
-          <input type="checkbox" name="filter" value="time-date" checked />
-          Time/Date </label
-        ><br />
-        <label>
-          <input type="checkbox" name="filter" value="tags" checked />
-          Tags
-        </label>
+        <div class="filter-group">
+          <h4 class="filter-section-title">Location</h4>
+          <div class="filter-options" id="location-filters">
+            <!-- Location options will be populated dynamically -->
+          </div>
+        </div>
+        <div class="filter-group">
+          <h4 class="filter-section-title">Tags</h4>
+          <div class="filter-options" id="tag-filters">
+            <!-- Tag options will be populated dynamically -->
+          </div>
+        </div>
       </div>
     </div>
 

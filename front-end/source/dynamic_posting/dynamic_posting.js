@@ -33,6 +33,8 @@ async function fetch_server_data() {
  * this function reads from server.json and dynamically generates posts to our posting page.
  * @returns {void}
  */
+// ...existing code...
+
 async function render_posts() {
   const json_data = await fetch_server_data();
 
@@ -42,58 +44,68 @@ async function render_posts() {
 
     const new_post = document.createElement("div");
     new_post.classList.add("listing");
-
     new_post.id = post["id"];
 
-    const h3_element = document.createElement("h3");
-    h3_element.classList.add("title");
-    h3_element.innerHTML = post["title"]
-      ? post["title"]
-      : "Title: Not Supplied";
-    new_post.appendChild(h3_element);
+    // Title
+    const title_wrapper = document.createElement("h3");
+    const title_value = document.createElement("span");
+    title_value.classList.add("title");
+    title_value.textContent = post["title"] || "Not Supplied";
+    title_wrapper.appendChild(title_value);
+    new_post.appendChild(title_wrapper);
 
-    const p_element = document.createElement("p");
-    p_element.classList.add("date");
-    p_element.innerHTML = post["date"]
-      ? "Date found: " + post["date"]
-      : "Date: Not supplied";
-    new_post.appendChild(p_element);
+    // Date
+    const date_wrapper = document.createElement("p");
+    const date_value = document.createElement("span");
+    date_value.classList.add("date");
+    date_value.textContent = post["date"] || "Not supplied";
+    date_wrapper.textContent = "Date found: ";
+    date_wrapper.appendChild(date_value);
+    new_post.appendChild(date_wrapper);
 
-    const p_element2 = document.createElement("p");
-    p_element2.classList.add("description");
+    // Description
+    const desc_wrapper = document.createElement("p");
+    const desc_value = document.createElement("span");
+    desc_value.classList.add("description");
+    desc_value.textContent = post["description"] || "Not supplied";
+    desc_wrapper.textContent = "Description: ";
+    desc_wrapper.appendChild(desc_value);
+    new_post.appendChild(desc_wrapper);
 
-    p_element2.innerHTML = post["description"]
-      ? "Description: " + post["description"]
-      : "Description: Not supplied";
-    new_post.appendChild(p_element2);
+    // Tags
+    const tags_wrapper = document.createElement("p");
+    const tags_value = document.createElement("span");
+    tags_value.classList.add("tags");
+    tags_value.textContent = post["tags"] && post["tags"].length > 0
+      ? post["tags"].join(", ")
+      : "Not supplied";
+    tags_wrapper.textContent = "Tags: ";
+    tags_wrapper.appendChild(tags_value);
+    new_post.appendChild(tags_wrapper);
 
-    const p_element3 = document.createElement("p");
-    p_element3.classList.add("tags");
-    p_element3.innerHTML = post["tags"] && post["tags"].length > 0
-      ? "Tags: " + post["tags"].join(", ")
-      : "Tags: Not supplied";
-    new_post.appendChild(p_element3);
+    // Location
+    const location_wrapper = document.createElement("p");
+    const location_value = document.createElement("span");
+    location_value.classList.add("location");
+    location_value.textContent = post["location"] || "Not supplied";
+    location_wrapper.textContent = "Location: ";
+    location_wrapper.appendChild(location_value);
+    new_post.appendChild(location_wrapper);
 
-    const p_element4 = document.createElement("p");
-    p_element4.classList.add("location");
-    p_element4.innerHTML = post["location"] && post["location"] !== ""
-      ? "Location: " + post["location"]
-      : "Location: Not supplied";
-    new_post.appendChild(p_element4);
-
+    // Report button
     const button_element = document.createElement("button");
     button_element.classList.add("report-button");
-
     button_element.innerHTML = "Report Listing";
-    button_element.dataset.item = post["title"]; // need to fix functionality with report button ask nathan.
+    button_element.dataset.item = post["title"];
     button_element.addEventListener("click", function () {
       alert("Reporting: " + button_element.dataset.item);
     });
-
     new_post.appendChild(button_element);
 
     listings_container.appendChild(new_post);
   }
 }
+
+// ...existing code...
 
 render_posts();
