@@ -68,17 +68,17 @@ async function render_posts() {
     new_post.appendChild(p_element2);
 
     const p_element3 = document.createElement("p");
-    p_element3.classList.add("category");
-    p_element3.innerHTML = post["category"]
-      ? "Category: " + post["category"]
-      : "Category: Not supplied";
+    p_element3.classList.add("tags");
+    p_element3.innerHTML = post["tags"] && post["tags"].length > 0
+      ? "Tags: " + post["tags"].join(", ")
+      : "Tags: Not supplied";
     new_post.appendChild(p_element3);
 
     const p_element4 = document.createElement("p");
-    p_element4.classList.add("poster");
-    p_element4.innerHTML = post["anon_listing"]
-      ? "Poster: Anonymous"
-      : "Poster:" + post["user"];
+    p_element4.classList.add("location");
+    p_element4.innerHTML = post["location"] && post["location"] !== ""
+      ? "Location: " + post["location"]
+      : "Location: Not supplied";
     new_post.appendChild(p_element4);
 
     const button_element = document.createElement("button");
