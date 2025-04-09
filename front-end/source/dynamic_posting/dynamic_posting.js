@@ -46,7 +46,7 @@ async function render_posts() {
     new_post.id = post["id"];
 
     const h3_element = document.createElement("h3");
-    h3_element.classList.add("listing");
+    h3_element.classList.add("title");
     h3_element.innerHTML = post["title"]
       ? post["title"]
       : "Title: Not Supplied";

@@ -53,9 +53,15 @@ function filterListingsByRelevance(query) {
     const listingScores = [];
     
     listings.forEach(listing => {
-      const title = listing.querySelector('.title').textContent.toLowerCase();
-      const category = listing.querySelector('.category').textContent.toLowerCase();
-      const location = listing.querySelector('.location').textContent.toLowerCase();
+      const titleElement = listing.querySelector('.title');
+      const categoryElement = listing.querySelector('.category');
+      const locationElement = listing.querySelector('.location');
+      const descriptionElement = listing.querySelector('.description');
+      
+      const title = titleElement ? titleElement.textContent.toLowerCase() : '';
+      const category = categoryElement ? categoryElement.textContent.toLowerCase() : '';
+      const location = locationElement ? locationElement.textContent.toLowerCase() : '';
+      const description = descriptionElement ? descriptionElement.textContent.toLowerCase() : '';
       
       // Simple relevance scoring (can be enhanced for better matching)
       let score = 0;
@@ -63,6 +69,7 @@ function filterListingsByRelevance(query) {
       if (title.includes(query)) score += 3;  // Title match is most important
       if (category.includes(query)) score += 2;
       if (location.includes(query)) score += 2;
+      if (description.includes(query)) score += 1;
       
       listingScores.push({ listing, score });
     });
