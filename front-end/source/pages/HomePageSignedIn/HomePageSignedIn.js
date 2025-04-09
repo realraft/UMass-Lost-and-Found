@@ -21,7 +21,61 @@ document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('search-query', function(e) {
     filterListingsByRelevance(e.detail.query);
   });
+
+  // Add event listeners for sort radio buttons
+  const dateRadio = document.getElementById('date-posted');
+  const relevanceRadio = document.getElementById('relevance');
+  
+  if (dateRadio) {
+    dateRadio.addEventListener('change', function() {
+      if (this.checked) {
+        sortListingsByDate();
+      }
+    });
+  }
+  
+  if (relevanceRadio) {
+    relevanceRadio.addEventListener('change', function() {
+      if (this.checked) {
+        const searchBox = document.querySelector('.search-box input');
+        const query = searchBox ? searchBox.value : '';
+        if (query.trim()) {
+          filterListingsByRelevance(query);
+        }
+      }
+    });
+  }
 });
+
+// Function to sort listings by date
+function sortListingsByDate() {
+  const listingContainer = document.querySelector('.listing-container');
+  const listings = Array.from(listingContainer.querySelectorAll('.listing:not(.hidden)'));
+  
+  // Remove any previous "no results" message
+  const existingNoResults = listingContainer.querySelector('.no-results');
+  if (existingNoResults) {
+    listingContainer.removeChild(existingNoResults);
+  }
+  
+  // Sort listings by date
+  listings.sort((a, b) => {
+    // Extract dates from the listings
+    // We're assuming each listing has a date element or data attribute
+    const dateA = new Date(a.querySelector('.date')?.textContent || 
+                          a.getAttribute('data-date') || 0);
+    const dateB = new Date(b.querySelector('.date')?.textContent ||
+                          b.getAttribute('data-date') || 0);
+    
+    // Sort in descending order (newest first)
+    return dateB - dateA;
+  });
+  
+  // Reorder listings in the DOM
+  listings.forEach(listing => {
+    listingContainer.appendChild(listing);
+  });
+}
   
 function filterListingsByRelevance(query) {
     // Normalize the query
