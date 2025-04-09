@@ -26,8 +26,8 @@
       "description": "",
       "date": "2025-04-02",
       "anon": false,
-      "location": "",
-      "tags": [],
+      "location": "Train Station",
+      "tags": ["Electronics"],
       "user_id": 103
     },
     {
@@ -47,7 +47,7 @@
       "date": "2025-04-03",
       "anon": false,
       "location": "Train Station",
-      "tags": [],
+      "tags": ["Accessories"],
       "user_id": 105
     },
     {
@@ -56,7 +56,7 @@
       "description": "Black laptop left on a bus. Might have sensitive data.",
       "date": "2025-04-04",
       "anon": false,
-      "location": "",
+      "location": "Bus Stop",
       "tags": ["Electronics"],
       "user_id": 106
     },
@@ -67,7 +67,7 @@
       "date": "2025-04-07",
       "anon": false,
       "location": "City Park",
-      "tags": [],
+      "tags": ["Accessories"],
       "user_id": 107
     },
     {

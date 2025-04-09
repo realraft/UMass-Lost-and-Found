@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(() => {
     // Trigger search functionality
     initializeFilters();
+    setupToggleButtons();
   }, 300);
 
   if (searchQuery) {
@@ -52,6 +53,40 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// Function to set up toggle filter buttons
+function setupToggleButtons() {
+  document.getElementById('toggle-location-filters').addEventListener('click', function() {
+    toggleFilters('location-filters');
+  });
+  
+  document.getElementById('toggle-tag-filters').addEventListener('click', function() {
+    toggleFilters('tag-filters');
+  });
+}
+
+// Function to toggle all filters in a specific section
+function toggleFilters(filterId) {
+  const checkboxes = document.querySelectorAll(`#${filterId} input[type="checkbox"]`);
+  
+  // Count how many checkboxes are checked
+  const checkedCount = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;
+  
+  // If all or some are checked, uncheck all. Otherwise, check all.
+  const shouldCheck = checkedCount === 0; // If none are checked, we should check all
+  
+  // Apply the appropriate state to all checkboxes
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = shouldCheck;
+  });
+  
+  // Apply the filters with the new checkbox state
+  applyFilters();
+  
+  // Update button text based on new state
+  const buttonText = shouldCheck ? "Deselect All" : "Select All";
+  document.getElementById(`toggle-${filterId}`).textContent = buttonText;
+}
+
 // Function to initialize filters
 async function initializeFilters() {
   try {
@@ -89,9 +124,23 @@ async function initializeFilters() {
     filterCheckboxes.forEach(checkbox => {
       checkbox.addEventListener('change', applyFilters);
     });
+
+    // Initialize toggle button text based on initial checkbox state
+    updateToggleButtonText('location-filters');
+    updateToggleButtonText('tag-filters');
   } catch (error) {
     console.error('Error fetching filter data:', error);
   }
+}
+
+// Function to update toggle button text based on checkbox state
+function updateToggleButtonText(filterId) {
+  const checkboxes = document.querySelectorAll(`#${filterId} input[type="checkbox"]`);
+  const checkedCount = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;
+  const allChecked = checkedCount === checkboxes.length;
+  
+  const buttonText = allChecked ? "Deselect All" : "Select All";
+  document.getElementById(`toggle-${filterId}`).textContent = buttonText;
 }
 
 // Function to populate filter options
@@ -122,12 +171,14 @@ function populateFilterOptions(containerId, options) {
 function applyFilters() {
   const listings = document.querySelectorAll('.listing');
   
-  // Get selected locations
+  // Get all location checkboxes and selected locations
+  const locationCheckboxes = document.querySelectorAll('#location-filters .filter-option input[type="checkbox"]');
   const selectedLocations = Array.from(
     document.querySelectorAll('#location-filters .filter-option input:checked')
   ).map(input => input.value);
   
-  // Get selected tags
+  // Get all tag checkboxes and selected tags
+  const tagCheckboxes = document.querySelectorAll('#tag-filters .filter-option input[type="checkbox"]');
   const selectedTags = Array.from(
     document.querySelectorAll('#tag-filters .filter-option input:checked')
   ).map(input => input.value);
@@ -136,8 +187,12 @@ function applyFilters() {
   listings.forEach(listing => {
     let showListing = true;
     
-    // Check location filter
-    if (selectedLocations.length > 0) {
+    // If we have location checkboxes but none are selected, hide all listings
+    if (locationCheckboxes.length > 0 && selectedLocations.length === 0) {
+      showListing = false;
+    }
+    // Otherwise check location filter normally
+    else if (selectedLocations.length > 0) {
       const locationElement = listing.querySelector('.location');
       const listingLocation = locationElement ? locationElement.textContent.trim() : '';
       if (!selectedLocations.includes(listingLocation)) {
@@ -145,8 +200,12 @@ function applyFilters() {
       }
     }
     
-    // Check tag filter
-    if (selectedTags.length > 0 && showListing) {
+    // If we have tag checkboxes but none are selected, hide all listings
+    if (tagCheckboxes.length > 0 && selectedTags.length === 0 && showListing) {
+      showListing = false;
+    }
+    // Otherwise check tag filter normally
+    else if (selectedTags.length > 0 && showListing) {
       const tagsElement = listing.querySelector('.tags');
       if (tagsElement) {
         const tagsText = tagsElement.textContent.trim();

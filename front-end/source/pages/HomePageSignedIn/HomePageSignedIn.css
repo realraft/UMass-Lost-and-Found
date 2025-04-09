@@ -271,3 +271,24 @@ footer {
   margin-bottom: 0;
   box-shadow: none;
 }
+
+.filter-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.toggle-filter {
+  font-size: 12px;
+  padding: 4px 8px;
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.toggle-filter:hover {
+  background-color: #e0e0e0;
+}
