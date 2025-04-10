@@ -9,13 +9,15 @@
 </head>
 <body>
     <h1>Umass Lost and Found</h1>
-    <div class="container">
-        <div class="posts-sidebar">
-            <div class="PostNameElement">
-                <h2>Post Name</h2>
+    <div class="messaging-page">
+        <div class="posts-container">
+            <div class="post-messages">
+                <button class="post">Post 1</button>
+                <button class="post-button">Post Messages</button>
             </div>
-            <div class="PostNameElement">
-                <h2>Post Name</h2>
+            <div class="post-messages">
+                <button class="post">Post 2</button>
+                <button class="post-button">Post Messages</button>
             </div>
         </div>        
         <div class="message-container">
@@ -31,15 +33,16 @@
                 <div class="myMessage">
                     <h3>Where can I see you to give it back</h3>
                 </div>
-
             </div>
-            <div>    
+            <form id="messageForm">
+                <div>
                     <label for="newMessage">Message: </label>
-                    <input id="newMessage" type="text">
-                    <input type="submit" value="send">
-            
-            </div>  
+                    <input id="newMessage" type="text" />
+                    <input id="send" type="submit" value="=>" />
+                </div>
+            </form>
         </div>
     </div>
+    <script type="module", src="MessagingPage/MessagingPage.js"></script>
 </body>
 </html>
