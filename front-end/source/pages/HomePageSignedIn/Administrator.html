@@ -51,8 +51,20 @@
       <!-- Dynamically populated posts will appear here -->
     </div>
 
+    <!-- Edit/Delete Modal (Hidden initially) -->
+    <div id="overlay" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);">
+      <div id="editDeleteModal" style="background: white; padding: 20px; width: 300px; margin: 100px auto; border-radius: 10px;">
+        <h3 id="editDeleteTitle">Edit/Delete Post</h3>
+        <label for="editReason">Edit Reason:</label><br>
+        <textarea id="editReason" rows="4" style="width: 100%;"></textarea><br>
+        <button id="saveChangesButton">Save Changes</button>
+        <button id="deleteReportButton">Delete Report</button>
+        <button onclick="closeModal()">Close</button>
+      </div>
+    </div>
+
     <!-- External Scripts -->
     <script src="../../dynamic_posting/dynamic_posting.js"></script>
-    <script src="AdminPanel.js"></script>
+    <script src="Administrator.js"></script> <!-- Replaced AdminPanel.js with Administrator.js -->
   </body>
 </html>
