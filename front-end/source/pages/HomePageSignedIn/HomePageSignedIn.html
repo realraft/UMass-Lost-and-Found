@@ -14,6 +14,14 @@
     <div class="page-container">
       <!-- Left Sidebar with Filters -->
       <div class="sidebar">
+    
+        <div class="admin-button">
+          <a href="Administrator.html">
+            <button>Administrator</button>
+          </a>
+        </div>
+        
+      
         <div class="sort-by">
           <h3>Sort By</h3>
           <input type="radio" id="date-posted" name="sort" value="date-posted" />
@@ -31,6 +39,7 @@
             <div class="filter-options" id="location-filters">
               <!-- Location options will be populated dynamically -->
             </div>
+            
           </div>
           <div class="filter-group">
             <h4 class="filter-section-title">Tags</h4>
@@ -53,16 +62,15 @@
       </div>
     </div>
 
-    <!-- Modal Overlay -->
-    <div class="overlay" id="overlay"></div>
-    <!-- Report Modal -->
-    <div class="modal" id="reportModal">
-      <span class="close">&times;</span>
-      <h2 id="reportTitle">Report XYZ</h2>
-      <textarea placeholder="Write reason for reporting here"></textarea>
-      <button id="submitReport">Submit</button>
-    </div>
+<!-- Overlay and Modal for Reporting -->
 
+<div class="overlay" id="overlay"></div>
+<div class="modal" id="reportModal">
+  <span class="close" id="closeModal">&times;</span>
+  <h2 id="reportTitle">Report an Issue</h2>
+  <textarea id="reportReason" placeholder="Submit reason for reporting item (for example: illegal, offensive, inappropriate)"></textarea>
+  <button id="submitReport">Submit</button>
+</div>
     <script src="../../dynamic_posting/dynamic_posting.js"></script>
     <script src="ReportWindow.js"></script>
   </body>

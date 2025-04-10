@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administrator Panel - UMass Lost and Found</title>
+    <link rel="stylesheet" href="HomePageSignedIn.css" />
+    <script src="../../components/navbar/navbar.js"></script>
+    <script src="AdminPanel.js"></script>
+  </head>
+
+  <body>
+    <!-- Filters Section -->
+    <div class="sort-filter">
+      <div class="sort-by">
+        <h3>Sort By</h3>
+        <input type="radio" id="date-posted" name="sort" value="date-posted" />
+        <label for="date-posted">Date Posted</label><br />
+        <input type="radio" id="relevance" name="sort" value="relevance" />
+        <label for="relevance">Relevance</label>
+      </div>
+      <div class="filters">
+        <h3>Filters</h3>
+        <label>
+          <input type="checkbox" name="filter" value="location" checked />
+          Location
+        </label><br />
+        <label>
+          <input type="checkbox" name="filter" value="time-date" checked />
+          Time/Date
+        </label><br />
+        <label>
+          <input type="checkbox" name="filter" value="tags" checked />
+          Tags
+        </label>
+      </div>
+    </div>
+
+    <!-- Posts Section -->
+    <div
+      class="listing-container"
+      id="postsContainer"
+      style="
+        height: 400px;
+        overflow-y: scroll;
+        border: 1px solid #ccc;
+        padding: 10px;
+      "
+    ></div>
+
+    <!-- Modal Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Edit/Delete Modal -->
+    <div class="modal" id="editDeleteModal">
+      <span class="close">&times;</span>
+      <h2 id="editDeleteTitle">Edit/Delete Post</h2>
+      <textarea placeholder="Write reason for editing here"></textarea>
+      <button id="saveChangesButton">Save Changes</button>
+      <button id="deleteReportButton">Delete Post</button>
+    </div>
+
+    <script src="../../dynamic_posting/dynamic_posting.js"></script>
+    <script src="AdminPanel.js"></script>
+    <script src="ReportWindow.js"></script>
+  </body>
+</html>
