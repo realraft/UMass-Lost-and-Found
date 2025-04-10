@@ -1,26 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMass Lost And Found</title>
-    <link rel="stylesheet" href="listings.css">
-    <link rel="stylesheet" href="styles.css"> 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UMass Lost And Found</title>
+  <link rel="stylesheet" href="listings.css">
+  <link rel="stylesheet" href="styles.css"> 
+  <style>
+    /* Optional inline style for overlay */
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 999;
+    }
+    .modal {
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -30%);
+      background: #fff;
+      padding: 20px;
+      border: 1px solid #ccc;
+      z-index: 1000;
+    }
+  </style>
 </head>
 <body>
-    <div class="button-container">
-        <a href="frontpage.html"><button>Back to Home Page</button></a>
-        <button>Post</button>
-        <button class="report-button">Report</button>
-    </div>
+  <div class="button-container">
+    <a href="frontpage.html"><button>Back to Home Page</button></a>
+    <button>Post</button>
+    <button class="report-button" data-item="XYZ">Report</button>
+  </div>
 
-    <div class="modal" id="reportModal">
-        <span class="close">&times;</span>
-        <h2>Report XYZ</h2>
-        <textarea placeholder="Write reason for reporting here"></textarea>
-        <button id="submitReport">Submit</button>
-    </div>
+  <!-- Overlay background -->
+  <div id="overlay"></div>
 
-    <script src="script.js"></script>
+  <!-- Modal -->
+  <div class="modal" id="reportModal">
+    <span class="close" style="cursor:pointer;">&times;</span>
+    <h2>Report XYZ</h2>
+    <form id="reportForm">
+      <textarea id="reportReason" placeholder="Write reason for reporting here" rows="4" style="width:100%;"></textarea>
+      <br/>
+      <button type="submit" id="submitReport">Submit</button>
+    </form>
+  </div>
+
+  <script src="ReportWindow.js"></script>
 </body>
 </html>
