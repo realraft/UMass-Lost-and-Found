@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
  
     closeButton.addEventListener("click", () => {
         modal.style.display = "none";
-        overlay.style.display = "none";
+        overlay.style.display = "none"; 
         reportReasonInput.value = ""; // Reset input
     });
 

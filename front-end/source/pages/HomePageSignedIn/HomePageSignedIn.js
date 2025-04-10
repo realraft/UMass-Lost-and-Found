@@ -9,11 +9,11 @@ document.addEventListener("DOMContentLoaded", function () {
     setupToggleButtons();
 
     // Set date-posted as default and sort listings
-    const dateRadio = document.getElementById("date-posted");
+    const dateRadio = document.getElementById("date-posted"); 
     if (dateRadio) {
       dateRadio.checked = true;
       sortListingsByDate();
-    }
+    } 
   }, 300);
 
   if (searchQuery) {
