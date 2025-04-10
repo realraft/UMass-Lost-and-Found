@@ -1,161 +1,87 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Check if we have a search query in the URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const searchQuery = urlParams.get("search");
+  const overlay = document.getElementById("overlay");
+  const reportModal = document.getElementById("reportModal");
+  const reportTitle = document.getElementById("reportTitle");
+  const submitReportButton = document.getElementById("submitReport");
+  const reportReasonInput = document.getElementById("reportReason");
+  const closeModalButton = document.getElementById("closeModal");
+  let currentPostId = null;
 
-  setTimeout(() => {
-    // Trigger search functionality
-    initializeFilters();
-    setupToggleButtons();
-
-    // Set date-posted as default and sort listings
-    const dateRadio = document.getElementById("date-posted"); 
-    if (dateRadio) {
-      dateRadio.checked = true;
-      sortListingsByDate();
-    } 
-  }, 300);
-
-  if (searchQuery) {
-    // Set the relevance radio button
-    const relevanceRadio = document.getElementById("relevance");
-    if (relevanceRadio) {
-      relevanceRadio.checked = true;
-    }
-
-    // Add a small delay to ensure the listings are loaded before filtering
-    setTimeout(() => {
-      // Trigger search functionality
-      sortListingsByRelevance(searchQuery);
-    }, 300);
+  // Function to open the report modal
+  function openReportModal(postId, postTitle) {
+    currentPostId = postId;
+    overlay.style.display = "block";
+    reportModal.style.display = "block";
+    reportTitle.textContent = `Report Listing: ${postTitle}`;
   }
 
-  // Listen for search events from navbar
-  document.addEventListener("search-query", function (e) {
-    sortListingsByRelevance(e.detail.query);
+  // Function to close the report modal
+  function closeReportModal() {
+    overlay.style.display = "none";
+    reportModal.style.display = "none";
+    reportReasonInput.value = ""; // Clear the input field
+    currentPostId = null; // Reset the current post ID
+  }
+
+  // Add event listener to dynamically open the modal when a "Report" button is clicked
+  document.addEventListener("click", function (event) {
+    if (event.target.classList.contains("report-button")) {
+      const postId = event.target.getAttribute("data-post-id");
+      const postTitle = event.target.getAttribute("data-post-title");
+      openReportModal(postId, postTitle);
+    }
   });
 
-  // Add event listeners for sort radio buttons
-  const dateRadio = document.getElementById("date-posted");
-  const relevanceRadio = document.getElementById("relevance");
-
-  if (dateRadio) {
-    dateRadio.addEventListener("change", function () {
-      if (this.checked) {
-        sortListingsByDate();
-      }
-    });
-  }
-
-  if (relevanceRadio) {
-    relevanceRadio.addEventListener("change", function () {
-      if (this.checked) {
-        const searchBox = document.querySelector(".search-box input");
-        const query = searchBox ? searchBox.value : "";
-        if (query.trim()) {
-          sortListingsByRelevance(query);
-        }
-      }
-    });
-  }
-
-  // Open a connection to IndexedDB
-  const dbRequest = indexedDB.open("LostAndFoundDB", 1);
-
-  dbRequest.onupgradeneeded = (event) => {
-    const db = event.target.result;
-
-    // Create an object store for reports if it doesn't already exist
-    if (!db.objectStoreNames.contains("reports")) {
-      db.createObjectStore("reports", { keyPath: "id" });
-    }
-  };
-
-  dbRequest.onsuccess = (event) => {
-    const db = event.target.result;
-
-    // Add functionality for the report modal
-    const overlay = document.getElementById("overlay");
-    const reportModal = document.getElementById("reportModal");
-    const reportTitle = document.getElementById("reportTitle");
-    const submitReportButton = document.getElementById("submitReport");
-    const reportReasonInput = document.querySelector("#reportModal textarea");
-
-    // Report modal logic
-    function openReportModal() {
-      overlay.style.display = "block";
-      reportModal.style.display = "block";
-
-      // Always set modal title to "Report Item"
-      reportTitle.textContent = "Report Item";
+  // Add event listener to handle report submission
+  submitReportButton.addEventListener("click", function () {
+    const reportReason = reportReasonInput.value.trim();
+    if (!reportReason) {
+      alert("Please provide a reason for reporting.");
+      return;
     }
 
-    function closeReportModal() {
-      overlay.style.display = "none";
-      reportModal.style.display = "none";
-      reportReasonInput.value = ""; // Clear the textarea
-    }
+    // Save the report locally using IndexedDB
+    const dbRequest = indexedDB.open("LostAndFoundDB", 1);
 
-    overlay.addEventListener("click", closeReportModal);
-    document.querySelector(".close").addEventListener("click", closeReportModal);
-
-    submitReportButton.addEventListener("click", function () {
-      const reportReason = reportReasonInput.value.trim();
-
-      if (!reportReason) {
-        alert("Please provide a reason for reporting.");
-        return;
+    dbRequest.onupgradeneeded = function (event) {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains("reports")) {
+        db.createObjectStore("reports", { keyPath: "id", autoIncrement: true });
       }
+    };
 
-      const report = {
-        id: Date.now().toString(), // Unique ID
-        reason: reportReason, // User-provided reason
-        timestamp: new Date().toISOString(), // Date and time of the report
-      };
-
-      saveReportToIndexedDB(report, db);
-      closeReportModal();
-      alert("Thank you! Your report has been submitted.");
-      console.log("Report submitted:", report);
-    });
-
-    function saveReportToIndexedDB(report, db) {
+    dbRequest.onsuccess = function (event) {
+      const db = event.target.result;
       const transaction = db.transaction("reports", "readwrite");
       const store = transaction.objectStore("reports");
 
-      store.add(report);
-
-      transaction.oncomplete = () => {
-        console.log("Report saved successfully in IndexedDB:", report);
+      // Create a new report object
+      const newReport = {
+        post_id: currentPostId,
+        reason: reportReason,
+        timestamp: new Date().toISOString(),
       };
 
-      transaction.onerror = (event) => {
-        console.error("Error saving report to IndexedDB:", event.target.error);
+      // Save the report to IndexedDB
+      const addRequest = store.add(newReport);
+      addRequest.onsuccess = function () {
+        alert("Your report has been submitted successfully.");
+        closeReportModal(); // Close the modal after successful submission
       };
-    }
 
-    // Update dynamic listings and add report functionality
-    const listingContainer = document.querySelector(".listing-container");
-    function attachReportFunctionality() {
-      const listings = listingContainer.querySelectorAll(".listing");
-      listings.forEach((listing) => {
-        const reportButton = listing.querySelector(".report-button");
+      addRequest.onerror = function () {
+        console.error("Error saving report to IndexedDB.");
+        alert("Failed to submit report.");
+      };
+    };
 
-        reportButton.addEventListener("click", () => {
-          openReportModal();
-        });
-      });
-    }
+    dbRequest.onerror = function () {
+      console.error("Error accessing IndexedDB.");
+      alert("Failed to submit report due to database error.");
+    };
+  });
 
-    attachReportFunctionality();
-  };
-
-  dbRequest.onerror = (event) => {
-    console.error("Error opening IndexedDB:", event.target.error);
-  };
+  // Add event listener to close the modal on overlay or close button click
+  overlay.addEventListener("click", closeReportModal);
+  closeModalButton.addEventListener("click", closeReportModal);
 });
-
-function redirectToAdmin() {
-  // Redirect to the Administrator page
-  window.location.href = "Administrator.html";
-}

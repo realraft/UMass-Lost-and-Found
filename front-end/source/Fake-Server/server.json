@@ -102,10 +102,57 @@
     }
   ],
   "reports": [
-    {
-      "id": "temp",
-      "post_id": "temp",
-      "report_text": "temp"
-    }
+    [
+      {
+        "id": 1,
+        "post_id": 1,
+        "report_text": "This watch looks suspicious."
+      },
+      {
+        "id": 2,
+        "post_id": 2,
+        "report_text": "These keys may belong to someone else."
+      },
+      {
+        "id": 3,
+        "post_id": 3,
+        "report_text": "This phone might be stolen."
+      },
+      {
+        "id": 4,
+        "post_id": 4,
+        "report_text": "Someone reported these sunglasses as fake."
+      },
+      {
+        "id": 5,
+        "post_id": 5,
+        "report_text": "This backpack may contain valuable items."
+      },
+      {
+        "id": 6,
+        "post_id": 6,
+        "report_text": "This laptop appears to have sensitive information."
+      },
+      {
+        "id": 7,
+        "post_id": 7,
+        "report_text": "The owner reported this wallet as lost."
+      },
+      {
+        "id": 8,
+        "post_id": 8,
+        "report_text": "These headphones were flagged by a user."
+      },
+      {
+        "id": 9,
+        "post_id": 9,
+        "report_text": "This jacket doesn't seem to match the description from the owner."
+      },
+      {
+        "id": 10,
+        "post_id": 10,
+        "report_text": "The notebook contains private notes and was reported lost."
+      }
+    ]  
   ]
 }

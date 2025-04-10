@@ -1,18 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
     const postsContainer = document.getElementById("postsContainer");
   
-    // Fetch posts and reports from the fake server
-    fetch('./Fake-Server/server.json')
-      .then(response => response.json())
+    // Fetch posts and reports from the server (make sure you're running a local server)
+    fetch("../../Fake-Server/server.json")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to fetch data: ${response.status}`);
+        }
+        return response.json();
+      })
       .then(data => {
-        const posts = data.posts; // All posts
-        const reports = data.reports; // All reports
+        const posts = data.posts || []; // All posts
+        const reports = data.reports || []; // All reports
   
         // Match posts with reports
         const reportedPosts = reports
-          .filter(report => report.post_id !== "temp") // Exclude temporary placeholders
+          .flat()  // Flatten the array (since reports is an array of arrays)
           .map(report => {
-            const post = posts.find(post => post.id === parseInt(report.post_id)); // Match report to post
+            const post = posts.find(post => post.id === report.post_id); // Match report to post
             return post ? { ...post, report_text: report.report_text } : null; // Combine post details with report text
           })
           .filter(post => post !== null); // Exclude any unmatched reports
@@ -57,7 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", () => {
           const postId = button.getAttribute("data-id");
           console.log(`Post with ID ${postId} kept.`);
-          // Optional functionality: Mark post as reviewed
+          alert(`Post with ID ${postId} has been marked as kept.`);
+          // Optional: Additional logic to handle "kept" posts
         });
       });
   
@@ -77,9 +83,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (postToDelete) {
         postsContainer.removeChild(postToDelete); // Remove post element dynamically
         console.log(`Post with ID ${postId} deleted.`);
+        alert(`Post with ID ${postId} has been deleted.`);
       } else {
         console.error(`Post with ID ${postId} not found.`);
       }
     }
   });
-  
