@@ -14,14 +14,8 @@
     <div class="page-container">
       <!-- Left Sidebar with Filters -->
       <div class="sidebar">
-    
-        <div class="admin-button">
-          <a href="Administrator.html">
-            <button>Administrator</button>
-          </a>
-        </div>
+        <div class="admin-button"></div>
         
-      
         <div class="sort-by">
           <h3>Sort By</h3>
           <input type="radio" id="date-posted" name="sort" value="date-posted" />
@@ -39,7 +33,6 @@
             <div class="filter-options" id="location-filters">
               <!-- Location options will be populated dynamically -->
             </div>
-            
           </div>
           <div class="filter-group">
             <h4 class="filter-section-title">Tags</h4>
@@ -62,17 +55,15 @@
       </div>
     </div>
 
-<!-- Overlay and Modal for Reporting -->
+    <!-- Overlay and Modal for Reporting -->
+    <div id="reportModal" class="modal" style="display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:1px solid #ccc; z-index:1000;">
+      <span id="closeModal" class="close" style="cursor:pointer; float:right;">&times;</span>
+      <h3>Report Listing</h3>
+      <textarea id="reportText" placeholder="Write your report here..." rows="4" style="width:100%;"></textarea>
+      <button id="submitReport">Submit Report</button>
+    </div>
 
-<!-- Report Modal -->
-<div id="reportModal" class="modal" style="display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:1px solid #ccc; z-index:1000;">
-  <span id="closeModal" class="close" style="cursor:pointer; float:right;">&times;</span>
-  <h3>Report Listing</h3>
-  <textarea id="reportText" placeholder="Write your report here..." rows="4" style="width:100%;"></textarea>
-  <button id="submitReport">Submit Report</button>
-</div>
-</div>
     <script src="../../dynamic_posting/dynamic_posting.js"></script>
     <script src="ReportWindow.js"></script>
   </body>
-</html
+</html>
