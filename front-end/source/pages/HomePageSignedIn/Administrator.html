@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administrator - Reported Posts</title>
+    <link rel="stylesheet" href="HomePageSignedIn.css" />
+    <script src="../../components/navbar/navbar.js"></script>
+    <script src="Administrator.js"></script>
+
+
+</head>
+
+<body>
+    <!-- Page layout container -->
+    <div class="page-container">
+        <!-- Sidebar for navigation -->
+        <div class="sidebar">
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <h1>Reported Posts</h1>
+            <!-- Scrollable Container for Reported Posts -->
+            <div class="scrollable-container" id="reportedPostsContainer">
+                <!-- Dynamically loaded reported posts will appear here -->
+                <p>No reported posts yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="overlay" id="overlay"></div>
+    <!-- View Report Modal -->
+    <div class="modal" id="viewReportModal">
+        <span class="close" id="closeModal">&times;</span>
+        <h2 id="reportTitle">Reported Post</h2>
+        <p id="reportDetails"></p>
+        <button id="deleteReport">Delete Post</button>
+    </div>
+
+    <style>
+        /* Scrollable container styling */
+        .scrollable-container {
+            max-height: 400px; /* Adjust height as needed */
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        /* Mimic HomePageSignedIn post styling */
+        .post-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #fff;
+        }
+
+        .post-item h3 {
+            margin: 0 0 5px;
+        }
+
+        .post-item p {
+            margin: 0;
+        }
+
+        .post-item button {
+            margin-top: 10px;
+        }
+    </style>
+
+    <script>
+        // Function to dynamically add reported posts to the scrollable container
+        function addReportedPost(postId, title, reason) {
+            const container = document.getElementById('reportedPostsContainer');
+
+            // Check if "No reported posts yet" message exists and remove it
+            const emptyMessage = container.querySelector('p');
+            if (emptyMessage) emptyMessage.remove();
+
+            // Create reported post element
+            const postItem = document.createElement('div');
+            postItem.classList.add('post-item');
+            postItem.setAttribute('data-post-id', postId);
+
+            postItem.innerHTML = `
+                <h3>${title}</h3>
+                <p>Reported for: ${reason}</p>
+                <button class="view-button" data-post-id="${postId}">View</button>
+                <button class="delete-button" data-post-id="${postId}">Delete</button>
+            `;
+
+            container.appendChild(postItem);
+        }
+
+        // Function to open the View Report Modal
+        function openViewModal(postId) {
+            const modal = document.getElementById('viewReportModal');
+            const overlay = document.getElementById('overlay');
+            const postElement = document.querySelector(`.post-item[data-post-id="${postId}"]`);
+
+            const title = postElement.querySelector('h3').textContent;
+            const details = postElement.querySelector('p').textContent;
+
+            document.getElementById('reportTitle').textContent = title;
+            document.getElementById('reportDetails').textContent = details;
+
+            modal.dataset.postId = postId; // Store post ID in modal
+            modal.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            document.getElementById('viewReportModal').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        // Attach event listeners using event delegation
+        document.getElementById('reportedPostsContainer').addEventListener('click', function (event) {
+            if (event.target.classList.contains('view-button')) {
+                const postId = event.target.getAttribute('data-post-id');
+                openViewModal(postId);
+            }
+
+            if (event.target.classList.contains('delete-button')) {
+                const postId = event.target.getAttribute('data-post-id');
+                const postElement = document.querySelector(`.post-item[data-post-id="${postId}"]`);
+                
+                postElement.remove(); // Delete post element from DOM
+                alert(`Post ID ${postId} has been deleted.`);
+            }
+        });
+
+        document.getElementById('overlay').addEventListener('click', closeModal);
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+
+        // Example: Dynamically adding reported posts (replace with actual data fetching)
+        setTimeout(() => {
+            addReportedPost(1, "Lost Wallet", "Spam");
+            addReportedPost(2, "Found Phone", "Inappropriate Content");
+        }, 1000); // Simulating delay for dynamic loading
+    </script>
+</body>
+</html>
