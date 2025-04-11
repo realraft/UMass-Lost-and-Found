@@ -30,11 +30,7 @@ export class HomePageSignedIn extends BasePage {
     // Add navbar to the document
     this.#addNavbar();
 
-    // Initialize functionality after a short delay to ensure
-    // dynamic content has been loaded
-    setTimeout(() => {
-      this.#loadData();
-    }, 300);
+    this.#loadData();
 
     return this.#container;
   }
