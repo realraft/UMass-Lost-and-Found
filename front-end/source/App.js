@@ -1,8 +1,11 @@
-import { EventHub } from "/front-end/source/eventHub/EventHub.js";
-import { Events } from "/front-end/source/eventHub/Events.js";
-import { HomePageSignedOut } from "/front-end/source/pages/HomePageSignedOut/index.js";
-import { HomePageSignedIn } from "/front-end/source/pages/HomePageSignedIn/index.js";
-import { NavBar } from "/front-end/source/components/navbar/index.js";
+import { EventHub } from "./eventHub/EventHub.js";
+import { Events } from "./eventHub/Events.js";
+import { HomePageSignedOut } from "./pages/HomePageSignedOut/index.js";
+import { HomePageSignedIn } from "./pages/HomePageSignedIn/index.js";
+import { NavBar } from "./components/navbar/index.js";
+import { PostItemPage } from "./pages/postItemPage/index.js";
+//import { PostedItemPage } from "./pages/PostedItemPage/index.js";
+import { MessagingPage } from "./pages/MessagingPage/index.js";
 
 export default class App {
   constructor() {
@@ -17,7 +20,10 @@ export default class App {
     this._hub.subscribe(Events.NavigateTo, (page) => this._navigateTo(page));
     this._pageComponents = {
       home: new HomePageSignedOut(),
-      homeSignedIn: new HomePageSignedIn()
+      homeSignedIn: new HomePageSignedIn(),
+      postItem: new PostItemPage(),
+      //postedItem: new PostedItemPage(),
+      messaging: new MessagingPage()
     };
     this._navbar = new NavBar();
   }
@@ -59,18 +65,27 @@ export default class App {
     this._container.appendChild(this._pageContainer);
   }
 
-  // Toggles the view between main and simple
+  // Handles navigation to different pages
   _navigateTo(page) {
     switch (page) {
       case "":
       case "/":
       case "/home":
+      case "/HomePageSignedOut":
         this._currentPage = "home";
         break;
       case "/HomePageSignedIn":
         this._currentPage = "homeSignedIn";
         break;
-      // Add other routes as needed
+      case "/PostItemPage":
+        this._currentPage = "postItem";
+        break;
+      case "/PostedItemPage":
+        this._currentPage = "postedItem";
+        break;
+      case "/MessagingPage":
+        this._currentPage = "messaging";
+        break;
       default:
         this._currentPage = "home";
     }
