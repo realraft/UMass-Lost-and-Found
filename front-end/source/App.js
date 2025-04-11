@@ -4,7 +4,7 @@ import { HomePageSignedOut } from "./pages/HomePageSignedOut/index.js";
 import { HomePageSignedIn } from "./pages/HomePageSignedIn/index.js";
 import { NavBar } from "./components/navbar/index.js";
 import { PostItemPage } from "./pages/postItemPage/index.js";
-//import { PostedItemPage } from "./pages/PostedItemPage/index.js";
+import { PostedItemPage } from "./pages/PostedItemPage/index.js";
 import { MessagingPage } from "./pages/MessagingPage/index.js";
 
 export default class App {
@@ -19,11 +19,22 @@ export default class App {
     
     this._hub = EventHub.getEventHubInstance();
     this._hub.subscribe(Events.NavigateTo, (page) => this._navigateTo(page));
+    
+    // Add ViewPost event handler
+    this._hub.subscribe(Events.ViewPost, (postData) => {
+      // Update the PostedItemPage component with the data
+      const postedItemPage = this._pageComponents.postedItem;
+      if (postedItemPage) {
+        postedItemPage.updatePost(postData);
+        this._navigateTo("/PostedItemPage");
+      }
+    });
+    
     this._pageComponents = {
       home: new HomePageSignedOut(),
       homeSignedIn: new HomePageSignedIn(),
       postItem: new PostItemPage(),
-      //postedItem: new PostedItemPage(),
+      postedItem: new PostedItemPage(),
       messaging: new MessagingPage()
     };
     this._navbar = new NavBar();
