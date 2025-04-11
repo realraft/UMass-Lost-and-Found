@@ -16,6 +16,12 @@ export class HomePageSignedIn extends BasePage {
     document.body.className = 'signed-in-page';
     
     if (this.#container) {
+      // Even if the container exists, we should check for search params in the URL
+      // This handles the case when navigating from another page with a search query
+      setTimeout(() => {
+        this.#checkForSearchQuery();
+      }, 0);
+      
       return this.#container;
     }
     
@@ -347,6 +353,8 @@ export class HomePageSignedIn extends BasePage {
     const searchQuery = urlParams.get('search');
     
     if (searchQuery) {
+      // Don't update the search field in the navbar, as it will be cleared by the navbar component
+      
       // Set the relevance radio button
       const relevanceRadio = document.getElementById('relevance');
       if (relevanceRadio) {

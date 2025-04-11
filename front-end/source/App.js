@@ -75,7 +75,10 @@ export default class App {
 
   // Handles navigation to different pages
   _navigateTo(page) {
-    switch (page) {
+    // Extract the base path and search parameters
+    const [basePath, searchParams] = page.split('?');
+    
+    switch (basePath) {
       case "":
       case "/":
       case "/home":
@@ -97,10 +100,28 @@ export default class App {
       default:
         this._currentPage = "home";
     }
+    
+    // If we have search parameters and we're navigating to the HomePageSignedIn,
+    // process the search query
+    if (searchParams && this._currentPage === "homeSignedIn") {
+      const urlParams = new URLSearchParams("?" + searchParams);
+      const searchQuery = urlParams.get('search');
+      if (searchQuery && this._pageComponents.homeSignedIn) {
+        // Trigger a custom event that the HomePageSignedIn component will listen for
+        document.dispatchEvent(new CustomEvent('search-query', { 
+          detail: { query: searchQuery }
+        }));
+      }
+    }
+    
     this._renderCurrentPage();
     
     // Update the URL without reloading the page
-    window.history.pushState({ page }, page, window.location.origin + page);
+    // Preserve search parameters if they exist
+    const fullUrl = searchParams ? 
+      `${window.location.origin}${basePath}?${searchParams}` : 
+      `${window.location.origin}${basePath}`;
+    window.history.pushState({ page: basePath }, basePath, fullUrl);
   }
 
   // Renders the current view based on the _currentPage state

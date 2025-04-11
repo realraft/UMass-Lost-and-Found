@@ -45,7 +45,7 @@ export class NavBar extends BasePage {
         </div>
         <div class="navbar-search">
           <form class="search-form" action="/search" method="get">
-            <input type="search" name="q" placeholder="Search…" aria-label="Search" />
+            <input type="search" name="search" placeholder="Search…" aria-label="Search" />
             <button type="submit">🔍</button>
           </form>
         </div>
@@ -118,27 +118,10 @@ export class NavBar extends BasePage {
         const searchQuery = searchInput.value.trim();
         
         if (searchQuery) {
-          // Check if we're already on the HomePageSignedIn
-          if (window.location.href.includes('HomePageSignedIn')) {
-            // We're on the home page, dispatch a custom event for filtering by relevance
-            const relevanceRadio = document.getElementById('relevance');
-            if (relevanceRadio) {
-              relevanceRadio.checked = true;
-              
-              // Create and dispatch a custom event with the search query
-              const searchEvent = new CustomEvent('search-query', {
-                detail: { query: searchQuery }
-              });
-              document.dispatchEvent(searchEvent);
-              
-              // Clear the search input after searching
-              searchInput.value = '';
-            }
-          } else {
-            // Navigate to HomePageSignedIn with search parameter using EventHub
-            hub.publish(Events.NavigateTo, `/HomePageSignedIn?search=${encodeURIComponent(searchQuery)}`);
-            // No need to clear input here as page will be redirected
-          }
+          // Always navigate to the HomePageSignedIn with search parameter
+          hub.publish(Events.NavigateTo, `/HomePageSignedIn?search=${encodeURIComponent(searchQuery)}`);
+          // Clear the input after submission
+          searchInput.value = '';
         }
       });
     }
