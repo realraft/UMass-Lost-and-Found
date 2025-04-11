@@ -12,7 +12,7 @@ export class AdminPage extends BasePage {
   }
 
   render() {
-    document.body.className = 'AdminPage';
+    document.body.className = 'admin-link';
     
     if (this.#container) {
       setTimeout(() => this.#checkForSearchQuery(), 0);
