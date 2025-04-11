@@ -1,6 +1,7 @@
 import { EventHub } from "./eventHub/EventHub.js";
 import { Events } from "./eventHub/Events.js";
 import { HomePageSignedOut } from "./pages/HomePageSignedOut/index.js";
+import { HomePageSignedIn } from "./pages/HomePageSignedIn/index.js";
 
 export default class App {
   constructor() {
@@ -14,7 +15,7 @@ export default class App {
     this._hub.subscribe(Events.NavigateTo, (page) => this._navigateTo(page));
     this._pageComponents = {
       home: new HomePageSignedOut(),
-      // Add other page components as needed
+      homeSignedIn: new HomePageSignedIn()
     };
   }
 
@@ -61,10 +62,9 @@ export default class App {
       case "/home":
         this._currentPage = "home";
         break;
-      case "/signin":
-        // Redirect to the signed-in page
-        window.location.href = "./source/pages/HomePageSignedIn/HomePageSignedIn.html";
-        return; // Return early to avoid further processing
+      case "/HomePageSignedIn":
+        this._currentPage = "homeSignedIn";
+        break;
       // Add other routes as needed
       default:
         this._currentPage = "home";

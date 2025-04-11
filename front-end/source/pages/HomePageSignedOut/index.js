@@ -11,6 +11,9 @@ export class HomePageSignedOut extends BasePage {
   }
 
   render() {
+    // Apply signed-out-page class directly to the body element
+    document.body.className = 'signed-out-page';
+    
     if (this.#container) {
       return this.#container;
     }
@@ -69,8 +72,8 @@ export class HomePageSignedOut extends BasePage {
     if (signInButton) {
       signInButton.addEventListener("click", (event) => {
         event.preventDefault(); // Prevent default navigation
-        // Use general NavigateTo event with the target path
-        hub.publish(Events.NavigateTo, "/signin");
+        // Use general NavigateTo event with the target path to HomePageSignedIn
+        hub.publish(Events.NavigateTo, "/HomePageSignedIn");
       });
     }
   }

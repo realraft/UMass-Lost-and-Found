@@ -1,4 +1,6 @@
-body {
+/* HomePageSignedOut specific styles */
+/* Fix selector to apply directly to body when the parent has signed-out-page class */
+body.signed-out-page {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -12,7 +14,7 @@ body {
 }
 
 /* Container for the homepage content */
-.homepage-container {
+.signed-out-page .homepage-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -20,7 +22,7 @@ body {
     max-width: 100%;
 }
 
-.header {
+.signed-out-page .header {
     background-color: #8C1515; /* UMass Crimson */
     color: white;
     width: 100vw; /* Full viewport width */
@@ -33,7 +35,7 @@ body {
     text-align: center;
 }
 
-.image-container {
+.signed-out-page .image-container {
     width: 60%; /* Responsive width */
     max-width: 400px; /* Maximum size */
     margin: 30px auto;
@@ -41,7 +43,7 @@ body {
     justify-content: center;
 }
 
-.image-container img {
+.signed-out-page .image-container img {
     width: 100%;
     height: auto; /* This ensures the full image is visible */
     max-height: 300px; /* Limit maximum height */
@@ -50,7 +52,7 @@ body {
     margin: 0 auto; /* Center the image */
 }
 
-.description {
+.signed-out-page .description {
     width: 80%; /* Responsive width */
     margin: 20px auto;
     font-size: 1.2em;
@@ -58,7 +60,7 @@ body {
     text-align: center;
 }
 
-.sign-in-button {
+.signed-out-page .sign-in-button {
     background-color: #8C1515; /* UMass Crimson */
     color: white;
     border: none;
@@ -73,19 +75,19 @@ body {
     text-decoration: none; /* Remove underline from link */
 }
 
-.sign-in-button:hover {
+.signed-out-page .sign-in-button:hover {
     background-color: #6C1010;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .header {
+    .signed-out-page .header {
         font-size: 2em;
     }
-    .image-container {
+    .signed-out-page .image-container {
         width: 80%;
     }
-    .description {
+    .signed-out-page .description {
         width: 90%;
         font-size: 1em;
     }
