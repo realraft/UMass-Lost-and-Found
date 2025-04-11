@@ -6,30 +6,52 @@ document.addEventListener('DOMContentLoaded', function() {
   
   const pathPrefix = window.location.pathname.includes('/pages/') ? '../../' : '';
 
-  // Fetch the navbar HTML
-  fetch(`${pathPrefix}components/navbar/navbar.html`)
-    .then(response => response.text())
-    .then(data => {
-      // Create a container for the navbar
-      const navbarContainer = document.createElement('div');
-      navbarContainer.innerHTML = data;
+  // Create a container for the navbar and add the HTML directly
+  const navbarContainer = document.createElement('div');
+  navbarContainer.innerHTML = `
+    <div class="navbar">
+      <div class="navbar-brand">
+        <a href="${pathPrefix}pages/HomePageSignedIn/HomePageSignedIn.html" style="text-decoration: none; color: white;">
+          <h1>UMass Lost and Found</h1>
+        </a>
+      </div>
+      <div class="navbar-search">
+        <form class="search-form" action="/search" method="get">
+          <input type="search" name="q" placeholder="Search…" aria-label="Search" />
+          <button type="submit">🔍</button>
+        </form>
+      </div>
+      <div class="navbar-actions">
+        <a href="${pathPrefix}pages/postItemPage/post_item_page.html" class="nav-link">
+          <button class="post-button">Post</button>
+        </a>
+        <div class="dropdown">
+          <button class="dropdown-button">☰</button>
+          <div class="dropdown-content">
+            <a href="${pathPrefix}pages/MessagingPage/MessagingPage.html">Messaging</a>
+            <a href="#" class="disabled-link">Post Manager</a>
+            <a href="#" class="disabled-link">Admin Page</a>
+            <a href="${pathPrefix}pages/HomePageSignedOut/HomePageSignedOut.html">Log Out</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
       
-      // Insert the navbar at the beginning of the body
-      document.body.prepend(navbarContainer);
+  // Insert the navbar at the beginning of the body
+  document.body.prepend(navbarContainer);
       
-      // Add the CSS file to the head
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = `${pathPrefix}components/navbar/navbar.css`;
-      document.head.appendChild(link);
+  // Add the CSS file to the head
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = `${pathPrefix}components/navbar/navbar.css`;
+  document.head.appendChild(link);
       
-      // Add click event listener to dropdown button
-      setupDropdown();
+  // Add click event listener to dropdown button
+  setupDropdown();
       
-      // Add search functionality
-      setupSearch(pathPrefix);
-    })
-    .catch(error => console.error('Error loading navbar:', error));
+  // Add search functionality
+  setupSearch(pathPrefix);
 });
 
 function setupDropdown() {
