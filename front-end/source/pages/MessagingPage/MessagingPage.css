@@ -5,50 +5,102 @@ h1 {
     text-align: center;
 }
 
-.container {
+.messaging-page {
     display: flex
 }
 
-.posts-sidebar {
-    width: 15em;
+.posts-container {
+    width: 17.5em;
     background-color: white;
     color: black;
     height: 100vh;   
 
     display: flex;
     flex-direction: column;
-    gap: 0.25em;
+    gap: 0.2em;
 }
 
 .message-container {
-    flex: 1
+    flex: 1;
+    background-image: url("clouds.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    height: 75vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .messages-content {
     color: black;
-    background-color: rgb(248, 248, 221);
     flex-direction: column;
-    height: 85vh;
+    height: 75vh;
     overflow-y: auto;
-    background-image: url("clouds.jpg");
 }
 
 .myMessage {
     color: black;
     background-color: lightgreen;
-    text-align: right;
+    text-align: center;
     width: 50%;
     margin-left: auto;
+    margin-right: 1em;
 }
 
 .otherMessage {
     color: black;
     background-color: rgb(31, 180, 230);
     width: 50%;
+    text-align: center;
+    margin-left: 1em;
 }
 
-.PostNameElement {
+.post-messages {
     color: black;
     text-align: center;
     background-color: rgb(250, 213, 213);
+    height: 5em;
+    justify-content: center;
+    align-content: center;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
 }
+
+.post-button {
+    color: black;
+    border: none;
+    font-size: 1rem;
+    background: none;
+}
+
+.post-button:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.post {
+    color: black;
+    border: none;
+    font-size: 2rem;
+    background: none;
+}
+
+.post:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#messageForm div {
+    display: flex;
+    flex-direction: row;
+    align-items: left;
+    gap: 1em; 
+    padding: 0.5em;
+  }
+
+  label {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
