@@ -7,12 +7,15 @@ export class NavBar extends BasePage {
   
   constructor() {
     super();
-    const pathPrefix = window.location.pathname.includes('/pages/') ? '../../' : '';
+    const pathPrefix = this.getPathPrefix();
     this.loadCSS(`${pathPrefix}components/navbar`, "navbar");
   }
   
+  getPathPrefix() {
+    return window.location.pathname.includes('/pages/') ? '../../' : '';
+  }
+  
   render() {
-    // Don't add navbar to the HomePageSignedOut
     if (window.location.href.includes('HomePageSignedOut')) {
       return null;
     }
@@ -21,19 +24,14 @@ export class NavBar extends BasePage {
       return this.#container;
     }
     
-    const pathPrefix = window.location.pathname.includes('/pages/') ? '../../' : '';
-
-    // Create a container for the navbar
     this.#container = document.createElement('div');
-    
-    // Setup container content
-    this.#setupContainerContent(pathPrefix);
+    this.#setupContainerContent();
     this.#attachEventListeners();
     
     return this.#container;
   }
   
-  #setupContainerContent(pathPrefix) {
+  #setupContainerContent() {
     if (!this.#container) return;
     
     this.#container.innerHTML = `
@@ -45,7 +43,7 @@ export class NavBar extends BasePage {
         </div>
         <div class="navbar-search">
           <form class="search-form" action="/search" method="get">
-            <input type="search" name="q" placeholder="Search…" aria-label="Search" />
+            <input type="search" name="search" placeholder="Search…" aria-label="Search" />
             <button type="submit">🔍</button>
           </form>
         </div>
@@ -68,17 +66,9 @@ export class NavBar extends BasePage {
   }
   
   #attachEventListeners() {
-    // Setup dropdown functionality
     this.#setupDropdown();
-    
-    // Setup search functionality
-    const pathPrefix = window.location.pathname.includes('/pages/') ? '../../' : '';
-    this.#setupSearch(pathPrefix);
-
+    this.#setupSearch();
     this.#setupNav();
-    
-    // Get EventHub instance if needed for future use
-    const hub = EventHub.getEventHubInstance();
   }
   
   #setupDropdown() {
@@ -86,28 +76,26 @@ export class NavBar extends BasePage {
     const dropdownContent = this.#container.querySelector('.dropdown-content');
     
     if (dropdownButton && dropdownContent) {
-      // Toggle dropdown when button is clicked
       dropdownButton.addEventListener('click', function(e) {
         e.stopPropagation();
         dropdownContent.classList.toggle('show');
       });
       
-      // Close dropdown when clicking elsewhere
       document.addEventListener('click', function() {
         if (dropdownContent.classList.contains('show')) {
           dropdownContent.classList.remove('show');
         }
       });
       
-      // Prevent dropdown from closing when clicking inside it
       dropdownContent.addEventListener('click', function(e) {
         e.stopPropagation();
       });
     }
   }
   
-  #setupSearch(pathPrefix) {
+  #setupSearch() {
     const searchForm = this.#container.querySelector('.search-form');
+    const hub = EventHub.getEventHubInstance();
     
     if (searchForm) {
       searchForm.addEventListener('submit', function(e) {
@@ -117,79 +105,40 @@ export class NavBar extends BasePage {
         const searchQuery = searchInput.value.trim();
         
         if (searchQuery) {
-          // Check if we're already on the HomePageSignedIn
-          if (window.location.href.includes('HomePageSignedIn')) {
-            // We're on the home page, dispatch a custom event for filtering by relevance
-            const relevanceRadio = document.getElementById('relevance');
-            if (relevanceRadio) {
-              relevanceRadio.checked = true;
-              
-              // Create and dispatch a custom event with the search query
-              const searchEvent = new CustomEvent('search-query', {
-                detail: { query: searchQuery }
-              });
-              document.dispatchEvent(searchEvent);
-              
-              // Clear the search input after searching
-              searchInput.value = '';
-            }
-          } else {
-            // Redirect to the home page with the search query as a parameter NEEDS TO BE CHANGED
-            window.location.href = `${pathPrefix}pages/HomePageSignedIn/HomePageSignedIn.html?search=${encodeURIComponent(searchQuery)}`;
-            // No need to clear input here as page will be redirected
-          }
+          hub.publish(Events.NavigateTo, `/HomePageSignedIn?search=${encodeURIComponent(searchQuery)}`);
+          searchInput.value = '';
         }
       });
     }
   }
 
   #setupNav() {
-    // Add event listeners if needed
     const hub = EventHub.getEventHubInstance();
     
-    // Add click event to the home button
-    const homeButton = this.#container.querySelector(".home-link");
-    if (homeButton) {
-      homeButton.addEventListener("click", (event) => {
-        event.preventDefault(); // Prevent default navigation
-        hub.publish(Events.NavigateTo, "/HomePageSignedOut");
-      });
-    }
+    // Set up navigation links
+    const navLinks = [
+      { selector: '.home-link', path: '/HomePageSignedIn' },
+      { selector: '.post-button', path: '/PostItemPage' },
+      { selector: '.messaging-link', path: '/MessagingPage' },
+      { selector: '.logout-link', path: '/HomePageSignedOut' }
+    ];
     
-    // Add click event to the post button
-    const postButton = this.#container.querySelector(".post-button");
-    if (postButton) {
-      postButton.addEventListener("click", (event) => {
-        event.preventDefault();
-        hub.publish(Events.NavigateTo, "/PostItemPage");
-      });
-    }
-    
-    // Add click events to dropdown menu links
-    const messagingLink = this.#container.querySelector(".messaging-link");
-    if (messagingLink) {
-      messagingLink.addEventListener("click", (event) => {
-        event.preventDefault();
-        hub.publish(Events.NavigateTo, "/MessagingPage");
-      });
-    }
-    
-    // Handle disabled links
-    const disabledLinks = this.#container.querySelectorAll(".disabled-link");
-    disabledLinks.forEach(link => {
-      link.addEventListener("click", (event) => {
-        event.preventDefault();
-        alert("This feature is not yet available.");
-      });
+    navLinks.forEach(link => {
+      const element = this.#container.querySelector(link.selector);
+      if (element) {
+        element.addEventListener('click', (event) => {
+          event.preventDefault();
+          hub.publish(Events.NavigateTo, link.path);
+        });
+      }
     });
     
-    // Add click event to the logout link
-    const logoutLink = this.#container.querySelector(".logout-link");
-    if (logoutLink) {
-      logoutLink.addEventListener("click", (event) => {
+    // Handle disabled links
+    this.#container.querySelectorAll('.disabled-link').forEach(link => {
+      link.addEventListener('click', (event) => {
         event.preventDefault();
-        hub.publish(Events.NavigateTo, "/HomePageSignedOut");
+        alert('This feature is not yet available.');
       });
-    }
+    });
   }
 }

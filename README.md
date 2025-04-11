@@ -18,20 +18,19 @@
 **Owen Raftery**\
 Role(s): Project-Manager\
 Role(s) Description: Will be leading the team during meetings and give instructions on what to code. \
-Issues to work on: Research on if we can use UMass email api, in our platform
+Issues from current milestone: Basic SPA implementation, navbar implementation, filtering on homepage, searching functionality, SPA navigation for homepages
 
 **Nathan Dennis**\
 Role(s): Notetaker, Front-end developer\
 Role(s) Description: Will be taking down notes, and recording what my teammates do in regards to the website. Will also offer suggestions and implement them when necessary. Will mainly work on the front-end.\
-Issues to work on: General front end. Skeleton HTML and CSS.
-
+Issues from current milestone: SPA navigation for Admin Page, dynamically load reports from fake server to admin page, report modal for every post on homepage
 
 **Jacob Taylor**\
 Role(s): Time-keeper\
 Role(s) Description: Will organize meetings, keep track of what's missing, and come up with deadlines to the issues. \
-Issues to work on: Research databases and ways we can host our site
+Issues from current milestone: SPA navigation for PostedItemPage, dynamically load posts from fake server to home page, multi view ui for every post
 
 **Roberto Rubio**\
 Role(s): Communicator\
 Role(s) Description: Will make sure the Backend and Frontend are syncronized and will code for both. \
-Issues to work on: research about the GPS API (costs, keys, and how to implement). 
+Issues from current milestone: BasePage implementation, base eventhub and events implementation, SPA navigation for MessagingPage, base implementation for messaging features

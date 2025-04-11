@@ -1,5 +1,5 @@
-import { Events } from "../eventHub/Events";
-import { Service } from "./Service"
+import { Events } from "../eventHub/Events.js";
+import { Service } from "./Service.js";
 
 export class MessagingService extends Service { //database specific to messaging service 
     constructor() {

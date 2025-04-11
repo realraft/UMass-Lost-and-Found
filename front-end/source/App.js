@@ -1,8 +1,11 @@
-import { EventHub } from "/front-end/source/eventHub/EventHub.js";
-import { Events } from "/front-end/source/eventHub/Events.js";
-import { HomePageSignedOut } from "/front-end/source/pages/HomePageSignedOut/index.js";
-import { HomePageSignedIn } from "/front-end/source/pages/HomePageSignedIn/index.js";
-import { NavBar } from "/front-end/source/components/navbar/index.js";
+import { EventHub } from "./eventHub/EventHub.js";
+import { Events } from "./eventHub/Events.js";
+import { HomePageSignedOut } from "./pages/HomePageSignedOut/index.js";
+import { HomePageSignedIn } from "./pages/HomePageSignedIn/index.js";
+import { NavBar } from "./components/navbar/index.js";
+import { PostItemPage } from "./pages/postItemPage/index.js";
+import { PostedItemPage } from "./pages/PostedItemPage/index.js";
+import { MessagingPage } from "./pages/MessagingPage/index.js";
 
 export default class App {
   constructor() {
@@ -12,12 +15,27 @@ export default class App {
     this._currentPage = "home";
     this._hub = null; // EventHub instance for managing events
     this._navbar = null; // NavBar component instance
+    this._navbarElement = null; // Navbar DOM element
     
     this._hub = EventHub.getEventHubInstance();
     this._hub.subscribe(Events.NavigateTo, (page) => this._navigateTo(page));
+    
+    // Add ViewPost event handler
+    this._hub.subscribe(Events.ViewPost, (postData) => {
+      // Update the PostedItemPage component with the data
+      const postedItemPage = this._pageComponents.postedItem;
+      if (postedItemPage) {
+        postedItemPage.updatePost(postData);
+        this._navigateTo("/PostedItemPage");
+      }
+    });
+    
     this._pageComponents = {
       home: new HomePageSignedOut(),
-      homeSignedIn: new HomePageSignedIn()
+      homeSignedIn: new HomePageSignedIn(),
+      postItem: new PostItemPage(),
+      postedItem: new PostedItemPage(),
+      messaging: new MessagingPage()
     };
     this._navbar = new NavBar();
   }
@@ -48,36 +66,62 @@ export default class App {
       throw new Error("Container element not found");
     }
     
-    // Add navbar to the container (it will not render for HomePageSignedOut)
-    const navbarElement = this._navbar.render();
-    if (navbarElement) {
-      this._container.appendChild(navbarElement);
-    }
+    this._navbarElement = this._navbar.render();
     
     this._pageContainer = document.createElement("main");
     this._pageContainer.id = "page-container";
     this._container.appendChild(this._pageContainer);
   }
 
-  // Toggles the view between main and simple
+  // Handles navigation to different pages
   _navigateTo(page) {
-    switch (page) {
+    // Extract the base path and search parameters
+    const [basePath, searchParams] = page.split('?');
+    
+    switch (basePath) {
       case "":
       case "/":
       case "/home":
+      case "/HomePageSignedOut":
         this._currentPage = "home";
         break;
       case "/HomePageSignedIn":
         this._currentPage = "homeSignedIn";
         break;
-      // Add other routes as needed
+      case "/PostItemPage":
+        this._currentPage = "postItem";
+        break;
+      case "/PostedItemPage":
+        this._currentPage = "postedItem";
+        break;
+      case "/MessagingPage":
+        this._currentPage = "messaging";
+        break;
       default:
         this._currentPage = "home";
     }
+    
+    // If we have search parameters and we're navigating to the HomePageSignedIn,
+    // process the search query
+    if (searchParams && this._currentPage === "homeSignedIn") {
+      const urlParams = new URLSearchParams("?" + searchParams);
+      const searchQuery = urlParams.get('search');
+      if (searchQuery && this._pageComponents.homeSignedIn) {
+        // Trigger a custom event that the HomePageSignedIn component will listen for
+        document.dispatchEvent(new CustomEvent('search-query', { 
+          detail: { query: searchQuery }
+        }));
+      }
+    }
+    
     this._renderCurrentPage();
     
     // Update the URL without reloading the page
-    window.history.pushState({ page }, page, window.location.origin + page);
+    // Preserve search parameters if they exist
+    const fullUrl = searchParams ? 
+      `${window.location.origin}${basePath}?${searchParams}` : 
+      `${window.location.origin}${basePath}`;
+    window.history.pushState({ page: basePath }, basePath, fullUrl);
   }
 
   // Renders the current view based on the _currentPage state
@@ -93,13 +137,16 @@ export default class App {
     this._pageContainer.appendChild(pageComponent.render());
     
     // Update navbar visibility based on current page
-    const navbarElement = this._navbar.render();
     if (this._currentPage === "home") {
-      if (navbarElement && navbarElement.parentNode === this._container) {
-        this._container.removeChild(navbarElement);
+      // Remove navbar when on HomePageSignedOut
+      if (this._navbarElement && this._navbarElement.parentNode === this._container) {
+        this._container.removeChild(this._navbarElement);
       }
-    } else if (navbarElement && !navbarElement.parentNode) {
-      this._container.insertBefore(navbarElement, this._pageContainer);
+    } else {
+      // Add navbar for all other pages if it's not already in the DOM
+      if (this._navbarElement && !this._navbarElement.parentNode) {
+        this._container.insertBefore(this._navbarElement, this._pageContainer);
+      }
     }
   }
 }
