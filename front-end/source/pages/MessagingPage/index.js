@@ -10,14 +10,14 @@ export class MessagingPage extends BasePage {
     messagingService = null
     userId = -1
 
-    constructor(id) {
+    constructor(id) { //create page and get css
         super()
         this.loadCSS("pages/MessagingPage", "MessagingPage")
         this.messagingService = new MessagingService()
         this.userId = id
     }
 
-    #getTemplate() {
+    #getTemplate() { //draft template 
         return `
             <div class="posts-container">
             </div>        
@@ -54,7 +54,7 @@ export class MessagingPage extends BasePage {
         }
     }
 
-    #addEventListeners() {
+    #addEventListeners() { //add actions to buttons 
         const send_button = this.#container.querySelector("#send-message")
         const newMessage = this.#container.querySelector("#newMessage")
 
@@ -66,13 +66,13 @@ export class MessagingPage extends BasePage {
         }
     }
 
-    #createContainer() {
+    #createContainer() { //creates div
         this.#container = document.createElement("div")
         this.#container.className = "messaging-page"
         this.#container.innerHTML = this.#getTemplate()
     }
 
-    render() {
+    render() { //render messaging page 
         this.#createContainer()
         this.#renderFirstMessagePage()
         setTimeout(() => {
@@ -82,7 +82,7 @@ export class MessagingPage extends BasePage {
         return this.#container
     }
 
-    async #renderFirstMessagePage() {
+    async #renderFirstMessagePage() { //render first conversation
         const postsMessages = await this.#getPostsMessages() //messages 
         const posts = await this.#getPosts() // posts
         const userPostMessages = postsMessages.filter(p => {
@@ -111,7 +111,7 @@ export class MessagingPage extends BasePage {
         }
     }
 
-    #addPosttoSidebar(post, id, messages) {
+    #addPosttoSidebar(post, id, messages) { //add post to sidebar
         const eventhub = EventHub.getEventHubInstance()
         const postsContainer = this.#container.querySelector(".posts-container")
 
@@ -145,7 +145,7 @@ export class MessagingPage extends BasePage {
         })
     }
 
-    #handleNewMessage(newMessage) {
+    #handleNewMessage(newMessage) { //handle the new message
         const message = newMessage.value.trim()
         if (message.length === 0) {
             alert("Please enter a message")
@@ -166,8 +166,7 @@ export class MessagingPage extends BasePage {
 
         const eventhub = EventHub.getEventHubInstance()
         eventhub.publish(Events.NewUserMessage, info)
-        
-                newMessage.value = ""
+        newMessage.value = ""
     }
 
     #publishNewMessage(info) {
@@ -234,7 +233,7 @@ export class MessagingPage extends BasePage {
         this.messagingService.storeMessage(info) //to indexeddb
     }
 
-    #addSubscriptions() {
+    #addSubscriptions() { 
         const eventHub = EventHub.getEventHubInstance()
         eventHub.subscribe(Events.NewUserMessage, async info => {
             await this.#sendMessagetoServer(info)
@@ -247,4 +246,4 @@ export class MessagingPage extends BasePage {
             this.#publishNewMessage({id: cid, data: mobj})
         })
     }
-}
+}S
