@@ -217,15 +217,25 @@ export class PostItemPage extends BasePage {
         // Handle post submission logic
         const description = this.#container.querySelector("#description").value;
         const dateFound = this.#container.querySelector(".date-input").value;
-        const tags = this.#container.querySelector(".tag-input").value;
+        const tags = this.#container.querySelector(".tag-input").value.split(',').map(tag => tag.trim());
+        const anon = this.#container.querySelector(".anonymous-button").checked;
         
-        // Example: Publish an event with the form data
-        hub.publish(Events.ItemPosted, {
-          description,
-          dateFound,
-          tags,
-          // Additional data as needed
-        });
+        // Create the new post object
+        const newPost = {
+          id: Date.now().toString(),
+          title: description.split('\n')[0] || 'Untitled Post', // Use first line as title
+          description: description,
+          date: dateFound,
+          anon: anon,
+          tags: tags.filter(tag => tag.length > 0),
+          location: "Not supplied" // You can add location input if needed
+        };
+        
+        // Publish the new post event
+        hub.publish(Events.NewPost, newPost);
+        
+        // Navigate back to home page
+        hub.publish(Events.NavigateTo, "/HomePageSignedIn");
       });
     }
     

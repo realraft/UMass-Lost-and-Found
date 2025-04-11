@@ -232,6 +232,11 @@ export class HomePageSignedIn extends BasePage {
     document.addEventListener('search-query', (e) => {
       this.#sortListingsByRelevance(e.detail.query);
     });
+
+    // Add listener for new posts
+    hub.subscribe(Events.NewPost, (newPost) => {
+      this.#addNewPost(newPost);
+    });
   }
 
   #initializeSorting() {
@@ -664,6 +669,142 @@ export class HomePageSignedIn extends BasePage {
       if (this.#listingContainer) {
         this.#listingContainer.innerHTML = '<div class="error-message">Failed to load listings. Please try again later.</div>';
       }
+    }
+  }
+
+  #addNewPost(post) {
+    if (!this.#listingContainer) return;
+
+    const new_post = document.createElement("div");
+    new_post.classList.add("listing");
+    new_post.id = post.id;
+
+    // Title
+    const title_wrapper = document.createElement("h3");
+    const title_value = document.createElement("span");
+    title_value.classList.add("title");
+    title_value.textContent = post.title || "Not Supplied";
+    title_wrapper.appendChild(title_value);
+    new_post.appendChild(title_wrapper);
+
+    // Date
+    const date_wrapper = document.createElement("p");
+    const date_value = document.createElement("span");
+    date_value.classList.add("date");
+    date_value.textContent = post.date || "Not supplied";
+    date_wrapper.textContent = "Date found: ";
+    date_wrapper.appendChild(date_value);
+    new_post.appendChild(date_wrapper);
+
+    // Description
+    const desc_wrapper = document.createElement("p");
+    const desc_value = document.createElement("span");
+    desc_value.classList.add("description");
+    desc_value.textContent = post.description || "Not supplied";
+    desc_wrapper.textContent = "Description: ";
+    desc_wrapper.appendChild(desc_value);
+    new_post.appendChild(desc_wrapper);
+
+    // Tags
+    const tags_wrapper = document.createElement("p");
+    const tags_value = document.createElement("span");
+    tags_value.classList.add("tags");
+    tags_value.textContent = post.tags && post.tags.length > 0
+      ? post.tags.join(", ")
+      : "Not supplied";
+    tags_wrapper.textContent = "Tags: ";
+    tags_wrapper.appendChild(tags_value);
+    new_post.appendChild(tags_wrapper);
+
+    // Location
+    const location_wrapper = document.createElement("p");
+    const location_value = document.createElement("span");
+    location_value.classList.add("location");
+    location_value.textContent = post.location || "Not supplied";
+    location_wrapper.textContent = "Location: ";
+    location_wrapper.appendChild(location_value);
+    new_post.appendChild(location_wrapper);
+
+    // Report button
+    const button_element = document.createElement("button");
+    button_element.classList.add("report-button");
+    button_element.innerHTML = "Report Listing";
+    button_element.dataset.item = post.title;
+    new_post.appendChild(button_element);
+
+    // Add the new post at the beginning of the container
+    if (this.#listingContainer.firstChild) {
+      this.#listingContainer.insertBefore(new_post, this.#listingContainer.firstChild);
+    } else {
+      this.#listingContainer.appendChild(new_post);
+    }
+
+    // Update filters if the post has new tags or location
+    if (post.tags && post.tags.length > 0) {
+      const tagFilters = document.getElementById('tag-filters');
+      if (tagFilters) {
+        post.tags.forEach(tag => {
+          // Check if this tag filter already exists
+          const existingFilter = tagFilters.querySelector(`input[value="${tag}"]`);
+          if (!existingFilter) {
+            // Add new tag filter
+            const filterOption = document.createElement('div');
+            filterOption.className = 'filter-option';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = tag;
+            checkbox.id = `tag-filters-${tag.toLowerCase().replace(/\s+/g, '-')}`;
+            checkbox.checked = true;
+            checkbox.addEventListener('change', () => this.#applyFilters());
+            
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = tag;
+            
+            filterOption.appendChild(checkbox);
+            filterOption.appendChild(label);
+            tagFilters.appendChild(filterOption);
+          }
+        });
+      }
+    }
+
+    if (post.location) {
+      const locationFilters = document.getElementById('location-filters');
+      if (locationFilters) {
+        // Check if this location filter already exists
+        const existingFilter = locationFilters.querySelector(`input[value="${post.location}"]`);
+        if (!existingFilter) {
+          // Add new location filter
+          const filterOption = document.createElement('div');
+          filterOption.className = 'filter-option';
+          
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.value = post.location;
+          checkbox.id = `location-filters-${post.location.toLowerCase().replace(/\s+/g, '-')}`;
+          checkbox.checked = true;
+          checkbox.addEventListener('change', () => this.#applyFilters());
+          
+          const label = document.createElement('label');
+          label.htmlFor = checkbox.id;
+          label.textContent = post.location;
+          
+          filterOption.appendChild(checkbox);
+          filterOption.appendChild(label);
+          locationFilters.appendChild(filterOption);
+        }
+      }
+    }
+
+    // Re-apply current filters and sorting
+    this.#applyFilters();
+    
+    // If sorted by date, resort the listings
+    const dateRadio = document.getElementById('date-posted');
+    if (dateRadio && dateRadio.checked) {
+      this.#sortListingsByDate();
     }
   }
 }
