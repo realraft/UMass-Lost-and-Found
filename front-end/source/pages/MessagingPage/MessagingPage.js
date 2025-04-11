@@ -1,14 +1,17 @@
 import { EventHub } from "../../eventHub/EventHub";
 import { Events } from "../../eventHub/Events";
 import { MessagingService } from "../../services/MessagingService";
+import { BasePage } from "../BasePage/BasePage";
 
 export class MessagingPage extends BasePage {
 
     #container = null
+    messagingService = null
 
     constructor() {
         super()
         this.loadCSS("MessagingPage")
+        this.messagingService = new MessagingService()
     }
 
     #getTemplate() {
@@ -61,11 +64,12 @@ export class MessagingPage extends BasePage {
     }
 
     #handleNewMessage(newMessage) {
+        const eventhub = EventHub.getEventHubInstance()
         const message = newMessage.value
         const data = message.split(":") //get the user 
         if (data[1].length > 0) {
             const info = {id: `${postid}-${data[0]}-${user2Id}`, text: data[1]} //message format, same ID as post-conversation object
-            eventHub.publish(Events.events["NewUserMessage"], info)
+            eventhub.publish(Events.events["NewUserMessage"], info)
             newMessage.value = "message received"
         } else {
             alert("Please enter a message")
@@ -103,7 +107,7 @@ export class MessagingPage extends BasePage {
     }
 
     async renderConversation(id) { //id
-        await MessagingService.loadConversationMessagesFromDB(id).then((data) => {
+        await this.messagingService.loadConversationMessagesFromDB(id).then((data) => {
             this.#clearMessages_content()
             if (data) {
                 const messages = data.messages
