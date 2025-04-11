@@ -108,6 +108,7 @@ export class NavBar extends BasePage {
   
   #setupSearch(pathPrefix) {
     const searchForm = this.#container.querySelector('.search-form');
+    const hub = EventHub.getEventHubInstance();
     
     if (searchForm) {
       searchForm.addEventListener('submit', function(e) {
@@ -134,8 +135,8 @@ export class NavBar extends BasePage {
               searchInput.value = '';
             }
           } else {
-            // Redirect to the home page with the search query as a parameter NEEDS TO BE CHANGED
-            window.location.href = `${pathPrefix}pages/HomePageSignedIn/HomePageSignedIn.html?search=${encodeURIComponent(searchQuery)}`;
+            // Navigate to HomePageSignedIn with search parameter using EventHub
+            hub.publish(Events.NavigateTo, `/HomePageSignedIn?search=${encodeURIComponent(searchQuery)}`);
             // No need to clear input here as page will be redirected
           }
         }

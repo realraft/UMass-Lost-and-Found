@@ -1,8 +1,8 @@
-import { EventHub } from "../../eventHub/EventHub";
-import { Events } from "../../eventHub/Events";
-import { MessagingService } from "../../services/MessagingService";
-import { BasePage } from "../BasePage/BasePage";
-import { PostedItemPage } from "../PostedItemPage/PostedItemPage";
+import { EventHub } from "../../eventHub/EventHub.js";
+import { Events } from "../../eventHub/Events.js";
+import { MessagingService } from "../../services/MessagingService.js";
+import { BasePage } from "../BasePage/BasePage.js";
+import { PostedItemPage } from "../PostedItemPage/index.js";
 
 export class MessagingPage extends BasePage {
 
