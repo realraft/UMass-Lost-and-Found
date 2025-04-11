@@ -1,5 +1,6 @@
-import { navbar } from "@/components/navbar";
-import { Events, EventHub } from "@/lib/eventhub";
+import { EventHub } from "./eventHub/EventHub.js";
+import { Events } from "./eventHub/Events.js";
+import { HomePageSignedOut } from "./pages/HomePageSignedOut/index.js";
 
 export default class App {
   constructor() {
@@ -9,11 +10,11 @@ export default class App {
     this._currentPage = "home";
     this._hub = null; // EventHub instance for managing events
     
-    this._hub = EventHub.getInstance();
+    this._hub = EventHub.getEventHubInstance();
     this._hub.subscribe(Events.NavigateTo, (page) => this._navigateTo(page));
     this._pageComponents = {
-      home: new TaskListPage(),
-      login: new LoginPage(),
+      home: new HomePageSignedOut(),
+      // Add other page components as needed
     };
   }
 
@@ -43,8 +44,9 @@ export default class App {
       throw new Error("Container element not found");
     }
     
-    const navbar = new Navbar();
-    this._container.appendChild(navbar.render());
+    // We'll skip the navbar for now as it might require additional setup
+    // const navbar = new Navbar();
+    // this._container.appendChild(navbar.render());
     
     this._pageContainer = document.createElement("main");
     this._pageContainer.id = "page-container";
@@ -59,11 +61,13 @@ export default class App {
       case "/home":
         this._currentPage = "home";
         break;
-      case "/login":
-        this._currentPage = "login";
-        break;
+      case "/signin":
+        // Redirect to the signed-in page
+        window.location.href = "./source/pages/HomePageSignedIn/HomePageSignedIn.html";
+        return; // Return early to avoid further processing
+      // Add other routes as needed
       default:
-        this._currentPage = "404";
+        this._currentPage = "home";
     }
     this._renderCurrentPage();
     
