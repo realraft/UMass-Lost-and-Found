@@ -182,7 +182,7 @@ body.signed-in-page {
   display: block;
   width: 100%;
   padding: 10px;
-  background-color: #8C1515;
+  background-color: #dc3545;
   color: white;
   border: none;
   border-radius: 5px;
@@ -190,7 +190,7 @@ body.signed-in-page {
 }
 
 .signed-in-page .modal button:hover {
-  background-color: #8C1515;
+  background-color: #b92d3b;
 }
 
 .signed-in-page .listing.hidden {
@@ -199,12 +199,16 @@ body.signed-in-page {
 
 .signed-in-page .filter-group {
   margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .signed-in-page .filter-section-title {
   margin: 0 0 8px 0;
   font-weight: bold;
   color: #333;
+  display: block;
 }
 
 .signed-in-page .filter-options {
@@ -254,7 +258,30 @@ body.signed-in-page {
   flex-grow: 1;
 }
 
-.signed-in-page .sort-by, 
+.signed-in-page .sort-by {
+  margin-bottom: 20px;
+}
+
+.signed-in-page .sort-by h3 {
+  margin-bottom: 10px;
+}
+
+.signed-in-page .sort-by-options {
+  display: flex;
+  align-items: center;
+}
+
+.signed-in-page .sort-by label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 15px;
+  margin-bottom: 0;
+}
+
+.signed-in-page .sort-by input[type="radio"] {
+  margin-right: 4px;
+}
+
 .signed-in-page .filters {
   margin-bottom: 20px;
 }
@@ -285,7 +312,7 @@ body.signed-in-page {
 .signed-in-page .filter-header {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 8px;
+  margin-bottom: 0;
 }
 
 .signed-in-page .toggle-filter {
