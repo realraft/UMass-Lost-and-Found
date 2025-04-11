@@ -39,7 +39,7 @@ export class NavBar extends BasePage {
     this.#container.innerHTML = `
       <div class="navbar">
         <div class="navbar-brand">
-          <a href="${pathPrefix}pages/HomePageSignedIn/HomePageSignedIn.html" style="text-decoration: none; color: white;">
+          <a href="#" style="text-decoration: none; color: white;" class="home-link">
             <h1>UMass Lost and Found</h1>
           </a>
         </div>
@@ -50,16 +50,16 @@ export class NavBar extends BasePage {
           </form>
         </div>
         <div class="navbar-actions">
-          <a href="${pathPrefix}pages/postItemPage/post_item_page.html" class="nav-link">
+          <a href="#" class="nav-link">
             <button class="post-button">Post</button>
           </a>
           <div class="dropdown">
             <button class="dropdown-button">☰</button>
             <div class="dropdown-content">
-              <a href="${pathPrefix}pages/MessagingPage/MessagingPage.html">Messaging</a>
+              <a href="#" class="messaging-link">Messaging</a>
               <a href="#" class="disabled-link">Post Manager</a>
               <a href="#" class="disabled-link">Admin Page</a>
-              <a href="${pathPrefix}pages/HomePageSignedOut/HomePageSignedOut.html">Log Out</a>
+              <a href="#" class="logout-link">Log Out</a>
             </div>
           </div>
         </div>
@@ -74,6 +74,8 @@ export class NavBar extends BasePage {
     // Setup search functionality
     const pathPrefix = window.location.pathname.includes('/pages/') ? '../../' : '';
     this.#setupSearch(pathPrefix);
+
+    this.#setupNav();
     
     // Get EventHub instance if needed for future use
     const hub = EventHub.getEventHubInstance();
@@ -137,6 +139,56 @@ export class NavBar extends BasePage {
             // No need to clear input here as page will be redirected
           }
         }
+      });
+    }
+  }
+
+  #setupNav() {
+    // Add event listeners if needed
+    const hub = EventHub.getEventHubInstance();
+    
+    // Add click event to the home button
+    const homeButton = this.#container.querySelector(".home-link");
+    if (homeButton) {
+      homeButton.addEventListener("click", (event) => {
+        event.preventDefault(); // Prevent default navigation
+        hub.publish(Events.NavigateTo, "/HomePageSignedOut");
+      });
+    }
+    
+    // Add click event to the post button
+    const postButton = this.#container.querySelector(".post-button");
+    if (postButton) {
+      postButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        hub.publish(Events.NavigateTo, "/PostItemPage");
+      });
+    }
+    
+    // Add click events to dropdown menu links
+    const messagingLink = this.#container.querySelector(".messaging-link");
+    if (messagingLink) {
+      messagingLink.addEventListener("click", (event) => {
+        event.preventDefault();
+        hub.publish(Events.NavigateTo, "/MessagingPage");
+      });
+    }
+    
+    // Handle disabled links
+    const disabledLinks = this.#container.querySelectorAll(".disabled-link");
+    disabledLinks.forEach(link => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        alert("This feature is not yet available.");
+      });
+    });
+    
+    // Add click event to the logout link
+    const logoutLink = this.#container.querySelector(".logout-link");
+    if (logoutLink) {
+      logoutLink.addEventListener("click", (event) => {
+        event.preventDefault();
+        hub.publish(Events.NavigateTo, "/HomePageSignedOut");
       });
     }
   }

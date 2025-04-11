@@ -53,7 +53,7 @@ export class HomePageSignedOut extends BasePage {
     // Create sign-in button
     const signInButton = document.createElement("a");
     signInButton.className = "sign-in-button";
-    signInButton.href = "../HomePageSignedIn/HomePageSignedIn.html";
+    signInButton.href = "#";
     signInButton.textContent = "Sign In";
     
     // Add all elements to container
