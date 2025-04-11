@@ -80,10 +80,9 @@ export class HomePageSignedIn extends BasePage {
     modal.appendChild(itemName);
     modal.appendChild(textarea);
     modal.appendChild(submitButton);
-    
-    // Add elements to DOM
-    document.body.appendChild(overlay);
-    document.body.appendChild(modal);
+        
+    this.#container.appendChild(overlay);
+    this.#container.appendChild(modal);
   }
 
   #openReportModal(itemTitle) {
@@ -233,7 +232,7 @@ export class HomePageSignedIn extends BasePage {
     
     tagHeader.appendChild(tagToggle);
     tagFilterGroup.appendChild(tagTitle);
-    tagFilterGroup.appendChild(tagHeader);
+        tagFilterGroup.appendChild(tagHeader);
     tagFilterGroup.appendChild(tagFilters);
     
     // Add filter groups to filters section
