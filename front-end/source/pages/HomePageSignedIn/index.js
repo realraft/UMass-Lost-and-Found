@@ -649,7 +649,6 @@ export class HomePageSignedIn extends BasePage {
   
   async #renderListings() {
     try {
-      // Fetch server data with proper error handling
       const response = await fetch('/front-end/source/Fake-Server/server.json');
       
       if (!response.ok) {
@@ -658,9 +657,7 @@ export class HomePageSignedIn extends BasePage {
       
       const json_data = await response.json();
       
-      // Clear any existing content
       if (this.#listingContainer) {
-        // Keep only the loading indicator if it exists
         const loadingIndicator = this.#listingContainer.querySelector('.loading-indicator');
         this.#listingContainer.innerHTML = '';
         if (loadingIndicator) {
@@ -668,11 +665,21 @@ export class HomePageSignedIn extends BasePage {
         }
       }
       
-      // Render each post as a listing
       for (const post of json_data.posts) {
         const new_post = document.createElement("div");
         new_post.classList.add("listing");
         new_post.id = post.id;
+
+        // Make the listing clickable
+        new_post.style.cursor = 'pointer';
+        new_post.addEventListener('click', (e) => {
+          // Don't trigger if clicking the report button
+          if (e.target.classList.contains('report-button')) {
+            return;
+          }
+          const hub = EventHub.getEventHubInstance();
+          hub.publish(Events.ViewPost, post);
+        });
 
         // Title
         const title_wrapper = document.createElement("h3");
