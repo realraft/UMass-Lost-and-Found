@@ -460,7 +460,15 @@ export class AdminPage extends BasePage {
       }
       
       const json_data = await response.json();
-      
+      const posts = json_data.posts;
+      const reports = json_data.reports;
+  
+      // Associate reports with posts
+      const postsWithReports = posts.map(post => {
+        post.reports = reports.filter(report => report.post_id === post.id);
+        return post;
+      });
+  
       if (this.#listingContainer) {
         const loadingIndicator = this.#listingContainer.querySelector('.loading-indicator');
         this.#listingContainer.innerHTML = '';
@@ -468,8 +476,8 @@ export class AdminPage extends BasePage {
           this.#listingContainer.appendChild(loadingIndicator);
         }
       }
-      
-      json_data.posts.forEach(post => this.#createListingElement(post));
+  
+      postsWithReports.forEach(post => this.#createListingElement(post));
     } catch (error) {
       console.error("Error rendering listings:", error);
       
