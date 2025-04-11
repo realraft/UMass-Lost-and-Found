@@ -35,7 +35,7 @@ export default class App {
       homeSignedIn: new HomePageSignedIn(),
       postItem: new PostItemPage(),
       postedItem: new PostedItemPage(),
-      messaging: new MessagingPage()
+      messaging: new MessagingPage(1) // Initialize with default user ID 1
     };
     this._navbar = new NavBar();
   }
