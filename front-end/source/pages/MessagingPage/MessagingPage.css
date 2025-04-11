@@ -1,4 +1,4 @@
-h1 {
+.messaging-page h1 {
     color: white;
     background-color: red;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -9,7 +9,7 @@ h1 {
     display: flex
 }
 
-.posts-container {
+.messaging-page .posts-container {
     width: 17.5em;
     background-color: white;
     color: black;
@@ -20,7 +20,7 @@ h1 {
     gap: 0.2em;
 }
 
-.message-container {
+.messaging-page .message-container {
     flex: 1;
     background-image: url("clouds.jpg");
     background-size: cover;
@@ -31,14 +31,14 @@ h1 {
     flex-direction: column;
 }
 
-.messages-content {
+.messaging-page .messages-content {
     color: black;
     flex-direction: column;
     height: 75vh;
     overflow-y: auto;
 }
 
-.myMessage {
+.messaging-page .myMessage {
     color: black;
     background-color: lightgreen;
     text-align: center;
@@ -47,7 +47,7 @@ h1 {
     margin-right: 1em;
 }
 
-.otherMessage {
+.messaging-page .otherMessage {
     color: black;
     background-color: rgb(31, 180, 230);
     width: 50%;
@@ -55,7 +55,7 @@ h1 {
     margin-left: 1em;
 }
 
-.post-messages {
+.messaging-page .post-messages {
     color: black;
     text-align: center;
     background-color: rgb(250, 213, 213);
@@ -68,39 +68,39 @@ h1 {
     gap: 0.2em;
 }
 
-.post-button {
+.messaging-page .post-button {
     color: black;
     border: none;
     font-size: 1rem;
     background: none;
 }
 
-.post-button:hover {
+.messaging-page .post-button:hover {
     text-decoration: underline;
     cursor: pointer;
 }
 
-.post {
+.messaging-page .post {
     color: black;
     border: none;
     font-size: 2rem;
     background: none;
 }
 
-.post:hover {
+.messaging-page .post:hover {
     text-decoration: underline;
     cursor: pointer;
 }
 
-#messageForm div {
+.messaging-page #messageForm div {
     display: flex;
     flex-direction: row;
     align-items: left;
     gap: 1em; 
     padding: 0.5em;
-  }
+}
 
-  label {
+.messaging-page label {
     font-size: 1.25rem;
     font-weight: bold;
-  }
+}

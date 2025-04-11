@@ -1,4 +1,4 @@
-.header-container {
+.post-item-page .header-container {
   display: flex;
   justify-content: space-between;
   height: 150px;
@@ -6,37 +6,37 @@
   margin: 10px;
 }
 
-.name-container {
+.post-item-page .name-container {
   width: 500px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-#header-text {
+.post-item-page #header-text {
   font-weight: bolder;
   color: black;
   font-size: 48px;
 }
 
-.search-container {
+.post-item-page .search-container {
   width: 289.89px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
 
-.search-bar {
+.post-item-page .search-bar {
   display: flex;
   max-width: 600px; /* ↑ increase from 400px → controls overall width */
-  width: 100%; /* lets it grow to its container’s width */
+  width: 100%; /* lets it grow to its container's width */
   margin: 0 auto;
   justify-content: center;
   align-items: center;
   gap: 0.75rem;
 }
 
-.search-bar input {
+.post-item-page .search-bar input {
   flex: 1;
   width: 100%;
   padding: 0.75rem 1.25rem; /* ↑ bigger padding for height */
@@ -46,14 +46,14 @@
   border-radius: 6px;
 }
 
-.post-button-container {
+.post-item-page .post-button-container {
   width: 289.89px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.post-button {
+.post-item-page .post-button {
   background-color: oklch(0.505 0.213 27.518); /* ✅ Primary brand color */
   color: #fff; /* ✅ High contrast text */
   padding: 0.75rem 1.5rem; /* ↑ Comfortable click area */
@@ -66,8 +66,8 @@
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.left-content-container,
-.right-content-container {
+.post-item-page .left-content-container,
+.post-item-page .right-content-container {
   width: 350px;
   height: 450px;
   margin: 50px;
@@ -76,20 +76,20 @@
   gap: 30px;
 }
 
-.post-img-container {
+.post-item-page .post-img-container {
   display: flex;
   justify-content: center;
   align-items: center;
   border: 2px solid black;
 }
-.post-img-container img,
-.GPS-map-container img {
+.post-item-page .post-img-container img,
+.post-item-page .GPS-map-container img {
   width: 100%;
   height: 100%;
   object-fit: contain; /* scales image to fit inside, letterboxing if needed */
 }
 
-.post-options-container {
+.post-item-page .post-options-container {
   display: flex;
   flex-direction: column;
   height: 200px;
@@ -97,16 +97,16 @@
   justify-content: center;
   gap: 10px;
 }
-.date-options-container,
-.anonymous-options-container {
+.post-item-page .date-options-container,
+.post-item-page .anonymous-options-container {
   display: flex;
   gap: 5px;
 }
 
-.date-found-option,
-.date-picker,
-.anonymous-text,
-.anonymous-button {
+.post-item-page .date-found-option,
+.post-item-page .date-picker,
+.post-item-page .anonymous-text,
+.post-item-page .anonymous-button {
   width: 100%;
   height: 100%;
   border: 2px solid black;
@@ -115,12 +115,12 @@
   align-items: center;
 }
 
-main {
+.post-item-page main {
   display: flex;
   justify-content: space-around;
 }
 
-.description-box {
+.post-item-page .description-box {
   width: 100%; /* Fill its parent container */
   max-width: 600px; /* Optional limit */
   height: 150px; /* Control vertical size */
@@ -131,13 +131,13 @@ main {
   resize: vertical; /* Allow user to resize height only */
   box-sizing: border-box; /* Include padding/border in width */
 }
-.description-box-input-container {
+.post-item-page .description-box-input-container {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.tag-input-container {
+.post-item-page .tag-input-container {
   display: flex;
   align-items: center;
   width: 100%;
@@ -148,12 +148,12 @@ main {
   border: 1px solid #ccc;
 }
 
-.tag-icon {
+.post-item-page .tag-icon {
   font-size: 1.25rem;
   margin-right: 0.75rem;
 }
 
-.tag-input {
+.post-item-page .tag-input {
   flex: 1;
   border: none;
   background: transparent;
@@ -161,20 +161,19 @@ main {
   outline: none;
 }
 
-.GPS-map-container img {
+.post-item-page .GPS-map-container img {
   border: 2px solid black;
 }
 
-.posts-container {
+.post-item-page .posts-container {
   width: 100%;
   height: 100%;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-
   gap: 10px;
 }
-.post {
+.post-item-page .post {
   height: 100%;
   width: 45%;
   display: flex;

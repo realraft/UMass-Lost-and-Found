@@ -19,61 +19,10 @@ export class PostItemPage extends BasePage {
     this.#container = document.createElement("div");
     this.#container.className = "post-item-page";
     
-    this.#setupHeader();
     this.#setupMainContent();
     this.#attachEventListeners();
 
     return this.#container;
-  }
-
-  #setupHeader() {
-    const header = document.createElement("header");
-    header.className = "header-container";
-
-    // Name container with title
-    const nameContainer = document.createElement("div");
-    nameContainer.className = "name-container";
-    const headerText = document.createElement("h1");
-    headerText.id = "header-text";
-    headerText.textContent = "UMass Lost and Found";
-    nameContainer.appendChild(headerText);
-
-    // Search container
-    const searchContainer = document.createElement("div");
-    searchContainer.className = "search-container";
-    const searchForm = document.createElement("form");
-    searchForm.className = "search-bar";
-    searchForm.action = "/search";
-    searchForm.method = "get";
-    
-    const searchInput = document.createElement("input");
-    searchInput.type = "search";
-    searchInput.name = "q";
-    searchInput.placeholder = "Search…";
-    searchInput.setAttribute("aria-label", "Search");
-    
-    const searchButton = document.createElement("button");
-    searchButton.type = "submit";
-    searchButton.textContent = "🔍";
-    
-    searchForm.appendChild(searchInput);
-    searchForm.appendChild(searchButton);
-    searchContainer.appendChild(searchForm);
-
-    // Post button container
-    const postButtonContainer = document.createElement("div");
-    postButtonContainer.className = "post-button-container";
-    const postButton = document.createElement("button");
-    postButton.className = "post-button";
-    postButton.textContent = "POST";
-    postButtonContainer.appendChild(postButton);
-
-    // Add all elements to header
-    header.appendChild(nameContainer);
-    header.appendChild(searchContainer);
-    header.appendChild(postButtonContainer);
-
-    this.#container.appendChild(header);
   }
 
   #setupMainContent() {

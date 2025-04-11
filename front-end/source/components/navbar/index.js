@@ -152,7 +152,7 @@ export class NavBar extends BasePage {
     if (homeButton) {
       homeButton.addEventListener("click", (event) => {
         event.preventDefault(); // Prevent default navigation
-        hub.publish(Events.NavigateTo, "/HomePageSignedOut");
+        hub.publish(Events.NavigateTo, "/HomePageSignedIn");
       });
     }
     
