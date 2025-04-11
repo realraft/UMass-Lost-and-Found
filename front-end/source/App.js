@@ -15,6 +15,7 @@ export default class App {
     this._currentPage = "home";
     this._hub = null; // EventHub instance for managing events
     this._navbar = null; // NavBar component instance
+    this._navbarElement = null; // Navbar DOM element
     
     this._hub = EventHub.getEventHubInstance();
     this._hub.subscribe(Events.NavigateTo, (page) => this._navigateTo(page));
@@ -54,11 +55,7 @@ export default class App {
       throw new Error("Container element not found");
     }
     
-    // Add navbar to the container (it will not render for HomePageSignedOut)
-    const navbarElement = this._navbar.render();
-    if (navbarElement) {
-      this._container.appendChild(navbarElement);
-    }
+    this._navbarElement = this._navbar.render();
     
     this._pageContainer = document.createElement("main");
     this._pageContainer.id = "page-container";
@@ -108,13 +105,16 @@ export default class App {
     this._pageContainer.appendChild(pageComponent.render());
     
     // Update navbar visibility based on current page
-    const navbarElement = this._navbar.render();
     if (this._currentPage === "home") {
-      if (navbarElement && navbarElement.parentNode === this._container) {
-        this._container.removeChild(navbarElement);
+      // Remove navbar when on HomePageSignedOut
+      if (this._navbarElement && this._navbarElement.parentNode === this._container) {
+        this._container.removeChild(this._navbarElement);
       }
-    } else if (navbarElement && !navbarElement.parentNode) {
-      this._container.insertBefore(navbarElement, this._pageContainer);
+    } else {
+      // Add navbar for all other pages if it's not already in the DOM
+      if (this._navbarElement && !this._navbarElement.parentNode) {
+        this._container.insertBefore(this._navbarElement, this._pageContainer);
+      }
     }
   }
 }
