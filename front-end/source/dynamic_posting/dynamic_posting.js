@@ -1,3 +1,6 @@
+import { EventHub } from "../eventHub/EventHub.js";
+import { Events } from "../eventHub/Events.js";
+
 // import fs from "fs";
 
 const FILE_PATH = "../../Fake-Server/server.json";
@@ -106,6 +109,29 @@ async function render_posts() {
   }
 }
 
-// ...existing code...
+// Add test function for creating a new post
+function testAddNewPost() {
+  const hub = EventHub.getEventHubInstance();
+  const newPost = {
+    id: Date.now().toString(), // Generate a unique ID
+    title: "Test Post",
+    description: "This is a test post to verify real-time updates",
+    date: new Date().toISOString().split('T')[0],
+    location: "Library",
+    tags: ["Test", "Electronics"],
+  };
+  
+  hub.publish(Events.NewPost, newPost);
+}
+
+// Add a test button to the page
+const testButton = document.createElement("button");
+testButton.textContent = "Add Test Post";
+testButton.style.position = "fixed";
+testButton.style.bottom = "20px";
+testButton.style.right = "20px";
+testButton.style.zIndex = "1000";
+testButton.addEventListener("click", testAddNewPost);
+document.body.appendChild(testButton);
 
 render_posts();
