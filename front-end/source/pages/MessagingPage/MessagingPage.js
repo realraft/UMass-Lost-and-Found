@@ -10,7 +10,7 @@ export class MessagingPage extends BasePage {
 
     constructor() {
         super()
-        this.loadCSS("MessagingPage")
+        this.loadCSS("pages/MessagingPage", "MessagingPage")
         this.messagingService = new MessagingService()
     }
 

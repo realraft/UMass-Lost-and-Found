@@ -2,6 +2,7 @@ import { EventHub } from "./eventHub/EventHub.js";
 import { Events } from "./eventHub/Events.js";
 import { HomePageSignedOut } from "./pages/HomePageSignedOut/index.js";
 import { HomePageSignedIn } from "./pages/HomePageSignedIn/index.js";
+import { NavBar } from "./components/navbar/index.js";
 
 export default class App {
   constructor() {
@@ -10,6 +11,7 @@ export default class App {
     this._pageComponents = {};
     this._currentPage = "home";
     this._hub = null; // EventHub instance for managing events
+    this._navbar = null; // NavBar component instance
     
     this._hub = EventHub.getEventHubInstance();
     this._hub.subscribe(Events.NavigateTo, (page) => this._navigateTo(page));
@@ -17,6 +19,7 @@ export default class App {
       home: new HomePageSignedOut(),
       homeSignedIn: new HomePageSignedIn()
     };
+    this._navbar = new NavBar();
   }
 
   // Render the AppController component and return the container
@@ -45,9 +48,11 @@ export default class App {
       throw new Error("Container element not found");
     }
     
-    // We'll skip the navbar for now as it might require additional setup
-    // const navbar = new Navbar();
-    // this._container.appendChild(navbar.render());
+    // Add navbar to the container (it will not render for HomePageSignedOut)
+    const navbarElement = this._navbar.render();
+    if (navbarElement) {
+      this._container.appendChild(navbarElement);
+    }
     
     this._pageContainer = document.createElement("main");
     this._pageContainer.id = "page-container";
@@ -86,5 +91,15 @@ export default class App {
       throw new Error(`Page component not found for view: ${this._currentPage}`);
     }
     this._pageContainer.appendChild(pageComponent.render());
+    
+    // Update navbar visibility based on current page
+    const navbarElement = this._navbar.render();
+    if (this._currentPage === "home") {
+      if (navbarElement && navbarElement.parentNode === this._container) {
+        this._container.removeChild(navbarElement);
+      }
+    } else if (navbarElement && !navbarElement.parentNode) {
+      this._container.insertBefore(navbarElement, this._pageContainer);
+    }
   }
 }

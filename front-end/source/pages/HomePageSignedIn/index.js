@@ -8,7 +8,7 @@ export class HomePageSignedIn extends BasePage {
 
   constructor() {
     super();
-    this.loadCSS("HomePageSignedIn", "HomePageSignedIn");
+    this.loadCSS("pages/HomePageSignedIn", "HomePageSignedIn");
   }
 
   render() {
@@ -26,9 +26,6 @@ export class HomePageSignedIn extends BasePage {
     // Setup container content synchronously
     this.#setupContainerContentSync();
     this.#attachEventListeners();
-    
-    // Add navbar to the document
-    this.#addNavbar();
 
     this.#loadData();
 
@@ -226,19 +223,6 @@ export class HomePageSignedIn extends BasePage {
       // Show error message
       this.#listingContainer.innerHTML = '<div class="error-message">Failed to load content. Please try again later.</div>';
     }
-  }
-
-  #addNavbar() {
-    // We don't need to manually add the navbar, as it's added 
-    // by the navbar.js script that's included in the HTML
-    // But we can make sure it's properly set up for this page
-    // by firing an event after a short timeout
-    setTimeout(() => {
-      const event = new CustomEvent('page-loaded', {
-        detail: { page: 'HomePageSignedIn' }
-      });
-      document.dispatchEvent(event);
-    }, 100);
   }
 
   #attachEventListeners() {

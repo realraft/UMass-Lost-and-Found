@@ -7,11 +7,11 @@ export class BasePage {
         throw new Error('Method "render" must be implemented in derived classes')
     }
 
-    loadCSS(pageName, cssName = pageName) {
+    loadCSS(path, cssName) {
         if (!this.cssloaded) {
             const link = document.createElement("link")
             link.rel = "stylesheet"
-            link.href = `/front-end/source/pages/${pageName}/${cssName}.css`
+            link.href = `/front-end/source/${path}/${cssName}.css`
             document.head.appendChild(link)
             this.cssloaded = true
         }

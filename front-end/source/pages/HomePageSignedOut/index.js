@@ -7,7 +7,7 @@ export class HomePageSignedOut extends BasePage {
 
   constructor() {
     super();
-    this.loadCSS("HomePageSignedOut", "HomePageSignedOut");
+    this.loadCSS("pages/HomePageSignedOut", "HomePageSignedOut");
   }
 
   render() {

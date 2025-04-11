@@ -38,13 +38,7 @@ body.signed-in-page {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  background-color: #007bff;
-  color: #fff;
   transition: background-color 0.3s ease-in-out;
-}
-
-.signed-in-page button:hover {
-  background-color: #0056b3;
 }
 
 .signed-in-page a {
