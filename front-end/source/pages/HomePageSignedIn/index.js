@@ -23,7 +23,7 @@ export class HomePageSignedIn extends BasePage {
     this.#container.className = "page-container";
     
     this.#createReportModal();
-    this.#setupContainerContentSync();
+    this.#setupContainerContent();
     this.#attachEventListeners();
     this.#loadData();
 
@@ -63,17 +63,18 @@ export class HomePageSignedIn extends BasePage {
   }
 
   #openReportModal(itemTitle) {
-    const overlay = document.getElementById('report-overlay');
-    const modal = document.getElementById('report-modal');
-    const itemElement = document.getElementById('report-item-name');
-    const reasonTextarea = document.getElementById('report-reason');
+    const elements = {
+      overlay: document.getElementById('report-overlay'),
+      modal: document.getElementById('report-modal'),
+      item: document.getElementById('report-item-name'),
+      reason: document.getElementById('report-reason')
+    };
     
-    if (overlay && modal && itemElement && reasonTextarea) {
-      itemElement.textContent = `Item: ${itemTitle}`;
-      reasonTextarea.value = '';
-      
-      overlay.style.display = 'block';
-      modal.style.display = 'block';
+    if (Object.values(elements).every(el => el)) {
+      elements.item.textContent = `Item: ${itemTitle}`;
+      elements.reason.value = '';
+      elements.overlay.style.display = 'block';
+      elements.modal.style.display = 'block';
     }
   }
 
@@ -105,17 +106,14 @@ export class HomePageSignedIn extends BasePage {
     }
   }
 
-  #setupContainerContentSync() {
+  #setupContainerContent() {
     if (!this.#container) return;
     
-    // Create sidebar with filters and sorting
     const sidebar = this.#createSidebar();
     
-    // Create main content area
     const mainContent = document.createElement("div");
     mainContent.className = "main-content";
     
-    // Create listings container
     this.#listingContainer = document.createElement("div");
     this.#listingContainer.className = "listing-container";
     
@@ -133,36 +131,7 @@ export class HomePageSignedIn extends BasePage {
     sidebar.className = "sidebar";
     
     // Create sort-by section
-    const sortBySection = document.createElement("div");
-    sortBySection.className = "sort-by";
-    
-    const sortTitle = document.createElement("h3");
-    sortTitle.textContent = "Sort By";
-    
-    const dateRadio = document.createElement("input");
-    dateRadio.type = "radio";
-    dateRadio.id = "date-posted";
-    dateRadio.name = "sort";
-    dateRadio.value = "date-posted";
-    dateRadio.checked = true;
-    
-    const dateLabel = document.createElement("label");
-    dateLabel.htmlFor = "date-posted";
-    dateLabel.textContent = "Date Posted";
-    
-    const lineBreak = document.createElement("br");
-    
-    const relevanceRadio = document.createElement("input");
-    relevanceRadio.type = "radio";
-    relevanceRadio.id = "relevance";
-    relevanceRadio.name = "sort";
-    relevanceRadio.value = "relevance";
-    
-    const relevanceLabel = document.createElement("label");
-    relevanceLabel.htmlFor = "relevance";
-    relevanceLabel.textContent = "Relevance";
-    
-    sortBySection.append(sortTitle, dateRadio, dateLabel, lineBreak, relevanceRadio, relevanceLabel);
+    const sortBySection = this.#createSortBySection();
     
     // Create filters section
     const filtersSection = document.createElement("div");
@@ -175,12 +144,41 @@ export class HomePageSignedIn extends BasePage {
     const locationFilterGroup = this.#createFilterGroup("Location", "location-filters");
     const tagFilterGroup = this.#createFilterGroup("Tags", "tag-filters");
     
-    // Add filter groups to filters section
     filtersSection.append(filtersTitle, locationFilterGroup, tagFilterGroup);
-    
-    // Add sections to sidebar
     sidebar.append(sortBySection, filtersSection);
+    
     return sidebar;
+  }
+
+  #createSortBySection() {
+    const sortBySection = document.createElement("div");
+    sortBySection.className = "sort-by";
+    
+    const sortTitle = document.createElement("h3");
+    sortTitle.textContent = "Sort By";
+    
+    // Helper function to create radio buttons
+    const createRadio = (id, label, checked = false) => {
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.id = id;
+      radio.name = "sort";
+      radio.value = id;
+      radio.checked = checked;
+      
+      const labelElement = document.createElement("label");
+      labelElement.htmlFor = id;
+      labelElement.textContent = label;
+      
+      return [radio, labelElement];
+    };
+    
+    const [dateRadio, dateLabel] = createRadio("date-posted", "Date Posted", true);
+    const lineBreak = document.createElement("br");
+    const [relevanceRadio, relevanceLabel] = createRadio("relevance", "Relevance");
+    
+    sortBySection.append(sortTitle, dateRadio, dateLabel, lineBreak, relevanceRadio, relevanceLabel);
+    return sortBySection;
   }
 
   #createFilterGroup(title, filterId) {
@@ -217,47 +215,39 @@ export class HomePageSignedIn extends BasePage {
       this.#initializeSorting();
       this.#checkForSearchQuery();
       
-      const loadingIndicator = this.#listingContainer.querySelector('.loading-indicator');
+      const loadingIndicator = this.#listingContainer?.querySelector('.loading-indicator');
       if (loadingIndicator) {
-        this.#listingContainer.removeChild(loadingIndicator);
+        loadingIndicator.remove();
       }
     } catch (error) {
       console.error('Error loading data:', error);
-      this.#listingContainer.innerHTML = '<div class="error-message">Failed to load content. Please try again later.</div>';
+      if (this.#listingContainer) {
+        this.#listingContainer.innerHTML = '<div class="error-message">Failed to load content. Please try again later.</div>';
+      }
     }
   }
 
   #attachEventListeners() {
     const hub = EventHub.getEventHubInstance();
-    
-    document.addEventListener('search-query', (e) => {
-      this.#sortListingsByRelevance(e.detail.query);
-    });
-
-    hub.subscribe(Events.NewPost, (newPost) => {
-      this.#addNewPost(newPost);
-    });
+    document.addEventListener('search-query', (e) => this.#sortListingsByRelevance(e.detail.query));
+    hub.subscribe(Events.NewPost, (newPost) => this.#addNewPost(newPost));
   }
 
   #initializeSorting() {
     const dateRadio = document.getElementById('date-posted');
     const relevanceRadio = document.getElementById('relevance');
     
-    if (dateRadio) {
-      dateRadio.addEventListener('change', () => {
-        if (dateRadio.checked) this.#sortListingsByDate();
-      });
-    }
+    dateRadio?.addEventListener('change', () => {
+      if (dateRadio.checked) this.#sortListingsByDate();
+    });
     
-    if (relevanceRadio) {
-      relevanceRadio.addEventListener('change', () => {
-        if (relevanceRadio.checked) {
-          const searchBox = document.querySelector('.search-form input');
-          const query = searchBox ? searchBox.value : '';
-          if (query.trim()) this.#sortListingsByRelevance(query);
-        }
-      });
-    }
+    relevanceRadio?.addEventListener('change', () => {
+      if (relevanceRadio.checked) {
+        const searchBox = document.querySelector('.search-form input');
+        const query = searchBox?.value?.trim() || '';
+        if (query) this.#sortListingsByRelevance(query);
+      }
+    });
     
     if (dateRadio) {
       dateRadio.checked = true;
@@ -266,43 +256,25 @@ export class HomePageSignedIn extends BasePage {
   }
 
   #checkForSearchQuery() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchQuery = urlParams.get('search');
-    
+    const searchQuery = new URLSearchParams(window.location.search).get('search');
     if (searchQuery) {
       const relevanceRadio = document.getElementById('relevance');
       if (relevanceRadio) relevanceRadio.checked = true;
-      
       this.#sortListingsByRelevance(searchQuery);
     }
   }
 
   #setupToggleButtons() {
-    const locationToggle = document.getElementById('toggle-location-filters');
-    const tagToggle = document.getElementById('toggle-tag-filters');
-    
-    if (locationToggle) {
-      locationToggle.addEventListener('click', () => {
-        this.#toggleFilters('location-filters');
-      });
-    }
-    
-    if (tagToggle) {
-      tagToggle.addEventListener('click', () => {
-        this.#toggleFilters('tag-filters');
-      });
-    }
+    ['location-filters', 'tag-filters'].forEach(filterId => {
+      const toggleBtn = document.getElementById(`toggle-${filterId}`);
+      toggleBtn?.addEventListener('click', () => this.#toggleFilters(filterId));
+    });
   }
 
   #toggleFilters(filterId) {
     const checkboxes = document.querySelectorAll(`#${filterId} input[type="checkbox"]`);
-    const checkedCount = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;
-    const shouldCheck = checkedCount === 0;
-    
-    checkboxes.forEach(checkbox => {
-      checkbox.checked = shouldCheck;
-    });
-    
+    const shouldCheck = Array.from(checkboxes).filter(checkbox => checkbox.checked).length === 0;
+    checkboxes.forEach(checkbox => checkbox.checked = shouldCheck);
     this.#applyFilters();
   }
 
@@ -318,20 +290,16 @@ export class HomePageSignedIn extends BasePage {
       posts.forEach(post => {
         if (post.location) locations.add(post.location);
         
-        if (post.tags && Array.isArray(post.tags)) {
-          post.tags.forEach(tag => {
-            if (tag) tags.add(tag);
-          });
+        if (post.tags?.length) {
+          post.tags.forEach(tag => tag && tags.add(tag));
         }
       });
       
       this.#populateFilterOptions('location-filters', Array.from(locations));
       this.#populateFilterOptions('tag-filters', Array.from(tags));
       
-      const filterCheckboxes = document.querySelectorAll('.filter-option input[type="checkbox"]');
-      filterCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', () => this.#applyFilters());
-      });
+      document.querySelectorAll('.filter-option input[type="checkbox"]')
+        .forEach(checkbox => checkbox.addEventListener('change', () => this.#applyFilters()));
     } catch (error) {
       console.error('Error fetching filter data:', error);
     }
@@ -362,48 +330,43 @@ export class HomePageSignedIn extends BasePage {
 
   #applyFilters() {
     const listings = document.querySelectorAll('.listing');
-    const locationCheckboxes = document.querySelectorAll('#location-filters .filter-option input[type="checkbox"]');
-    const selectedLocations = Array.from(
-      document.querySelectorAll('#location-filters .filter-option input:checked')
+    
+    // Helper function to get selected values
+    const getSelectedValues = (selector) => Array.from(
+      document.querySelectorAll(selector)
     ).map(input => input.value);
     
-    const tagCheckboxes = document.querySelectorAll('#tag-filters .filter-option input[type="checkbox"]');
-    const selectedTags = Array.from(
-      document.querySelectorAll('#tag-filters .filter-option input:checked')
-    ).map(input => input.value);
+    const selectedLocations = getSelectedValues('#location-filters .filter-option input:checked');
+    const selectedTags = getSelectedValues('#tag-filters .filter-option input:checked');
+    
+    const locationFilterActive = document.querySelectorAll('#location-filters .filter-option input').length > 0;
+    const tagFilterActive = document.querySelectorAll('#tag-filters .filter-option input').length > 0;
     
     listings.forEach(listing => {
       let showListing = true;
       
       // Location filter
-      if (locationCheckboxes.length > 0 && selectedLocations.length === 0) {
+      if (locationFilterActive && selectedLocations.length === 0) {
         showListing = false;
       } else if (selectedLocations.length > 0) {
-        const locationElement = listing.querySelector('.location');
-        const listingLocation = locationElement ? locationElement.textContent.trim() : '';
-        if (!selectedLocations.includes(listingLocation)) {
+        const locationText = listing.querySelector('.location')?.textContent.trim() || '';
+        if (!selectedLocations.includes(locationText)) {
           showListing = false;
         }
       }
       
       // Tag filter
-      if (tagCheckboxes.length > 0 && selectedTags.length === 0 && showListing) {
+      if (showListing && tagFilterActive && selectedTags.length === 0) {
         showListing = false;
-      } else if (selectedTags.length > 0 && showListing) {
-        const tagsElement = listing.querySelector('.tags');
-        if (tagsElement) {
-          const tagsText = tagsElement.textContent.trim();
-          if (tagsText === "Not supplied") {
-            showListing = false;
-          } else {
-            const listingTags = tagsText.split(',').map(tag => tag.trim());
-            const hasMatchingTag = listingTags.some(tag => selectedTags.includes(tag));
-            if (!hasMatchingTag) {
-              showListing = false;
-            }
-          }
-        } else {
+      } else if (showListing && selectedTags.length > 0) {
+        const tagsText = listing.querySelector('.tags')?.textContent.trim() || '';
+        if (tagsText === "Not supplied") {
           showListing = false;
+        } else {
+          const listingTags = tagsText.split(',').map(tag => tag.trim());
+          if (!listingTags.some(tag => selectedTags.includes(tag))) {
+            showListing = false;
+          }
         }
       }
       
@@ -414,37 +377,38 @@ export class HomePageSignedIn extends BasePage {
   }
 
   #updateNoResultsMessage() {
-    const visibleListings = document.querySelectorAll('.listing:not(.hidden)');
     const listingContainer = document.querySelector('.listing-container');
+    if (!listingContainer) return;
+    
+    const visibleListings = listingContainer.querySelectorAll('.listing:not(.hidden)');
     const existingNoResults = listingContainer.querySelector('.no-results');
     
     if (visibleListings.length === 0) {
       if (!existingNoResults) {
-        const noResults = document.createElement('div');
-        noResults.className = 'no-results';
-        noResults.textContent = 'No items match your filters.';
-        listingContainer.appendChild(noResults);
+        listingContainer.appendChild(this.#createMessageElement('No items match your filters.', 'no-results'));
       }
     } else if (existingNoResults) {
-      listingContainer.removeChild(existingNoResults);
+      existingNoResults.remove();
     }
+  }
+
+  #createMessageElement(message, className) {
+    const element = document.createElement('div');
+    element.className = className;
+    element.textContent = message;
+    return element;
   }
 
   #sortListingsByDate() {
     const listingContainer = document.querySelector('.listing-container');
-    const listings = Array.from(listingContainer.querySelectorAll('.listing:not(.hidden)'));
+    if (!listingContainer) return;
     
-    const existingNoResults = listingContainer.querySelector('.no-results');
-    if (existingNoResults) {
-      listingContainer.removeChild(existingNoResults);
-    }
+    const listings = Array.from(listingContainer.querySelectorAll('.listing:not(.hidden)'));
+    listingContainer.querySelector('.no-results')?.remove();
     
     listings.sort((a, b) => {
-      const dateA = new Date(a.querySelector('.date')?.textContent || 
-                            a.getAttribute('data-date') || 0);
-      const dateB = new Date(b.querySelector('.date')?.textContent ||
-                            b.getAttribute('data-date') || 0);
-      
+      const dateA = new Date(a.querySelector('.date')?.textContent || a.getAttribute('data-date') || 0);
+      const dateB = new Date(b.querySelector('.date')?.textContent || b.getAttribute('data-date') || 0);
       return dateB - dateA;
     });
     
@@ -452,22 +416,16 @@ export class HomePageSignedIn extends BasePage {
   }
     
   #sortListingsByRelevance(query) {
+    if (!query?.trim()) return;
+    
     query = query.toLowerCase();
-    
     const listingContainer = document.querySelector('.listing-container');
+    if (!listingContainer) return;
+    
     const listings = listingContainer.querySelectorAll('.listing:not(.hidden)');
+    listingContainer.querySelector('.no-results')?.remove();
     
-    if (!query.trim()) {
-      const existingNoResults = listingContainer.querySelector('.no-results');
-      if (existingNoResults) {
-        listingContainer.removeChild(existingNoResults);
-      }
-      return;
-    }
-    
-    const listingScores = [];
-    
-    listings.forEach(listing => {
+    const listingScores = Array.from(listings).map(listing => {
       const title = listing.querySelector('.title')?.textContent.toLowerCase() || '';
       const category = listing.querySelector('.category')?.textContent.toLowerCase() || '';
       const location = listing.querySelector('.location')?.textContent.toLowerCase() || '';
@@ -479,20 +437,17 @@ export class HomePageSignedIn extends BasePage {
       if (location.includes(query)) score += 2;
       if (description.includes(query)) score += 1;
       
-      listingScores.push({ listing, score });
+      return { listing, score };
     });
     
-    listingScores.sort((a, b) => b.score - a.score);
-    
-    listingScores.forEach(item => {
-      listingContainer.appendChild(item.listing);
-    });
+    listingScores
+      .sort((a, b) => b.score - a.score)
+      .forEach(item => listingContainer.appendChild(item.listing));
     
     if (listings.length === 0) {
-      const noResults = document.createElement('div');
-      noResults.className = 'no-results';
-      noResults.textContent = 'No items match your search and filters.';
-      listingContainer.appendChild(noResults);
+      listingContainer.appendChild(
+        this.#createMessageElement('No items match your search and filters.', 'no-results')
+      );
     }
   }
   
@@ -514,9 +469,7 @@ export class HomePageSignedIn extends BasePage {
         }
       }
       
-      for (const post of json_data.posts) {
-        this.#createListingElement(post);
-      }
+      json_data.posts.forEach(post => this.#createListingElement(post));
     } catch (error) {
       console.error("Error rendering listings:", error);
       
@@ -534,7 +487,7 @@ export class HomePageSignedIn extends BasePage {
     this.#applyFilters();
     
     const dateRadio = document.getElementById('date-posted');
-    if (dateRadio && dateRadio.checked) {
+    if (dateRadio?.checked) {
       this.#sortListingsByDate();
     }
   }
@@ -553,43 +506,34 @@ export class HomePageSignedIn extends BasePage {
       }
     });
 
-    // Create listing content
     const elements = [
       { tag: "h3", className: "title", text: post.title || "Not Supplied" },
       { tag: "p", label: "Date found: ", className: "date", text: post.date || "Not supplied" },
       { tag: "p", label: "Description: ", className: "description", text: post.description || "Not supplied" },
       { tag: "p", label: "Tags: ", className: "tags", 
-        text: post.tags && post.tags.length > 0 ? post.tags.join(", ") : "Not supplied" },
+        text: post.tags?.length > 0 ? post.tags.join(", ") : "Not supplied" },
       { tag: "p", label: "Location: ", className: "location", text: post.location || "Not supplied" }
     ];
     
-    // Add content elements to listing
     elements.forEach(el => {
       const wrapper = document.createElement(el.tag);
+      
       if (el.tag === "h3") {
-        const value = document.createElement("span");
-        value.classList.add(el.className);
-        value.textContent = el.text;
-        wrapper.appendChild(value);
+        wrapper.appendChild(this.#createSpan(el.className, el.text));
       } else {
         wrapper.textContent = el.label;
-        const value = document.createElement("span");
-        value.classList.add(el.className);
-        value.textContent = el.text;
-        wrapper.appendChild(value);
+        wrapper.appendChild(this.#createSpan(el.className, el.text));
       }
+      
       listing.appendChild(wrapper);
     });
     
-    // Add report button
     const reportBtn = document.createElement("button");
     reportBtn.classList.add("report-button");
     reportBtn.textContent = "Report Listing";
-    reportBtn.dataset.item = post.title;
     reportBtn.addEventListener('click', () => this.#openReportModal(post.title));
     listing.appendChild(reportBtn);
     
-    // Add to container
     if (addToBeginning && this.#listingContainer.firstChild) {
       this.#listingContainer.insertBefore(listing, this.#listingContainer.firstChild);
     } else {
@@ -599,17 +543,20 @@ export class HomePageSignedIn extends BasePage {
     return listing;
   }
 
+  #createSpan(className, text) {
+    const span = document.createElement("span");
+    span.classList.add(className);
+    span.textContent = text;
+    return span;
+  }
+
   #updateFiltersForNewPost(post) {
-    // Update tag filters if needed
-    if (post.tags && post.tags.length > 0) {
-      const tagFilters = document.getElementById('tag-filters');
-      this.#updateFilterOptions(tagFilters, post.tags);
+    if (post.tags?.length > 0) {
+      this.#updateFilterOptions(document.getElementById('tag-filters'), post.tags);
     }
 
-    // Update location filters if needed
     if (post.location) {
-      const locationFilters = document.getElementById('location-filters');
-      this.#updateFilterOptions(locationFilters, [post.location]);
+      this.#updateFilterOptions(document.getElementById('location-filters'), [post.location]);
     }
   }
 
@@ -617,18 +564,16 @@ export class HomePageSignedIn extends BasePage {
     if (!container) return;
     
     newValues.forEach(value => {
-      // Check if filter already exists
       const existingFilter = container.querySelector(`input[value="${value}"]`);
       if (!existingFilter) {
         const filterId = container.id;
-        
         const filterOption = document.createElement('div');
         filterOption.className = 'filter-option';
         
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.value = value;
-        checkbox.id = `${filterId}-${value.toLowerCase().replace(/\s+/g, '-')}`;
+        checkbox.id = `${filterId}-${value.replace(/\s+/g, '-').toLowerCase()}`;
         checkbox.checked = true;
         checkbox.addEventListener('change', () => this.#applyFilters());
         
