@@ -39,7 +39,7 @@ export class PostedItemPage extends BasePage {
         this.#container.innerHTML = '';
 
         if (!this.#currentPost) {
-            this.#container.innerHTML = '<div class="error-message">No item data available</div>';
+            this.#container.innerHTML = '<div class="posted-item-page error-message">No item data available</div>';
             return;
         }
 

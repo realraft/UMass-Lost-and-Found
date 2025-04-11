@@ -6,7 +6,7 @@
     background: #f5f5f5;
 }
 
-.post-content {
+.posted-item-page .post-content {
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -14,7 +14,7 @@
     margin-top: 1rem;
 }
 
-.photo-container {
+.posted-item-page .photo-container {
     grid-row: 1 / 3;
     grid-column: 1 / 2;
     border: 2px solid black;
@@ -22,33 +22,33 @@
     height: 300px;
 }
 
-.header-and-details {
+.posted-item-page .header-and-details {
     grid-row: 1 / 2;
     grid-column: 2 / 3;
     display: flex;
     flex-direction: column;
 }
 
-.heading {
+.posted-item-page .heading {
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 20px;
 }
 
-.details {
+.posted-item-page .details {
     margin-bottom: 20px;
 }
 
-.detail-section {
+.posted-item-page .detail-section {
     margin-bottom: 15px;
 }
 
-.detail-section label {
+.posted-item-page .detail-section label {
     font-weight: bold;
     margin-right: 10px;
 }
 
-.button-container {
+.posted-item-page .button-container {
     grid-row: 2 / 3;
     grid-column: 2 / 3;
     display: flex;
@@ -57,14 +57,14 @@
     margin-bottom: 20px;
 }
 
-.button {
+.posted-item-page .button {
     padding: 10px 15px;
     background-color: #f0f0f0;
     border: 1px solid #333;
     cursor: pointer;
 }
 
-.map-container {
+.posted-item-page .map-container {
     grid-row: 3 / 4;
     grid-column: 1 / 2;
     border: 2px solid black;
@@ -72,7 +72,7 @@
     height: 300px;
 }
 
-.post-title {
+.posted-item-page .post-title {
     font-size: 2rem;
     color: #333;
     margin-bottom: 1.5rem;
@@ -80,7 +80,7 @@
     padding-bottom: 0.5rem;
 }
 
-.image-container {
+.posted-item-page .image-container {
     margin-bottom: 2rem;
     display: flex;
     gap: 1rem;
@@ -88,33 +88,33 @@
     padding: 1rem 0;
 }
 
-.image-container img {
+.posted-item-page .image-container img {
     max-width: 400px;
     height: auto;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.post-details {
+.posted-item-page .post-details {
     color: #444;
     line-height: 1.6;
     font-size: 1.1rem;
 }
 
-.post-details p {
+.posted-item-page .post-details p {
     margin-bottom: 1rem;
     display: flex;
     align-items: baseline;
 }
 
-.post-details strong {
+.posted-item-page .post-details strong {
     color: #333;
     font-weight: 600;
     min-width: 120px;
     display: inline-block;
 }
 
-.description {
+.posted-item-page .description {
     margin: 2rem 0;
     padding: 1.5rem;
     background: #ffffff;
@@ -123,7 +123,7 @@
     border: 1px solid #e0e0e0;
 }
 
-.description h3 {
+.posted-item-page .description h3 {
     color: #881c1c;
     font-size: 1.25rem;
     margin-bottom: 1rem;
@@ -131,7 +131,7 @@
     border-bottom: 1px solid #eaeaea;
 }
 
-.description p {
+.posted-item-page .description p {
     white-space: normal;
     line-height: 1.6;
     color: #333;
@@ -140,23 +140,23 @@
     padding: 0;
 }
 
-.tags {
+.posted-item-page .tags {
     margin: 2rem 0;
 }
 
-.tags h3 {
+.posted-item-page .tags h3 {
     color: #881c1c;
     font-size: 1.25rem;
     margin-bottom: 1rem;
 }
 
-.tag-list {
+.posted-item-page .tag-list {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
 }
 
-.tag {
+.posted-item-page .tag {
     background: #f0f0f0;
     padding: 0.5rem 1rem;
     border-radius: 20px;
@@ -164,7 +164,7 @@
     color: #666;
 }
 
-.contact-button {
+.posted-item-page .contact-button {
     margin-top: 2rem;
     background: #881c1c;
     color: white;
@@ -178,11 +178,11 @@
     max-width: 300px;
 }
 
-.contact-button:hover {
+.posted-item-page .contact-button:hover {
     background: #6d1717;
 }
 
-.error-message {
+.posted-item-page .error-message {
     text-align: center;
     padding: 2rem;
     color: #666;
@@ -193,7 +193,7 @@
     margin-top: 2rem;
 }
 
-.post-details-section {
+.posted-item-page .post-details-section {
     background: #ffffff;
     border-radius: 8px;
     padding: 1.5rem;
@@ -202,7 +202,7 @@
     border: 1px solid #e0e0e0;
 }
 
-.post-details-section h3 {
+.posted-item-page .post-details-section h3 {
     color: #881c1c;
     font-size: 1.25rem;
     margin-bottom: 1rem;
@@ -210,7 +210,7 @@
     border-bottom: 1px solid #eaeaea;
 }
 
-.description-text {
+.posted-item-page .description-text {
     font-size: 1rem;
     line-height: 1.6;
     color: #333;
@@ -224,15 +224,15 @@
         padding: 1rem;
     }
     
-    .post-content {
+    .posted-item-page .post-content {
         padding: 1rem;
     }
     
-    .post-title {
+    .posted-item-page .post-title {
         font-size: 1.5rem;
     }
     
-    .post-details strong {
+    .posted-item-page .post-details strong {
         min-width: 100px;
     }
 }
