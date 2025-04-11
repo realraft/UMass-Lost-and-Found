@@ -134,7 +134,7 @@ export class NavBar extends BasePage {
               searchInput.value = '';
             }
           } else {
-            // Redirect to the home page with the search query as a parameter
+            // Redirect to the home page with the search query as a parameter NEEDS TO BE CHANGED
             window.location.href = `${pathPrefix}pages/HomePageSignedIn/HomePageSignedIn.html?search=${encodeURIComponent(searchQuery)}`;
             // No need to clear input here as page will be redirected
           }

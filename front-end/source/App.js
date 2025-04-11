@@ -1,8 +1,8 @@
-import { EventHub } from "./eventHub/EventHub.js";
-import { Events } from "./eventHub/Events.js";
-import { HomePageSignedOut } from "./pages/HomePageSignedOut/index.js";
-import { HomePageSignedIn } from "./pages/HomePageSignedIn/index.js";
-import { NavBar } from "./components/navbar/index.js";
+import { EventHub } from "/front-end/source/eventHub/EventHub.js";
+import { Events } from "/front-end/source/eventHub/Events.js";
+import { HomePageSignedOut } from "/front-end/source/pages/HomePageSignedOut/index.js";
+import { HomePageSignedIn } from "/front-end/source/pages/HomePageSignedIn/index.js";
+import { NavBar } from "/front-end/source/components/navbar/index.js";
 
 export default class App {
   constructor() {

@@ -23,6 +23,9 @@ export class HomePageSignedIn extends BasePage {
     this.#container = document.createElement("div");
     this.#container.className = "page-container";
     
+    // Create modal elements for reporting
+    this.#createReportModal();
+    
     // Setup container content synchronously
     this.#setupContainerContentSync();
     this.#attachEventListeners();
@@ -30,6 +33,106 @@ export class HomePageSignedIn extends BasePage {
     this.#loadData();
 
     return this.#container;
+  }
+
+  #createReportModal() {
+    // Create overlay element
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    overlay.id = 'report-overlay';
+    
+    // Create modal element
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'report-modal';
+    
+    // Create close button
+    const close = document.createElement('span');
+    close.className = 'close';
+    close.innerHTML = '&times;';
+    close.addEventListener('click', () => {
+      this.#closeReportModal();
+    });
+    
+    // Create modal title
+    const title = document.createElement('h3');
+    title.textContent = 'Report Listing';
+    
+    // Create item name element
+    const itemName = document.createElement('p');
+    itemName.id = 'report-item-name';
+    
+    // Create textarea for report reason
+    const textarea = document.createElement('textarea');
+    textarea.placeholder = 'Please describe why you are reporting this listing...';
+    textarea.id = 'report-reason';
+    
+    // Create submit button
+    const submitButton = document.createElement('button');
+    submitButton.textContent = 'Submit Report';
+    submitButton.addEventListener('click', () => {
+      this.#submitReport();
+    });
+    
+    // Assemble modal
+    modal.appendChild(close);
+    modal.appendChild(title);
+    modal.appendChild(itemName);
+    modal.appendChild(textarea);
+    modal.appendChild(submitButton);
+    
+    // Add elements to DOM
+    document.body.appendChild(overlay);
+    document.body.appendChild(modal);
+  }
+
+  #openReportModal(itemTitle) {
+    const overlay = document.getElementById('report-overlay');
+    const modal = document.getElementById('report-modal');
+    const itemElement = document.getElementById('report-item-name');
+    const reasonTextarea = document.getElementById('report-reason');
+    
+    // Set the item name in the modal
+    itemElement.textContent = `Item: ${itemTitle}`;
+    
+    // Clear any previous report text
+    reasonTextarea.value = '';
+    
+    // Show modal and overlay
+    if (overlay && modal) {
+      overlay.style.display = 'block';
+      modal.style.display = 'block';
+    }
+  }
+
+  #closeReportModal() {
+    const overlay = document.getElementById('report-overlay');
+    const modal = document.getElementById('report-modal');
+    
+    if (overlay && modal) {
+      overlay.style.display = 'none';
+      modal.style.display = 'none';
+    }
+  }
+
+  #submitReport() {
+    const reasonElement = document.getElementById('report-reason');
+    const itemElement = document.getElementById('report-item-name');
+    
+    if (reasonElement && itemElement) {
+      const reason = reasonElement.value.trim();
+      const item = itemElement.textContent.replace('Item: ', '');
+      
+      if (!reason) {
+        alert('Please provide a reason for reporting this listing.');
+        return;
+      }
+      
+      // SEND TO SERVER HERE
+      
+      // Close the modal
+      this.#closeReportModal();
+    }
   }
 
   #setupContainerContentSync() {
@@ -161,38 +264,6 @@ export class HomePageSignedIn extends BasePage {
     // Add sidebar and main content to container
     this.#container.appendChild(sidebar);
     this.#container.appendChild(mainContent);
-    
-    // Create modal and overlay for reporting
-    const overlay = document.createElement("div");
-    overlay.className = "overlay";
-    overlay.id = "overlay";
-    
-    const modal = document.createElement("div");
-    modal.className = "modal";
-    modal.id = "reportModal";
-    
-    const closeBtn = document.createElement("span");
-    closeBtn.className = "close";
-    closeBtn.innerHTML = "&times;";
-    
-    const reportTitle = document.createElement("h2");
-    reportTitle.id = "reportTitle";
-    reportTitle.textContent = "Report XYZ";
-    
-    const reportText = document.createElement("textarea");
-    reportText.placeholder = "Write reason for reporting here";
-    
-    const submitBtn = document.createElement("button");
-    submitBtn.id = "submitReport";
-    submitBtn.textContent = "Submit";
-    
-    modal.appendChild(closeBtn);
-    modal.appendChild(reportTitle);
-    modal.appendChild(reportText);
-    modal.appendChild(submitBtn);
-    
-    document.body.appendChild(overlay);
-    document.body.appendChild(modal);
   }
 
   // New method to load data asynchronously after component is rendered
@@ -650,6 +721,9 @@ export class HomePageSignedIn extends BasePage {
         button_element.classList.add("report-button");
         button_element.innerHTML = "Report Listing";
         button_element.dataset.item = post.title;
+        button_element.addEventListener('click', () => {
+          this.#openReportModal(post.title);
+        });
         new_post.appendChild(button_element);
 
         // Add listing to container

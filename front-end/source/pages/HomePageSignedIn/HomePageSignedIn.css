@@ -168,7 +168,7 @@ body.signed-in-page {
   display: block;
   width: 100%;
   padding: 10px;
-  background-color: #007bff;
+  background-color: #8C1515;
   color: white;
   border: none;
   border-radius: 5px;
@@ -176,7 +176,7 @@ body.signed-in-page {
 }
 
 .signed-in-page .modal button:hover {
-  background-color: #042a7d;
+  background-color: #8C1515;
 }
 
 .signed-in-page .listing.hidden {
