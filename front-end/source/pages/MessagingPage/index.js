@@ -1,17 +1,20 @@
-import { EventHub } from "../../eventHub/EventHub.js";
-import { Events } from "../../eventHub/Events.js";
-import { MessagingService } from "../../services/MessagingService.js";
-import { BasePage } from "../BasePage/BasePage.js";
+import { EventHub } from "../../eventHub/EventHub";
+import { Events } from "../../eventHub/Events";
+import { MessagingService } from "../../services/MessagingService";
+import { BasePage } from "../BasePage/BasePage";
+import { PostedItemPage } from "../PostedItemPage/PostedItemPage";
 
 export class MessagingPage extends BasePage {
 
     #container = null
     messagingService = null
+    userId = -1
 
-    constructor() {
+    constructor(id) {
         super()
         this.loadCSS("pages/MessagingPage", "MessagingPage")
         this.messagingService = new MessagingService()
+        this.userId = id
     }
 
     #getTemplate() {
@@ -41,6 +44,26 @@ export class MessagingPage extends BasePage {
         `;
     }
 
+    async #getPostsMessages() { //from server
+        try {
+          const response = await fetch('http://localhost:3000/postsMessages')
+          const postsMessages = await response.json();
+          return postsMessages
+        } catch (error) {
+            console.error('Error fetching posts messages:', error);
+        }
+    }
+
+    async #getPosts() { //from server
+        try {
+          const response = await fetch('http://localhost:3000/posts')
+          const posts = await response.json();
+          return posts
+        } catch (error) {
+            console.error('Error fetching posts messages:', error);
+        }
+    }
+
     #addEventListeners() {
         const send_button = document.querySelector("send")
         const newMessage = document.querySelector("newMessage")
@@ -56,21 +79,81 @@ export class MessagingPage extends BasePage {
         this.#container.innerHTML = this.#getTemplate()
     }
 
-    render() {
+    render() { //always with the first post saved if it exists
         this.#createContainer()
         this.#addEventListeners()
         this.#addSubscriptions()
+        this.#renderFirstMessagePage()
         return this.#container
+    }
+
+    async #renderFirstMessagePage() {
+        const postsMessages = await this.#getPostsMessages() //messages 
+        const posts = await this.#getPosts() // posts
+        const userPostMessages = postsMessages.filter(p => {
+                const idarr = p.id.split("-")
+                return idarr[1] === this.userId
+            })
+        if (userPostMessages.length > 0) {
+            userPostMessages.forEach(pM => {
+                const pid = pM.id.split("-")[0]
+                const post = posts.find(p => p.id === pid)
+                this.#addPosttoSidebar(p, pM.id, pM.messages)
+            })
+
+            let created = false
+            let i = 0
+            while (!created) {
+                if (i > posts.length - 1) {break}
+                const post = posts[i]
+                const postM = postsMessages.find(p => p.id === `${post.id}-${1}-${post.user_id}`)
+                if (postM) { //conversation exists for this post 
+                    this.#renderConversation(postM.id, postM.messages)
+                    created = true
+                }
+                i++
+            }
+        }
+    }
+
+    #addPosttoSidebar(post, id, messages) { //creates post container
+        const postsContainer = this.#container.querySelector(".posts-container")
+
+        const postMessage = document.createElement("div")
+        postMessage.className = "post-messages"
+
+        const postButton = document.createElement("button")
+        postButton.className = "post-button"
+        postButton.textContent = post.title
+
+        const postMessagesButton = document.createElement("button")
+        postMessagesButton.className = "post-button"
+        postMessagesButton.textContent = "Post Messages"
+        postMessagesButton.id = `id: ${id}`
+
+        postMessage.appendChild(postButton)
+        postMessage.appendChild(postMessagesButton)
+        postsContainer.appendChild(postMessage)
+
+        postButton.addEventListener("click", () => {
+            this.#clearMessages_content()
+            const newPost = new PostedItemPage()
+            newPost.updatePost(post)
+        })
+
+        postMessagesButton.addEventListener("click", () => {
+            this.#clearMessages_content()
+            this.#renderConversation(id, messages) //post id and messages: {user: 1, text: "message"}
+        })
     }
 
     #handleNewMessage(newMessage) {
         const eventhub = EventHub.getEventHubInstance()
         const message = newMessage.value
-        const data = message.split(":") //get the user 
-        if (data[1].length > 0) {
-            const info = {id: `${postid}-${data[0]}-${user2Id}`, text: data[1]} //message format, same ID as post-conversation object
+        if (message.length > 0) {
+            const info = {id: `${postid}-${data[0]}-${user2Id}`, text: message}
             eventhub.publish(Events.events["NewUserMessage"], info)
-            newMessage.value = "message received"
+            newMessage.value = ""
         } else {
             alert("Please enter a message")
         }
@@ -78,17 +161,10 @@ export class MessagingPage extends BasePage {
 
     #publishNewMessage(info) {
         const message_content = document.querySelector('message-content')
-
-        const ids = info.id.split("-")
-        const userId = ids[1]
-        const textdata = info.text.split(":")
-        const user = textdata[0]
-        const message = textdata[1]
-
         const messageDiv = document.createElement("div")
-        messageDiv.className = userId === user ? "myMessage" : "otherMessage"
+        messageDiv.className = userId === info.data.user ? "myMessage" : "otherMessage"
         const messageText = document.createElement("h3")
-        messageText.textContent = message
+        messageText.textContent = info.data.text
         messageDiv.appendChild(messageText)
         message_content.appendChild(messageDiv)
         message_content.scrollTop = message_content.scrollHeight
@@ -99,22 +175,58 @@ export class MessagingPage extends BasePage {
         message_content.replaceChildren()
     }
 
+    async #sendMessagetoServer(info) {
+        try {
+            const postsMessages = await this.#getPostsMessages()
+            let conversation = postsMessages.find(p => p.id === info.id)
+            if (!conversation) {
+                const newConversation = {
+                    id: info.id,
+                    messages: [{ user: this.userId, text: info.text }]
+                }
+                const response = await fetch('http://localhost:3000/postsMessages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newConversation)
+                })
+                if (!response.ok) {
+                    throw new Error("Failed to create new conversation")
+                }
+            } else {
+                conversation.messages.push({ user: this.userId, text: info.text })
+                const response = await fetch(`http://localhost:3000/postsMessages/${conversation.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(conversation)
+                })
+                if (!response.ok) {
+                    throw new Error("Failed to update conversation")
+                }
+            }
+        } catch (error) {
+            console.error("Error sending message to server", error)
+            throw error
+        }
+    }
+
     #addSubscriptions() {
         const eventHub = EventHub.getEventHubInstance()
         eventHub.subscribe(Events.events["NewUserMessage"], async info => {
             this.#publishNewMessage(info)
         })
-    }
 
-    async renderConversation(id) { //id
-        await this.messagingService.loadConversationMessagesFromDB(id).then((data) => {
-            this.#clearMessages_content()
-            if (data) {
-                const messages = data.messages
-                messages.forEach((message) => {
-                    this.#publishNewMessage({id: data.id, text: message})
-                })
-            }
+        eventHub.subscribe(Events.events["NewUserMessage"], async info => { //save to fake server
+            this.#sendMessagetoServer(info)
         })
     }
-}//const eventhub = EventHub.getEventHubInstance()
+
+    #renderConversation(cid, messages) { //message array
+        messages.forEach((mobj) => { //message format: {user: 1, text: "message"}}
+            this.#publishNewMessage({id: cid, data: mobj})
+        })
+    }
+}
