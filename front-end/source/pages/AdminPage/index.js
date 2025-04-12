@@ -13,97 +13,280 @@ export class AdminPage extends BasePage {
 
   render() {
     document.body.className = 'admin-link';
-    
+  
     if (this.#container) {
       setTimeout(() => this.#checkForSearchQuery(), 0);
       return this.#container;
     }
-    
+  
     this.#container = document.createElement("div");
     this.#container.className = "page-container";
-    
-    this.#createReportModal();
+  
+    this.#createAdminModal();
     this.#setupContainerContent();
     this.#attachEventListeners();
     this.#loadData();
-
+  
+    this.#loadCommentsFromIndexedDB();
+  
     return this.#container;
   }
 
-  #createReportModal() {
+  #createAdminModal() {
     const overlay = document.createElement('div');
     overlay.className = 'overlay';
     overlay.id = 'report-overlay';
-    
+  
     const modal = document.createElement('div');
     modal.className = 'modal';
-    modal.id = 'report-modal';
-    
-    const close = document.createElement('span');
-    close.className = 'close';
-    close.innerHTML = '&times;';
-    close.addEventListener('click', () => this.#closeReportModal());
-    
-    const title = document.createElement('h3');
-    title.textContent = 'Report Listing';
-    
-    const itemName = document.createElement('p');
-    itemName.id = 'report-item-name';
-    
-    const textarea = document.createElement('textarea');
-    textarea.placeholder = 'Please describe why you are reporting this listing...';
-    textarea.id = 'report-reason';
-    
-    const submitButton = document.createElement('button');
-    submitButton.textContent = 'Submit Report';
-    submitButton.addEventListener('click', () => this.#submitReport());
-    
-    modal.append(close, title, itemName, textarea, submitButton);
-    this.#container.append(overlay, modal);
-  }
-
-  #openReportModal(itemTitle) {
-    const elements = {
-      overlay: document.getElementById('report-overlay'),
-      modal: document.getElementById('report-modal'),
-      item: document.getElementById('report-item-name'),
-      reason: document.getElementById('report-reason')
-    };
-    
-    if (Object.values(elements).every(el => el)) {
-      elements.item.textContent = `Item: ${itemTitle}`;
-      elements.reason.value = '';
-      elements.overlay.style.display = 'block';
-      elements.modal.style.display = 'block';
-    }
-  }
-
-  #closeReportModal() {
-    const overlay = document.getElementById('report-overlay');
-    const modal = document.getElementById('report-modal');
-    
-    if (overlay && modal) {
-      overlay.style.display = 'none';
-      modal.style.display = 'none';
-    }
-  }
-
-  #submitReport() {
-    const reasonElement = document.getElementById('report-reason');
-    const itemElement = document.getElementById('report-item-name');
-    
-    if (reasonElement && itemElement) {
-      const reason = reasonElement.value.trim();
-      const item = itemElement.textContent.replace('Item: ', '');
-      
-      if (!reason) {
-        alert('Please provide a reason for reporting this listing.');
-        return;
+  
+    // Add a close button (X) to the modal
+    const closeButton = document.createElement('button');
+    closeButton.className = 'close';
+    closeButton.textContent = '×'; // Unicode for the "X" symbol
+    closeButton.addEventListener('click', () => this.#closeAdminModal());
+    modal.appendChild(closeButton);
+  
+    overlay.appendChild(modal);
+  
+    // Add event listener to the overlay to close the modal when clicked
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        this.#closeAdminModal();
       }
-      
-      // SEND TO SERVER HERE
-      this.#closeReportModal();
+    });
+  
+    document.body.appendChild(overlay);
+  }
+
+  #openAdminModal(postTitle) {
+    fetch('/front-end/source/Fake-Server/server.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(async (data) => {
+        const post = data.posts.find(p => p.title === postTitle);
+  
+        const overlay = document.getElementById('report-overlay');
+        const modal = overlay.querySelector('.modal');
+  
+        modal.innerHTML = ''; // Clear any existing content
+  
+        // Add the close button
+        const closeButton = document.createElement('button');
+        closeButton.className = 'close';
+        closeButton.textContent = '×';
+        closeButton.addEventListener('click', () => this.#closeAdminModal());
+        modal.appendChild(closeButton);
+  
+        // Add post details
+        const postDetails = document.createElement('div');
+        postDetails.className = 'post-details';
+        postDetails.innerHTML = `
+          <h3>${post.title}</h3>
+          <p><strong>Description:</strong> ${post.description || 'Not supplied'}</p>
+        `;
+        modal.appendChild(postDetails);
+  
+        // Add notes section
+        const notesSection = document.createElement('div');
+        notesSection.className = 'notes-section';
+  
+        const notesTitle = document.createElement('h4');
+        notesTitle.textContent = 'Notes';
+        notesSection.appendChild(notesTitle);
+  
+        const notesDisplay = document.createElement('p');
+        notesDisplay.className = 'notes-display';
+        notesSection.appendChild(notesDisplay);
+  
+        const notesTextBox = document.createElement('textarea');
+        notesTextBox.className = 'notes-textbox';
+        notesTextBox.style.display = 'none';
+        notesSection.appendChild(notesTextBox);
+  
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'notes-buttons';
+  
+        // Create the Comment button
+        const commentButton = document.createElement('button');
+        commentButton.textContent = 'Comment';
+        commentButton.addEventListener('click', () => {
+          notesTextBox.style.display = 'block';
+          commentButton.style.display = 'none'; // Hide the Comment button
+          saveButton.style.display = 'inline-block'; // Show Save button
+          editButton.style.display = 'inline-block'; // Show Edit button
+          cancelButton.style.display = 'inline-block'; // Show Cancel button
+          notesTextBox.value = notesDisplay.textContent || '';
+          notesTextBox.focus();
+        });
+  
+        // Create the Save button
+        const saveButton = document.createElement('button');
+        saveButton.textContent = 'Save';
+        saveButton.style.display = 'none'; // Initially hidden
+        saveButton.addEventListener('click', async () => {
+          const note = notesTextBox.value.trim();
+          if (note) {
+            await this.#saveNoteToIndexedDB(post.id, note);
+            notesDisplay.textContent = note;
+            notesTextBox.style.display = 'none';
+            commentButton.style.display = 'inline-block'; // Show Comment button
+            saveButton.style.display = 'none'; // Hide Save button
+            editButton.style.display = 'none'; // Hide Edit button
+            cancelButton.style.display = 'none'; // Hide Cancel button
+  
+            // Update the corresponding post element on the main page
+            const postElement = document.getElementById(`post-${post.id}`);
+            if (postElement) {
+              let commentElement = postElement.querySelector('.post-comment');
+              if (!commentElement) {
+                commentElement = document.createElement('p');
+                commentElement.className = 'post-comment';
+                postElement.appendChild(commentElement);
+              }
+              commentElement.textContent = `Comment: ${note}`;
+            }
+          }
+        });
+  
+        // Create the Edit button
+        const editButton = document.createElement('button');
+        editButton.textContent = 'Edit';
+        editButton.style.display = 'none'; // Initially hidden
+        editButton.addEventListener('click', () => {
+          notesTextBox.style.display = 'block';
+          notesTextBox.value = notesDisplay.textContent || '';
+          notesTextBox.focus();
+        });
+  
+        // Create the Cancel button
+        const cancelButton = document.createElement('button');
+        cancelButton.textContent = 'Cancel';
+        cancelButton.style.display = 'none'; // Initially hidden
+        cancelButton.addEventListener('click', () => {
+          notesTextBox.style.display = 'none';
+          commentButton.style.display = 'inline-block'; // Show Comment button
+          saveButton.style.display = 'none'; // Hide Save button
+          editButton.style.display = 'none'; // Hide Edit button
+          cancelButton.style.display = 'none'; // Hide Cancel button
+        });
+  
+        // Create the Exit button
+        const exitButton = document.createElement('button');
+        exitButton.textContent = 'Exit';
+        exitButton.addEventListener('click', () => {
+          this.#closeAdminModal(); // Close the modal
+        });
+  
+        // Create the Keep button
+        const keepButton = document.createElement('button');
+        keepButton.textContent = 'Keep';
+        keepButton.className = 'keep-button';
+        keepButton.addEventListener('click', () => {
+          this.#keepPost(post.id); 
+          this.#closeAdminModal(); 
+        });
+  
+        // Create the Delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.className = 'delete-button';
+        deleteButton.addEventListener('click', () => {
+          this.#deletePost(post.id); 
+        });
+  
+        // Append buttons to the container
+        buttonContainer.append(
+          commentButton,
+          saveButton,
+          editButton,
+          cancelButton,
+          exitButton,
+          keepButton,
+          deleteButton
+        );
+        notesSection.appendChild(buttonContainer);
+  
+        // Load the saved note from IndexedDB
+        const savedNote = await this.#getNoteFromIndexedDB(post.id);
+        if (savedNote) {
+          notesDisplay.textContent = savedNote.note;
+  
+          // Update the corresponding post element on the main page
+          const postElement = document.getElementById(post.id);
+          if (postElement) {
+            let commentElement = postElement.querySelector('.post-comment');
+            if (!commentElement) {
+              commentElement = document.createElement('p');
+              commentElement.className = 'post-comment';
+              postElement.appendChild(commentElement);
+            }
+            commentElement.textContent = `Comment: ${savedNote.note}`;
+          }
+        } else {
+          notesDisplay.textContent = 'No notes available.';
+        }
+  
+        modal.appendChild(notesSection);
+  
+        // Show the modal
+        overlay.style.display = 'block';
+        modal.style.display = 'block';
+      })
+      .catch(error => {
+        console.error('Error fetching post or report data:', error);
+      });
+  }
+
+  #closeAdminModal() {
+    const overlay = document.getElementById('report-overlay');
+    if (overlay) {
+      overlay.style.display = 'none';
     }
+  }
+
+  //PARTIALLY COMPLETE. WILL BE USED IN A MILESTONE USING BACKEND
+  #keepPost(postId) {
+    // Remove the post from the Administration Page
+    const postElement = document.getElementById(postId);
+    if (postElement) {
+      postElement.remove();
+    }
+  
+    // Display a confirmation message
+    alert(`Post with ID ${postId} has been kept and removed from the Administration Page.`);
+  }
+  #deletePost(postId) {
+    // Fetch the current data from server.json
+    fetch('/front-end/source/Fake-Server/server.json')
+      .then(response => response.json())
+      .then(data => {
+        // Remove the post and its associated report
+        const updatedPosts = data.posts.filter(post => post.id !== postId);
+        const updatedReports = data.reports.filter(report => report.post_id !== postId);
+  
+        // Simulate saving the updated data back to the server
+        console.log('Updated posts:', updatedPosts);
+        console.log('Updated reports:', updatedReports);
+  
+        alert(`Post with ID ${postId} has been deleted.`);
+  
+        // Remove the post from the Administration Page
+        const postElement = document.getElementById(postId);
+        if (postElement) {
+          postElement.remove();
+        }
+      })
+      .catch(error => {
+        console.error('Error deleting post:', error);
+      });
+  
+    // Close the modal
+    this.#closeAdminModal();
   }
 
   #setupContainerContent() {
@@ -130,17 +313,14 @@ export class AdminPage extends BasePage {
     const sidebar = document.createElement("div");
     sidebar.className = "sidebar";
     
-    // Create sort-by section
     const sortBySection = this.#createSortBySection();
     
-    // Create filters section
     const filtersSection = document.createElement("div");
     filtersSection.className = "filters";
     
     const filtersTitle = document.createElement("h3");
     filtersTitle.textContent = "Filters";
     
-    // Create filter groups
     const locationFilterGroup = this.#createFilterGroup("Location", "location-filters");
     const tagFilterGroup = this.#createFilterGroup("Tags", "tag-filters");
     
@@ -157,7 +337,6 @@ export class AdminPage extends BasePage {
     const sortTitle = document.createElement("h3");
     sortTitle.textContent = "Sort By";
     
-    // Helper function to create radio buttons
     const createRadio = (id, label, checked = false) => {
       const radio = document.createElement("input");
       radio.type = "radio";
@@ -502,18 +681,19 @@ export class AdminPage extends BasePage {
 
   #createListingElement(post, addToBeginning = false) {
     if (!this.#listingContainer) return;
-    
+  
     const listing = document.createElement("div");
     listing.classList.add("listing");
     listing.id = post.id;
     listing.style.cursor = 'pointer';
-    
+  
+    // Add event listener to the listing itself
     listing.addEventListener('click', (e) => {
-      if (!e.target.classList.contains('report-button')) {
+      if (!e.target.classList.contains('view-button')) {
         EventHub.getEventHubInstance().publish(Events.ViewPost, post);
       }
     });
-
+  
     const elements = [
       { tag: "h3", className: "title", text: post.title || "Not Supplied" },
       { tag: "p", label: "Date found: ", className: "date", text: post.date || "Not supplied" },
@@ -522,32 +702,40 @@ export class AdminPage extends BasePage {
         text: post.tags?.length > 0 ? post.tags.join(", ") : "Not supplied" },
       { tag: "p", label: "Location: ", className: "location", text: post.location || "Not supplied" }
     ];
-    
+  
     elements.forEach(el => {
       const wrapper = document.createElement(el.tag);
-      
+  
       if (el.tag === "h3") {
         wrapper.appendChild(this.#createSpan(el.className, el.text));
       } else {
         wrapper.textContent = el.label;
         wrapper.appendChild(this.#createSpan(el.className, el.text));
       }
-      
+  
       listing.appendChild(wrapper);
     });
-    
-    const reportBtn = document.createElement("button");
-    reportBtn.classList.add("report-button");
-    reportBtn.textContent = "Report Listing";
-    reportBtn.addEventListener('click', () => this.#openReportModal(post.title));
-    listing.appendChild(reportBtn);
-    
+  
+    // Create the "View Item" button
+    const viewButton = document.createElement("button");
+    viewButton.classList.add("view-button");
+    viewButton.textContent = "View Item";
+  
+    // Add event listener to the button to open the modal
+    viewButton.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent the event from propagating to the parent element
+      e.preventDefault(); // Prevent any default behavior
+      this.#openAdminModal(post.title); // Open the modal window
+    });
+  
+    listing.appendChild(viewButton);
+  
     if (addToBeginning && this.#listingContainer.firstChild) {
       this.#listingContainer.insertBefore(listing, this.#listingContainer.firstChild);
     } else {
       this.#listingContainer.appendChild(listing);
     }
-    
+  
     return listing;
   }
 
@@ -591,6 +779,62 @@ export class AdminPage extends BasePage {
         
         filterOption.append(checkbox, label);
         container.appendChild(filterOption);
+      }
+    });
+  }
+
+  //FEATURE TO BE FULLY IMPLEMENTED IN FUTURE MILESTONE WITH BACKEND
+  async #saveNoteToIndexedDB(postId, note) {
+    const db = await this.#openNotesDatabase();
+    const transaction = db.transaction('notes', 'readwrite');
+    const store = transaction.objectStore('notes');
+    store.put({ postId, note });
+    return transaction.complete;
+  }
+  
+  async #getNoteFromIndexedDB(postId) {
+    const db = await this.#openNotesDatabase();
+    const transaction = db.transaction('notes', 'readonly');
+    const store = transaction.objectStore('notes');
+    return store.get(postId);
+  }
+  
+  async #openNotesDatabase() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('AdminPageNotesDB', 1);
+  
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains('notes')) {
+          db.createObjectStore('notes', { keyPath: 'postId' });
+        }
+      };
+  
+      request.onsuccess = (event) => {
+        resolve(event.target.result);
+      };
+  
+      request.onerror = (event) => {
+        reject(event.target.error);
+      };
+    });
+  }
+  async #loadCommentsFromIndexedDB() {
+    const db = await this.#openNotesDatabase();
+    const transaction = db.transaction('notes', 'readonly');
+    const store = transaction.objectStore('notes');
+    const allNotes = await store.getAll();
+  
+    allNotes.forEach(note => {
+      const postElement = document.getElementById(`post-${note.postId}`);
+      if (postElement) {
+        let commentElement = postElement.querySelector('.post-comment');
+        if (!commentElement) {
+          commentElement = document.createElement('p');
+          commentElement.className = 'post-comment';
+          postElement.appendChild(commentElement);
+        }
+        commentElement.textContent = `Comment: ${note.note}`;
       }
     });
   }
