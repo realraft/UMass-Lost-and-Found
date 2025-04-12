@@ -36,7 +36,7 @@ export default class App {
       homeSignedIn: new HomePageSignedIn(),
       postItem: new PostItemPage(),
       postedItem: new PostedItemPage(),
-      messaging: new MessagingPage(),
+      messaging: new MessagingPage(1),
       adminPage: new AdminPage(),
     };
     this._navbar = new NavBar();
