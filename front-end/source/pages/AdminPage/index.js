@@ -171,7 +171,7 @@ export class AdminPage extends BasePage {
           notesTextBox.style.display = 'none';
           commentButton.style.display = 'inline-block'; // Show Comment button
           saveButton.style.display = 'none'; // Hide Save button
-          editButton.style.display = 'none'; // Hide Edit button
+          editButton.style.display = 'none'; // Hide Edit button 
           cancelButton.style.display = 'none'; // Hide Cancel button
         });
   

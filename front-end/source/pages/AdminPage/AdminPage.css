@@ -269,7 +269,7 @@ body.admin-link {
 
 /* Delete Button */
 .admin-link .modal .delete-button {
-  background-color: #dc3545; /* Red background */
+  background-color: #dc3545; /* Red background */ 
   color: white;
   padding: 10px 20px;
   border: none;
