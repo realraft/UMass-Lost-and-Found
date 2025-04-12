@@ -38,6 +38,9 @@ export default class App {
       postedItem: new PostedItemPage(),
       messaging: new MessagingPage(1),
       adminPage: new AdminPage(),
+      
+      messaging: new MessagingPage(1) // Initialize with default user ID 1
+ main
     };
     this._navbar = new NavBar();
   }
