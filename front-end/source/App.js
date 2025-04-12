@@ -38,6 +38,8 @@ export default class App {
       postedItem: new PostedItemPage(),
       messaging: new MessagingPage(),
       adminPage: new AdminPage(),
+      
+ main
     };
     this._navbar = new NavBar();
   }

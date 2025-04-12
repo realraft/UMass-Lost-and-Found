@@ -7,9 +7,7 @@ export class MessagingService extends Service { //database specific to messaging
         this.dbName = "messageDB" //name of database
         this.storeName = "messages" //store name 
         this.db = null //reference to indexedDB database
-
-        this.initDB().then( //initialize connection to indexedDB
-           () => {this.loadMessagesFromDB()}).catch(error => {console.log(error)})
+        this.initDB()
         this.addSubscriptions()
     }
 
@@ -38,22 +36,24 @@ export class MessagingService extends Service { //database specific to messaging
             const transaction = this.db.transaction([this.storeName], "readwrite")
             const objectStore = transaction.objectStore(this.storeName)
             const request = objectStore.get(info.id)
-            request.onsuccess = (event) => {
+                        request.onsuccess = (event) => {
                 const result = event.target.result
                 if (result) {
-                    result.messages.push(info.text)
-                    const pRequest = objectStore.put(result);
-                    pRequest.onsuccess = () => resolve();
-                    pRequest.onerror = (event) => reject(event.target.error);
+                                        result.messages.push(info.text)
+                    const updateRequest = objectStore.put(result)
+                    updateRequest.onsuccess = () => resolve()
+                    updateRequest.onerror = (event) => reject(event.target.error)
                 } else {
-                    const aRequest = objectStore.add({ id: info.id, messages: [info.text] })
-                    aRequest.onsuccess = () => resolve()
-                    aRequest.onerror = (event) => reject(event.target.error)
+                    // Create new conversation with first message
+                    const addRequest = objectStore.add({
+                        id: info.id,
+                        messages: [info.text]
+                    })
+                    addRequest.onsuccess = () => resolve()
+                    addRequest.onerror = (event) => reject(event.target.error)
                 }
             }
-            request.onerror = (event) => {
-                reject(event.target.error)
-            }
+            request.onerror = (event) => reject(event.target.error)
         })
     }
 
@@ -82,7 +82,7 @@ export class MessagingService extends Service { //database specific to messaging
     }
 
     addSubscriptions() { //subscribe message saving functions
-        this.subscribe(Events.NewMessage, async info => {
+        this.subscribe(Events["NewUserMessage"], async info => {
             try {
                 await this.storeMessage(info);
             } catch (error) {
@@ -90,7 +90,4 @@ export class MessagingService extends Service { //database specific to messaging
             }
         })
     }
-}
-
-//info: {id: "xxxx-xx-xx", messages: ["aaaaa", "bbbbb"]} per post and per user pair
-//id => conversation id = postid + user1id + user2id
+}//id => conversation id = postid + user1id + user2id
