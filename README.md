@@ -1,5 +1,5 @@
 
-https://docs.google.com/presentation/d/1p3ByEWV7cuuiouMyWRdtjRX1caeMyfrH3DCGmuW33jQ/edit?slide=id.p#slide=id.p
+
 
 # UMass-Lost-and-Found
 ## CS326 Group 16 Project
