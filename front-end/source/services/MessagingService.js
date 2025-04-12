@@ -1,5 +1,5 @@
-import { Events } from "../eventHub/Events";
-import { Service } from "./Service"
+import { Events } from "../eventHub/Events.js";
+import { Service } from "./Service.js";
 
 export class MessagingService extends Service { //database specific to messaging service 
     constructor() {
@@ -7,9 +7,8 @@ export class MessagingService extends Service { //database specific to messaging
         this.dbName = "messageDB" //name of database
         this.storeName = "messages" //store name 
         this.db = null //reference to indexedDB database
-
-        this.initDB().then( //initialize connection to indexedDB
-           () => {this.loadMessagesFromDB()}).catch(error => {console.log(error)})
+        this.initDB()
+        this.addSubscriptions()
     }
 
     async initDB() {
@@ -32,21 +31,37 @@ export class MessagingService extends Service { //database specific to messaging
         })
     }
 
-    async storeMessage(info) { //store user's message
+    async storeMessage(info) {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([this.storeName], "readwrite")
             const objectStore = transaction.objectStore(this.storeName)
-            const request = objectStore.add(info)
-            request.onsuccess = () => resolve()
+            const request = objectStore.get(info.id)
+                        request.onsuccess = (event) => {
+                const result = event.target.result
+                if (result) {
+                                        result.messages.push(info.text)
+                    const updateRequest = objectStore.put(result)
+                    updateRequest.onsuccess = () => resolve()
+                    updateRequest.onerror = (event) => reject(event.target.error)
+                } else {
+                    // Create new conversation with first message
+                    const addRequest = objectStore.add({
+                        id: info.id,
+                        messages: [info.text]
+                    })
+                    addRequest.onsuccess = () => resolve()
+                    addRequest.onerror = (event) => reject(event.target.error)
+                }
+            }
             request.onerror = (event) => reject(event.target.error)
-        });
+        })
     }
 
-    async loadMessagesFromDB() { //get messages
+    async loadConversationMessagesFromDB(id) { //get messages
         return new Promise((resolve, reject) => {
             let transaction = this.db.transaction([this.storeName], "readwrite")
             let store = transaction.objectStore(this.storeName)
-            let request = store.getAll()
+            let request = store.get(id) //get messages for specific conversation id
             request.onsuccess = (event) => {
                 resolve(event.target.result)
             }
@@ -56,28 +71,18 @@ export class MessagingService extends Service { //database specific to messaging
         });
     }
 
-    async clearMessages() { //delete all messages
-        return new Promise((resolve, reject) => {
-            let transaction = this.db.transaction([this.storeName], "readwrite")
-            let store = transaction.objectStore(this.storeName)
-            let request = store.clear()
-            request.onsuccess = () => resolve()
-            request.onerror = (event) => reject(event.target.error)
-        });
-    }
-
-    async deleteMessage(info) { //delete a message
+    async deleteConversation(id) { //delete a conversation
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([this.storeName], "readwrite")
             const objectStore = transaction.objectStore(this.storeName)
-            const request = objectStore.delete(info.id)
+            const request = objectStore.delete(id)
             request.onsuccess = () => resolve()
             request.onerror = (event) => reject(event.target.error)
         });
     }
 
     addSubscriptions() { //subscribe message saving functions
-        this.subscribe(Events.NewMessage, async info => {
+        this.subscribe(Events["NewUserMessage"], async info => {
             try {
                 await this.storeMessage(info);
             } catch (error) {
@@ -85,6 +90,4 @@ export class MessagingService extends Service { //database specific to messaging
             }
         })
     }
-}
-
-//info: {id: "xxxx-xx", pid: "xxxx", n: "xx", text: "aaaaa". user: "xxx"}
+}//id => conversation id = postid + user1id + user2id

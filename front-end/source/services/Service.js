@@ -1,6 +1,6 @@
-import { EventHub } from "../eventHub/EventHub"
+import { EventHub } from "../eventHub/EventHub.js"
 
-export default class Service {
+export class Service {
     constructor() {
         this.addSubscriptions()
     }

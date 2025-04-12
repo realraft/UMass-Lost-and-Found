@@ -107,5 +107,12 @@
       "post_id": "temp",
       "report_text": "temp"
     }
-  ]
+  ],
+  "postsMessages": [{
+    "id": "1-1-2", 
+    "messages": [{"user": 1, "text": "I lost my watch at the park. Please help!"}, 
+        {"user": 2, "text": "I found a watch at the park. Is it yours?"}]
+  }, {"id": "2-1-3", 
+    "messages": [{"user": 1, "text": "I found your keys"}, 
+        {"user": 3, "text": "Thank you! Where can I pick it up?"}]}]
 }
