@@ -56,7 +56,7 @@ export class NavBar extends BasePage {
             <div class="dropdown-content">
               <a href="#" class="messaging-link">Messaging</a>
               <a href="#" class="disabled-link">Post Manager</a>
-              <a href="#" class="disabled-link">Admin Page</a>
+              <a href="#" class="admin-link">Admin Page</a>
               <a href="#" class="logout-link">Log Out</a>
             </div>
           </div>
@@ -120,6 +120,7 @@ export class NavBar extends BasePage {
       { selector: '.home-link', path: '/HomePageSignedIn' },
       { selector: '.post-button', path: '/PostItemPage' },
       { selector: '.messaging-link', path: '/MessagingPage' },
+      { selector: '.admin-link', path: '/AdminPage' },
       { selector: '.logout-link', path: '/HomePageSignedOut' }
     ];
     

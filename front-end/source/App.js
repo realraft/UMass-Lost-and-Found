@@ -6,6 +6,7 @@ import { NavBar } from "./components/navbar/index.js";
 import { PostItemPage } from "./pages/postItemPage/index.js";
 import { PostedItemPage } from "./pages/PostedItemPage/index.js";
 import { MessagingPage } from "./pages/MessagingPage/index.js";
+import { AdminPage } from "./pages/AdminPage/index.js";
 
 export default class App {
   constructor() {
@@ -35,7 +36,8 @@ export default class App {
       homeSignedIn: new HomePageSignedIn(),
       postItem: new PostItemPage(),
       postedItem: new PostedItemPage(),
-      messaging: new MessagingPage(1) // Initialize with default user ID 1
+      messaging: new MessagingPage(1), // Initialize with default user ID 1
+      admin: new AdminPage()
     };
     this._navbar = new NavBar();
   }
@@ -96,6 +98,9 @@ export default class App {
         break;
       case "/MessagingPage":
         this._currentPage = "messaging";
+        break;
+      case "/AdminPage":
+        this._currentPage = "admin"
         break;
       default:
         this._currentPage = "home";

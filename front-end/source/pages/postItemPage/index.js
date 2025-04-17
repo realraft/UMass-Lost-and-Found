@@ -18,7 +18,7 @@ export class PostItemPage extends BasePage {
     // Create a container for the page
     this.#container = document.createElement("div");
     this.#container.className = "post-item-page";
-    
+
     this.#setupMainContent();
     this.#attachEventListeners();
 
