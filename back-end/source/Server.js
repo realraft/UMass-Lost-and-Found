@@ -2,6 +2,7 @@ import express from "express";
 
 import taskRoutes from "../routes/taskRoutes";
 import userRoutes from "../routes/userRoutes";
+import adminRoutes from "../routes/adminRoutes";
 
 const app = express();
 app.use(express.json());
