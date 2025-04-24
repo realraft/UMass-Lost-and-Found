@@ -11,7 +11,7 @@ export class BasePage {
         if (!this.cssloaded) {
             const link = document.createElement("link")
             link.rel = "stylesheet"
-            link.href = `/front-end/source/${path}/${cssName}.css`
+            link.href = `/source/${path}/${cssName}.css`
             document.head.appendChild(link)
             this.cssloaded = true
         }

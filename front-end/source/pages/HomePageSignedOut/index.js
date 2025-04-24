@@ -41,7 +41,7 @@ export class HomePageSignedOut extends BasePage {
     imageContainer.className = "image-container";
     
     const image = document.createElement("img");
-    image.src = "/front-end/public/umass.png";
+    image.src = "/umass.png";
     image.alt = "Lost and Found Items";
     imageContainer.appendChild(image);
     
