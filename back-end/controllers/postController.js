@@ -27,6 +27,7 @@ export const getPostById = (req, res) => {
   }
 };
 
+
 // Get all posts by user ID - key for post manager page
 export const getPostsByUserId = (req, res) => {
   try {
