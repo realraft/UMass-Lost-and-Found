@@ -13,6 +13,7 @@ const app = express();
 
 // Middleware
 app.use(express.static(path.join(__dirname, "../../front-end")));
+app.use(express.static(path.join(__dirname, "../../front-end/public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
