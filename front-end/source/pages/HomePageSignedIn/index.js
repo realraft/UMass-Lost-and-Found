@@ -280,9 +280,14 @@ export class HomePageSignedIn extends BasePage {
 
   async #initializeFilters() {
     try {
-      const response = await fetch('/front-end/source/Fake-Server/server.json');
-      const data = await response.json();
-      const posts = data.posts;
+      const response = await fetch('http://localhost:3000/api/posts');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch filter data: ${response.status} ${response.statusText}`);
+      }
+      
+      const responseData = await response.json();
+      const posts = responseData.data || []; // Access the data property from the response
       
       const locations = new Set();
       const tags = new Set();
@@ -453,13 +458,14 @@ export class HomePageSignedIn extends BasePage {
   
   async #renderListings() {
     try {
-      const response = await fetch('/front-end/source/Fake-Server/server.json');
+      const response = await fetch('http://localhost:3000/api/posts');
       
       if (!response.ok) {
         throw new Error(`Failed to fetch listings: ${response.status} ${response.statusText}`);
       }
       
-      const json_data = await response.json();
+      const responseData = await response.json();
+      const posts = responseData.data || []; // Access the data property from the response
       
       if (this.#listingContainer) {
         const loadingIndicator = this.#listingContainer.querySelector('.loading-indicator');
@@ -469,7 +475,12 @@ export class HomePageSignedIn extends BasePage {
         }
       }
       
-      json_data.posts.forEach(post => this.#createListingElement(post));
+      posts.forEach(post => this.#createListingElement(post));
+
+      // If no posts are found
+      if (posts.length === 0 && this.#listingContainer) {
+        this.#listingContainer.innerHTML = '<div class="no-posts-message">No posts found.</div>';
+      }
     } catch (error) {
       console.error("Error rendering listings:", error);
       
