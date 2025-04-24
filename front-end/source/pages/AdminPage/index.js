@@ -123,6 +123,24 @@ export class AdminPage extends BasePage {
           notesTextBox.value = notesDisplay.textContent || '';
           notesTextBox.focus();
         });
+
+        const comments = await this.#loadCommentsFromBackend(post.id);
+
+        const commentsContainer = document.createElement("div");
+        commentsContainer.className = "comments-container";
+
+        if (comments.length > 0) {
+          comments.forEach((comment) => {
+            const commentElement = document.createElement("p");
+            commentElement.className = "comment";
+            commentElement.textContent = `${comment.note}`;
+            commentsContainer.appendChild(commentElement);
+          });
+        } else {
+          commentsContainer.textContent = "No comments available.";
+        }
+
+        modal.appendChild(commentsContainer);
   
         // Create the Save button
         const saveButton = document.createElement('button');
@@ -131,13 +149,13 @@ export class AdminPage extends BasePage {
         saveButton.addEventListener('click', async () => {
           const note = notesTextBox.value.trim();
           if (note) {
-            await this.#saveNoteToIndexedDB(post.id, note);
+            await this.#saveNoteToBackend(post.id, note); // Save to backend
             notesDisplay.textContent = note;
-            notesTextBox.style.display = 'none';
-            commentButton.style.display = 'inline-block'; // Show Comment button
-            saveButton.style.display = 'none'; // Hide Save button
-            editButton.style.display = 'none'; // Hide Edit button
-            cancelButton.style.display = 'none'; // Hide Cancel button
+            notesTextBox.style.display = "none";
+            commentButton.style.display = "inline-block"; // Show Comment button
+            saveButton.style.display = "none"; // Hide Save button
+            editButton.style.display = "none"; // Hide Edit button
+            cancelButton.style.display = "none"; // Hide Cancel button
   
             // Update the corresponding post element on the main page
             const postElement = document.getElementById(`post-${post.id}`);
@@ -261,32 +279,58 @@ export class AdminPage extends BasePage {
     alert(`Post with ID ${postId} has been kept and removed from the Administration Page.`);
   }
   #deletePost(postId) {
-    // Fetch the current data from server.json
-    fetch('/front-end/source/Fake-Server/server.json')
-      .then(response => response.json())
-      .then(data => {
-        // Remove the post and its associated report
-        const updatedPosts = data.posts.filter(post => post.id !== postId);
-        const updatedReports = data.reports.filter(report => report.post_id !== postId);
-  
-        // Simulate saving the updated data back to the server
-        console.log('Updated posts:', updatedPosts);
-        console.log('Updated reports:', updatedReports);
-  
+    // Call the backend API to delete the post
+    fetch(`/api/admin/posts/${postId}`, { method: "DELETE" })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to delete post: ${response.status} ${response.statusText}`);
+        }
         alert(`Post with ID ${postId} has been deleted.`);
-  
         // Remove the post from the Administration Page
-        const postElement = document.getElementById(postId);
+        const postElement = document.getElementById(`post-${postId}`);
         if (postElement) {
           postElement.remove();
         }
       })
-      .catch(error => {
-        console.error('Error deleting post:', error);
+      .catch((error) => {
+        console.error("Error deleting post:", error);
+        alert("An error occurred while trying to delete the post. Please try again.");
       });
   
     // Close the modal
     this.#closeAdminModal();
+  }
+
+  async #saveNoteToBackend(postId, note) {
+    try {
+      const response = await fetch("/api/admin/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postId, note }),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to save note: ${response.status} ${response.statusText}`);
+      }
+      console.log("Note saved successfully.");
+    } catch (error) {
+      console.error("Error saving note:", error);
+      alert("An error occurred while saving the note. Please try again.");
+    }
+  }
+
+  async #loadCommentsFromBackend(postId) {
+    try {
+      const response = await fetch(`/api/admin/comments/${postId}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch comments: ${response.status} ${response.statusText}`);
+      }
+  
+      const comments = await response.json();
+      return comments;
+    } catch (error) {
+      console.error("Error loading comments:", error);
+      return [];
+    }
   }
 
   #setupContainerContent() {
