@@ -4,6 +4,8 @@ import { Events } from "../../eventHub/Events.js";
 
 export class PostItemPage extends BasePage {
   #container = null;
+  #tags = [];
+  #imageFile = null;
 
   constructor() {
     super();
@@ -15,7 +17,6 @@ export class PostItemPage extends BasePage {
       return this.#container;
     }
 
-    // Create a container for the page
     this.#container = document.createElement("div");
     this.#container.className = "post-item-page";
 
@@ -26,174 +27,220 @@ export class PostItemPage extends BasePage {
   }
 
   #setupMainContent() {
-    const main = document.createElement("main");
-    
-    const postsContainer = document.createElement("div");
-    postsContainer.className = "posts-container";
-    
-    // Create the post element
-    const post = document.createElement("div");
-    post.className = "post";
-    post.id = "1";
-    
-    // Left content
-    const leftContent = document.createElement("div");
-    leftContent.className = "left-content-container";
-    
-    // Image container
-    const imgContainer = document.createElement("div");
-    imgContainer.className = "post-img-container";
-    const img = document.createElement("img");
-    img.src = "placeholder.jpg";
-    imgContainer.appendChild(img);
-    
-    // Post options container
-    const optionsContainer = document.createElement("div");
-    optionsContainer.className = "post-options-container";
-    
-    // Date options
-    const dateOptionsContainer = document.createElement("div");
-    dateOptionsContainer.className = "date-options-container";
-    
-    const dateFoundOption = document.createElement("div");
-    dateFoundOption.className = "date-found-option";
-    const dateFoundText = document.createElement("p");
-    dateFoundText.textContent = "Date Found:";
-    dateFoundOption.appendChild(dateFoundText);
-    
-    const datePicker = document.createElement("div");
-    datePicker.className = "date-picker";
+    const formContainer = document.createElement("div");
+    formContainer.className = "form-container";
+
+    // Title
+    const titleGroup = document.createElement("div");
+    titleGroup.className = "form-group";
+    const titleLabel = document.createElement("label");
+    titleLabel.className = "form-label";
+    titleLabel.textContent = "Title";
+    const titleInput = document.createElement("input");
+    titleInput.type = "text";
+    titleInput.className = "form-control";
+    titleInput.placeholder = "Enter a title for your item";
+    titleInput.required = true;
+    titleGroup.append(titleLabel, titleInput);
+
+    // Image upload
+    const imageGroup = document.createElement("div");
+    imageGroup.className = "form-group";
+    const imageLabel = document.createElement("label");
+    imageLabel.className = "form-label";
+    imageLabel.textContent = "Image";
+    const imageUpload = document.createElement("div");
+    imageUpload.className = "image-upload-container";
+    imageUpload.innerHTML = '<p>Click to upload an image or drag and drop</p>';
+    const imageInput = document.createElement("input");
+    imageInput.type = "file";
+    imageInput.accept = "image/*";
+    imageInput.style.display = "none";
+    const imagePreview = document.createElement("img");
+    imagePreview.className = "image-preview";
+    imageGroup.append(imageLabel, imageUpload, imageInput, imagePreview);
+
+    // Description
+    const descGroup = document.createElement("div");
+    descGroup.className = "form-group";
+    const descLabel = document.createElement("label");
+    descLabel.className = "form-label";
+    descLabel.textContent = "Description";
+    const descInput = document.createElement("textarea");
+    descInput.className = "form-control description-box";
+    descInput.placeholder = "Describe the item you found...";
+    descInput.required = true;
+    descGroup.append(descLabel, descInput);
+
+    // Date found
+    const dateGroup = document.createElement("div");
+    dateGroup.className = "form-group";
+    const dateLabel = document.createElement("label");
+    dateLabel.className = "form-label";
+    dateLabel.textContent = "Date Found";
     const dateInput = document.createElement("input");
     dateInput.type = "date";
-    dateInput.className = "date-input";
-    const calendarBtn = document.createElement("button");
-    calendarBtn.type = "button";
-    calendarBtn.className = "calendar-btn";
-    calendarBtn.setAttribute("aria-label", "Open calendar");
-    calendarBtn.textContent = "📅";
-    datePicker.appendChild(dateInput);
-    datePicker.appendChild(calendarBtn);
-    
-    dateOptionsContainer.appendChild(dateFoundOption);
-    dateOptionsContainer.appendChild(datePicker);
-    
-    // Anonymous options
-    const anonymousOptionsContainer = document.createElement("div");
-    anonymousOptionsContainer.className = "anonymous-options-container";
-    
-    const anonymousText = document.createElement("div");
-    anonymousText.className = "anonymous-text";
-    const anonymousTextP = document.createElement("p");
-    anonymousTextP.textContent = "Anonymous Listing?";
-    anonymousText.appendChild(anonymousTextP);
-    
-    const anonymousButton = document.createElement("div");
-    anonymousButton.className = "anonymous-button";
-    
-    anonymousOptionsContainer.appendChild(anonymousText);
-    anonymousOptionsContainer.appendChild(anonymousButton);
-    
-    optionsContainer.appendChild(dateOptionsContainer);
-    optionsContainer.appendChild(anonymousOptionsContainer);
-    
-    leftContent.appendChild(imgContainer);
-    leftContent.appendChild(optionsContainer);
-    
-    // Right content
-    const rightContent = document.createElement("div");
-    rightContent.className = "right-content-container";
-    
-    // Description box
-    const descContainer = document.createElement("div");
-    descContainer.className = "description-box-input-container";
-    const descriptionLabel = document.createElement("label");
-    descriptionLabel.setAttribute("for", "description");
-    descriptionLabel.className = "sr-only";
-    const descriptionBox = document.createElement("textarea");
-    descriptionBox.id = "description";
-    descriptionBox.className = "description-box";
-    descriptionBox.placeholder = "Description...";
-    descContainer.appendChild(descriptionLabel);
-    descContainer.appendChild(descriptionBox);
-    
-    // Tag input
-    const tagContainer = document.createElement("div");
-    tagContainer.className = "tag-input-container";
-    const tagIcon = document.createElement("span");
-    tagIcon.className = "tag-icon";
-    tagIcon.textContent = "🏷️";
+    dateInput.className = "form-control";
+    dateInput.required = true;
+    dateGroup.append(dateLabel, dateInput);
+
+    // Location
+    const locationGroup = document.createElement("div");
+    locationGroup.className = "form-group";
+    const locationLabel = document.createElement("label");
+    locationLabel.className = "form-label";
+    locationLabel.textContent = "Location";
+    const locationInput = document.createElement("input");
+    locationInput.type = "text";
+    locationInput.className = "form-control";
+    locationInput.placeholder = "Where did you find the item?";
+    locationInput.required = true;
+    const locationPicker = document.createElement("div");
+    locationPicker.className = "location-picker";
+    locationPicker.innerHTML = '<p style="text-align: center; padding-top: 130px;">Map integration coming soon...</p>';
+    locationGroup.append(locationLabel, locationInput, locationPicker);
+
+    // Tags
+    const tagGroup = document.createElement("div");
+    tagGroup.className = "form-group";
+    const tagLabel = document.createElement("label");
+    tagLabel.className = "form-label";
+    tagLabel.textContent = "Tags";
     const tagInput = document.createElement("input");
     tagInput.type = "text";
-    tagInput.className = "tag-input";
-    tagInput.placeholder = "Tag(s)";
-    tagInput.setAttribute("aria-label", "Add tags");
-    tagContainer.appendChild(tagIcon);
-    tagContainer.appendChild(tagInput);
-    
-    // GPS map container
-    const gpsContainer = document.createElement("div");
-    gpsContainer.className = "GPS-map-container";
-    const gpsImg = document.createElement("img");
-    gpsImg.src = "Googlemapsplaceholder.png";
-    gpsImg.alt = "google-maps-placeholder";
-    gpsContainer.appendChild(gpsImg);
-    
-    rightContent.appendChild(descContainer);
-    rightContent.appendChild(tagContainer);
-    rightContent.appendChild(gpsContainer);
-    
-    // Append left and right content to post
-    post.appendChild(leftContent);
-    post.appendChild(rightContent);
-    
-    // Append post to posts container
-    postsContainer.appendChild(post);
-    
-    // Append posts container to main
-    main.appendChild(postsContainer);
-    
-    // Append main to container
-    this.#container.appendChild(main);
+    tagInput.className = "form-control";
+    tagInput.placeholder = "Type a tag and press Enter";
+    const tagContainer = document.createElement("div");
+    tagContainer.className = "tag-container";
+    tagGroup.append(tagLabel, tagInput, tagContainer);
+
+    // Anonymous listing
+    const anonGroup = document.createElement("div");
+    anonGroup.className = "form-check";
+    const anonInput = document.createElement("input");
+    anonInput.type = "checkbox";
+    anonInput.id = "anonymousCheck";
+    const anonLabel = document.createElement("label");
+    anonLabel.htmlFor = "anonymousCheck";
+    anonLabel.textContent = "Post anonymously";
+    anonGroup.append(anonInput, anonLabel);
+
+    // Submit button
+    const submitBtn = document.createElement("button");
+    submitBtn.className = "submit-button";
+    submitBtn.textContent = "Create Post";
+    submitBtn.type = "button";
+
+    formContainer.append(
+      titleGroup,
+      imageGroup,
+      descGroup,
+      dateGroup,
+      locationGroup,
+      tagGroup,
+      anonGroup,
+      submitBtn
+    );
+
+    this.#container.appendChild(formContainer);
   }
 
   #attachEventListeners() {
     const hub = EventHub.getEventHubInstance();
+    const form = this.#container.querySelector(".form-container");
     
-    // Post button functionality
-    const postButton = this.#container.querySelector(".post-button");
-    if (postButton) {
-      postButton.addEventListener("click", () => {
-        // Handle post submission logic
-        const description = this.#container.querySelector("#description").value;
-        const dateFound = this.#container.querySelector(".date-input").value;
-        const tags = this.#container.querySelector(".tag-input").value.split(',').map(tag => tag.trim());
-        const anon = this.#container.querySelector(".anonymous-button").checked;
-        
-        // Create the new post object
-        const newPost = {
-          id: Date.now().toString(),
-          title: description.split('\n')[0] || 'Untitled Post', // Use first line as title
-          description: description,
-          date: dateFound,
-          anon: anon,
-          tags: tags.filter(tag => tag.length > 0),
-          location: "Not supplied" // You can add location input if needed
-        };
-        
-        // Publish the new post event
-        hub.publish(Events.NewPost, newPost);
-        
-        // Navigate back to home page
-        hub.publish(Events.NavigateTo, "/HomePageSignedIn");
-      });
-    }
+    // Image upload handling
+    const imageUpload = form.querySelector(".image-upload-container");
+    const imageInput = form.querySelector('input[type="file"]');
+    const imagePreview = form.querySelector(".image-preview");
+
+    imageUpload.addEventListener("click", () => imageInput.click());
+    imageUpload.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      imageUpload.style.borderColor = "#881c1c";
+    });
+    imageUpload.addEventListener("dragleave", () => {
+      imageUpload.style.borderColor = "#dee2e6";
+    });
+    imageUpload.addEventListener("drop", (e) => {
+      e.preventDefault();
+      imageUpload.style.borderColor = "#dee2e6";
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith("image/")) {
+        this.#handleImageUpload(file, imagePreview);
+      }
+    });
+    imageInput.addEventListener("change", () => {
+      const file = imageInput.files[0];
+      if (file) {
+        this.#handleImageUpload(file, imagePreview);
+      }
+    });
+
+    // Tag handling
+    const tagInput = form.querySelector('.form-group:nth-child(6) input');
+    const tagContainer = form.querySelector('.tag-container');
     
-    // Header title navigation to home
-    const headerText = this.#container.querySelector("#header-text");
-    if (headerText) {
-      headerText.addEventListener("click", () => {
-        hub.publish(Events.NavigateTo, "/HomePageSignedIn");
-      });
+    tagInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const tag = tagInput.value.trim();
+        if (tag && !this.#tags.includes(tag)) {
+          this.#tags.push(tag);
+          this.#renderTags(tagContainer);
+          tagInput.value = "";
+        }
+      }
+    });
+
+    // Submit handling
+    const submitBtn = form.querySelector(".submit-button");
+    submitBtn.addEventListener("click", () => {
+      const titleInput = form.querySelector('.form-group:nth-child(1) input');
+      const descInput = form.querySelector('.description-box');
+      const dateInput = form.querySelector('input[type="date"]');
+      const locationInput = form.querySelector('.form-group:nth-child(5) input');
+      const anonInput = form.querySelector('#anonymousCheck');
+
+      const newPost = {
+        id: Date.now().toString(),
+        title: titleInput.value,
+        description: descInput.value,
+        date: dateInput.value,
+        location: locationInput.value,
+        tags: this.#tags,
+        anonymous: anonInput.checked,
+        image: this.#imageFile ? URL.createObjectURL(this.#imageFile) : null
+      };
+
+      hub.publish(Events.NewPost, newPost);
+      hub.publish(Events.NavigateTo, "/HomePageSignedIn");
+    });
+  }
+
+  #handleImageUpload(file, imagePreview) {
+    if (file.type.startsWith("image/")) {
+      this.#imageFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imagePreview.src = e.target.result;
+        imagePreview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
     }
+  }
+
+  #renderTags(container) {
+    container.innerHTML = "";
+    this.#tags.forEach(tag => {
+      const tagEl = document.createElement("span");
+      tagEl.className = "tag";
+      tagEl.innerHTML = `${tag}<span class="remove">×</span>`;
+      tagEl.querySelector(".remove").addEventListener("click", () => {
+        this.#tags = this.#tags.filter(t => t !== tag);
+        this.#renderTags(container);
+      });
+      container.appendChild(tagEl);
+    });
   }
 }

@@ -517,6 +517,17 @@ export class HomePageSignedIn extends BasePage {
       }
     });
 
+    // Add image if available
+    if (post.image) {
+      const imageContainer = document.createElement("div");
+      imageContainer.className = "image-container";
+      const img = document.createElement("img");
+      img.src = post.image;
+      img.alt = post.title || "Posted item";
+      imageContainer.appendChild(img);
+      listing.appendChild(imageContainer);
+    }
+
     const elements = [
       { tag: "h3", className: "title", text: post.title || "Not Supplied" },
       { tag: "p", label: "Date found: ", className: "date", text: post.date || "Not supplied" },
@@ -528,14 +539,12 @@ export class HomePageSignedIn extends BasePage {
     
     elements.forEach(el => {
       const wrapper = document.createElement(el.tag);
-      
       if (el.tag === "h3") {
         wrapper.appendChild(this.#createSpan(el.className, el.text));
       } else {
         wrapper.textContent = el.label;
         wrapper.appendChild(this.#createSpan(el.className, el.text));
       }
-      
       listing.appendChild(wrapper);
     });
     
