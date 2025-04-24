@@ -77,17 +77,6 @@
     "updatedAt": "2025-04-24T19:53:25.521Z"
   },
   {
-    "id": "8",
-    "title": "Lost Headphones (Updated)",
-    "description": "Wireless earbuds dropped on the subway platform.",
-    "location": "Subway Station",
-    "date": "2025-04-06",
-    "user_id": "108",
-    "imageUrl": null,
-    "createdAt": "2025-04-24T19:53:25.521Z",
-    "updatedAt": "2025-04-24T19:53:55.864Z"
-  },
-  {
     "id": "9",
     "title": "Found Jacket",
     "description": "Black North Face jacket found at the gym locker room.",
