@@ -1,44 +1,15 @@
-import { DataTypes } from 'sequelize';
+// User model definition
 
-export default (sequelize) => {
-  const User = sequelize.define('User', {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true
-    },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        len: [3, 25],
-      }
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true,
-      }
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        len: [8, 50],
-      }
-    }
-  }, {
-    timestamps: true,
-    tableName: 'users',
-    hooks: {
-      beforeCreate: async (user) => {
-        //add authentication
-      }
-    }
-  });
+class User {
+  constructor({id, username, email, password, role = 'user'}) {
+    this.id = id;
+    this.username = username;
+    this.email = email;
+    this.password = password; // In a real app, this should be hashed
+    this.role = role;
+    this.createdAt = new Date();
+    this.updatedAt = new Date();
+  }
+}
 
-  return User;
-};
+export default User;

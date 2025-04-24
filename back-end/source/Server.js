@@ -1,15 +1,27 @@
 import express from "express";
 
-import taskRoutes from "../routes/taskRoutes";
-import userRoutes from "../routes/userRoutes";
-import adminRoutes from "../routes/adminRoutes";
+import userRoutes from "../routes/userRoutes.js";
+import adminRoutes from "../routes/adminRoutes.js";
+import postRoutes from "../routes/postRoutes.js";
 
 const app = express();
+
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Set basic headers manually instead of using CORS
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
+
 // Routes
 app.use("/api/admin", adminRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/posts", postRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
