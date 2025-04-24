@@ -1,4 +1,3 @@
-// filepath: c:\Users\oaraf\Desktop\CS326\UMass-Lost-and-Found\front-end\source\pages\PostManagerPage\index.js
 import { BasePage } from "../BasePage/BasePage.js";
 import { EventHub } from "../../eventHub/EventHub.js";
 import { Events } from "../../eventHub/Events.js";
@@ -6,10 +5,13 @@ import { Events } from "../../eventHub/Events.js";
 export class PostManagerPage extends BasePage {
   #container = null;
   #listingContainer = null;
+  #userId = null;
 
   constructor() {
     super();
     this.loadCSS("pages/PostManagerPage", "PostManagerPage");
+    // Get userId from localStorage or use a default value if not available
+    this.#userId = localStorage.getItem('userId') || '101';
   }
 
   render() {
@@ -205,8 +207,7 @@ export class PostManagerPage extends BasePage {
   async #initializeFilters() {
     try {
       // Get posts for the current user for filtering
-      const userId = '108'; // Hardcoded for now
-      const response = await fetch(`http://localhost:3000/api/posts/user/${userId}`);
+      const response = await fetch(`http://localhost:3000/api/posts/user/${this.#userId}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch filter data: ${response.status} ${response.statusText}`);
@@ -384,8 +385,7 @@ export class PostManagerPage extends BasePage {
   
   async #renderListings() {
     try {
-      const userId = '108'; // Hardcoded for now
-      const response = await fetch(`http://localhost:3000/api/posts/user/${userId}`);
+      const response = await fetch(`http://localhost:3000/api/posts/user/${this.#userId}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch listings: ${response.status} ${response.statusText}`);
@@ -429,7 +429,7 @@ export class PostManagerPage extends BasePage {
       },
       body: JSON.stringify({
         ...post,
-        user_id: '1' // Hardcoded for now, would come from auth in a real app
+        user_id: this.#userId // Use the stored userId
       })
     })
     .then(response => response.json())
