@@ -1,5 +1,4 @@
 import express from "express";
-
 import userRoutes from "../routes/userRoutes.js";
 import adminRoutes from "../routes/adminRoutes.js";
 import postRoutes from "../routes/postRoutes.js";
@@ -7,6 +6,7 @@ import postRoutes from "../routes/postRoutes.js";
 const app = express();
 
 // Middleware
+app.use(express.static("../front-end"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
