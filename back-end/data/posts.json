@@ -108,5 +108,49 @@
     "imageUrl": null,
     "createdAt": "2025-04-24T20:07:12.922Z",
     "updatedAt": "2025-04-24T20:07:12.922Z"
+  },
+  {
+    "id": "1745530126847",
+    "title": "fdfdf",
+    "description": "fdfdf",
+    "location": "Not supplied",
+    "date": "2025-04-02",
+    "user_id": "108",
+    "imageUrl": null,
+    "createdAt": "2025-04-24T21:28:46.847Z",
+    "updatedAt": "2025-04-24T21:28:46.847Z"
+  },
+  {
+    "id": "1745530296756",
+    "title": "Lost iphone ",
+    "description": "Lost iphone ",
+    "location": "Not supplied",
+    "date": "2025-04-22",
+    "user_id": "108",
+    "imageUrl": null,
+    "createdAt": "2025-04-24T21:31:36.757Z",
+    "updatedAt": "2025-04-24T21:31:36.757Z"
+  },
+  {
+    "id": "1745530331165",
+    "title": "Lost iphone please help",
+    "description": "Lost iphone please help",
+    "location": "Not supplied",
+    "date": "2025-04-22",
+    "user_id": "108",
+    "imageUrl": null,
+    "createdAt": "2025-04-24T21:32:11.165Z",
+    "updatedAt": "2025-04-24T21:32:11.165Z"
+  },
+  {
+    "id": "1745530539753",
+    "title": "Lost Waffle",
+    "description": "I need my waffle, im so hungry. Found at the student union ",
+    "location": "Not supplied",
+    "date": "2025-04-24",
+    "user_id": "108",
+    "imageUrl": null,
+    "createdAt": "2025-04-24T21:35:39.753Z",
+    "updatedAt": "2025-04-24T21:35:39.753Z"
   }
 ]
