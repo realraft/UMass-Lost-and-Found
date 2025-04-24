@@ -204,9 +204,16 @@ export class PostManagerPage extends BasePage {
 
   async #initializeFilters() {
     try {
-      const response = await fetch('/front-end/source/Fake-Server/server.json');
-      const data = await response.json();
-      const posts = data.posts;
+      // Get posts for the current user for filtering
+      const userId = '108'; // Hardcoded for now
+      const response = await fetch(`http://localhost:3000/api/posts/user/${userId}`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch filter data: ${response.status} ${response.statusText}`);
+      }
+      
+      const responseData = await response.json();
+      const posts = responseData.data || [];
       
       const locations = new Set();
       const tags = new Set();
@@ -377,13 +384,15 @@ export class PostManagerPage extends BasePage {
   
   async #renderListings() {
     try {
-      const response = await fetch('/front-end/source/Fake-Server/server.json');
+      const userId = '108'; // Hardcoded for now
+      const response = await fetch(`http://localhost:3000/api/posts/user/${userId}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch listings: ${response.status} ${response.statusText}`);
       }
       
-      const json_data = await response.json();
+      const responseData = await response.json();
+      const posts = responseData.data || [];
       
       if (this.#listingContainer) {
         const loadingIndicator = this.#listingContainer.querySelector('.loading-indicator');
@@ -393,9 +402,13 @@ export class PostManagerPage extends BasePage {
         }
       }
       
-      // In a real app, we would filter posts to only show the current user's posts
-      // For this example, we'll just show all posts as if they belong to the user
-      json_data.posts.forEach(post => this.#createListingElement(post));
+      // Create listing elements for each post
+      posts.forEach(post => this.#createListingElement(post));
+
+      // If no posts are found
+      if (posts.length === 0 && this.#listingContainer) {
+        this.#listingContainer.innerHTML = '<div class="no-posts-message">You have no posts yet.</div>';
+      }
     } catch (error) {
       console.error("Error rendering listings:", error);
       
@@ -408,14 +421,34 @@ export class PostManagerPage extends BasePage {
   #addNewPost(post) {
     if (!this.#listingContainer) return;
 
-    this.#createListingElement(post, true);
-    this.#updateFiltersForNewPost(post);
-    this.#applyFilters();
-    
-    const dateRadio = document.getElementById('date-posted');
-    if (dateRadio?.checked) {
-      this.#sortListingsByDate();
-    }
+    // Add the new post to our backend
+    fetch('http://localhost:3000/api/posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...post,
+        user_id: '1' // Hardcoded for now, would come from auth in a real app
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Create the listing element with the saved post data
+      this.#createListingElement(data.data, true);
+      this.#updateFiltersForNewPost(data.data);
+      this.#applyFilters();
+      
+      const dateRadio = document.getElementById('date-posted');
+      if (dateRadio?.checked) {
+        this.#sortListingsByDate();
+      }
+    })
+    .catch(error => {
+      console.error('Error saving post:', error);
+      // Even if the API call fails, we still want to show the post in the UI
+      this.#createListingElement(post, true);
+    });
   }
 
   #createListingElement(post, addToBeginning = false) {
@@ -463,20 +496,77 @@ export class PostManagerPage extends BasePage {
     const editBtn = document.createElement("button");
     editBtn.classList.add("edit-button");
     editBtn.textContent = "Edit Post";
-    editBtn.addEventListener('click', (e) => {
+    editBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
-      // Edit functionality would go here
-      console.log(`Edit post: ${post.id}`);
+      
+      // In a real application, you would open a form to edit the post
+      // For this example, we'll just simulate an edit
+      const updatedPost = {
+        ...post,
+        title: `${post.title} (Updated)`,
+        updatedAt: new Date().toISOString()
+      };
+      
+      try {
+        const response = await fetch(`http://localhost:3000/api/posts/${post.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updatedPost)
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          // Update the listing with the updated post data
+          const titleElement = listing.querySelector('.title');
+          if (titleElement) {
+            titleElement.textContent = result.data.title;
+          }
+          alert('Post updated successfully!');
+        } else {
+          console.error('Failed to update post');
+          alert('Failed to update post. Please try again later.');
+        }
+      } catch (error) {
+        console.error('Error updating post:', error);
+        alert('Error updating post. Please try again later.');
+      }
     });
     
     // Delete button
     const deleteBtn = document.createElement("button");
     deleteBtn.classList.add("delete-button");
     deleteBtn.textContent = "Delete Post";
-    deleteBtn.addEventListener('click', (e) => {
+    deleteBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
-      // Delete functionality would go here
-      console.log(`Delete post: ${post.id}`);
+      
+      // Confirm deletion
+      if (confirm('Are you sure you want to delete this post?')) {
+        try {
+          const response = await fetch(`http://localhost:3000/api/posts/${post.id}`, {
+            method: 'DELETE'
+          });
+          
+          if (response.ok) {
+            // Remove the listing from the DOM
+            listing.remove();
+            alert('Post deleted successfully!');
+            
+            // Check if there are no more listings
+            const remainingListings = this.#listingContainer.querySelectorAll('.listing');
+            if (remainingListings.length === 0) {
+              this.#listingContainer.innerHTML = '<div class="no-posts-message">You have no posts yet.</div>';
+            }
+          } else {
+            console.error('Failed to delete post');
+            alert('Failed to delete post. Please try again later.');
+          }
+        } catch (error) {
+          console.error('Error deleting post:', error);
+          alert('Error deleting post. Please try again later.');
+        }
+      }
     });
     
     buttonContainer.append(editBtn, deleteBtn);
