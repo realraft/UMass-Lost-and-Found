@@ -1,0 +1,346 @@
+/* PostManagerPage specific styles */
+/* Fix selector to apply directly to body when it has post-manager-page class */
+body.post-manager-page {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.post-manager-page .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.post-manager-page header {
+  background-color: #343a40;
+  color: #fff;
+  text-align: center;
+  padding: 20px 0;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+.post-manager-page header h1 {
+  font-size: 2.5em;
+  margin: 0;
+}
+
+.post-manager-page header p {
+  margin: 10px 0;
+}
+
+.post-manager-page button {
+  padding: 10px 20px;
+  font-size: 1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.post-manager-page a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.post-manager-page a button {
+  margin: 5px;
+}
+
+.post-manager-page h3 {
+  margin-bottom: 10px;
+}
+
+.post-manager-page label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.post-manager-page input[type="checkbox"],
+.post-manager-page input[type="radio"] {
+  margin-right: 5px;
+}
+
+.post-manager-page .listing-container {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.post-manager-page .listing {
+  margin-bottom: 15px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #fdfdfd;
+}
+
+.post-manager-page .listing p {
+  margin: 5px 0;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.post-manager-page .listing .description {
+  display: inline;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.post-manager-page .listing img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto 10px;
+  border-radius: 5px;
+}
+
+.post-manager-page .listing p {
+  margin: 5px 0;
+}
+
+.post-manager-page footer {
+  background-color: #343a40;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  margin-top: 20px;
+  border-radius: 5px;
+}
+
+.post-manager-page .button-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.post-manager-page .edit-button {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.post-manager-page .edit-button:hover {
+  background-color: #0056b3;
+}
+
+.post-manager-page .delete-button {
+  background-color: #dc3545;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.post-manager-page .delete-button:hover {
+  background-color: #b92d3b;
+}
+
+.post-manager-page .overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9;
+}
+
+.post-manager-page .modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  width: 300px;
+  border-radius: 5px;
+  z-index: 10;
+}
+
+.post-manager-page .modal .close {
+  float: right;
+  cursor: pointer;
+  font-size: 1.5em;
+}
+
+.post-manager-page .modal textarea {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
+}
+
+.post-manager-page .modal button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.post-manager-page .modal button:hover {
+  background-color: #0056b3;
+}
+
+.post-manager-page .listing.hidden {
+  display: none;
+}
+
+.post-manager-page .filter-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.post-manager-page .filter-section-title {
+  margin: 0 0 8px 0;
+  font-weight: bold;
+  color: #333;
+  display: block;
+}
+
+.post-manager-page .filter-options {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.post-manager-page .filter-option {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.post-manager-page .filter-option label {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.post-manager-page .filter-option input {
+  margin-right: 6px;
+}
+
+.post-manager-page .page-container {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+  padding: 0 20px;
+}
+
+.post-manager-page .sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+}
+
+.post-manager-page .main-content {
+  flex-grow: 1;
+}
+
+.post-manager-page .sort-by {
+  margin-bottom: 20px;
+}
+
+.post-manager-page .sort-by h3 {
+  margin-bottom: 10px;
+}
+
+.post-manager-page .sort-by-options {
+  display: flex;
+  align-items: center;
+}
+
+.post-manager-page .sort-by label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 15px;
+  margin-bottom: 0;
+}
+
+.post-manager-page .sort-by input[type="radio"] {
+  margin-right: 4px;
+}
+
+.post-manager-page .filters {
+  margin-bottom: 20px;
+}
+
+.post-manager-page .filter-options {
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.post-manager-page .listing-container {
+  height: calc(100vh - 100px);
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.post-manager-page .sort-filter {
+  display: block;
+  border: none;
+  padding: 0;
+  margin-bottom: 0;
+  box-shadow: none;
+}
+
+.post-manager-page .filter-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0;
+}
+
+.post-manager-page .toggle-filter {
+  font-size: 12px;
+  padding: 4px 8px;
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.post-manager-page .toggle-filter:hover {
+  background-color: #e0e0e0;
+}
