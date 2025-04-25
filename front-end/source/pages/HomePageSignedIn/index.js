@@ -94,14 +94,57 @@ export class HomePageSignedIn extends BasePage {
     
     if (reasonElement && itemElement) {
       const reason = reasonElement.value.trim();
-      const item = itemElement.textContent.replace('Item: ', '');
+      const itemTitle = itemElement.textContent.replace('Item: ', '');
       
       if (!reason) {
         alert('Please provide a reason for reporting this listing.');
         return;
       }
+
+      // Find the post by title
+      const postElement = Array.from(this.#listingContainer.querySelectorAll('.listing'))
+        .find(listing => listing.querySelector('.title')?.textContent === itemTitle);
+
+      if (!postElement) {
+        alert('Could not find the post to report.');
+        return;
+      }
+
+      const post_id = postElement.id;
+      const reported_by = localStorage.getItem('userId') || '101';
+
+      // Send report to server
+      fetch('http://localhost:3000/api/admin/reports', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          post_id,
+          reason,
+          reported_by
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          // Publish the NewReport event with the report data
+          EventHub.getEventHubInstance().publish(Events.NewReport, data.data);
+          alert('Post reported successfully');
+        } else {
+          throw new Error(data.message || 'Failed to report post');
+        }
+      })
+      .catch(error => {
+        console.error('Error reporting post:', error);
+        alert('Failed to report post. Please try again later.');
+      });
       
-      // SEND TO SERVER HERE
       this.#closeReportModal();
     }
   }
