@@ -1,7 +1,5 @@
-// Post controller to handle post-related operations
 import * as postModel from '../models/index.js';
 
-// Get all posts
 export const getAllPosts = (req, res) => {
   try {
     const posts = postModel.getAllPosts();
@@ -11,7 +9,6 @@ export const getAllPosts = (req, res) => {
   }
 };
 
-// Get a post by ID
 export const getPostById = (req, res) => {
   try {
     const { id } = req.params;
@@ -27,8 +24,6 @@ export const getPostById = (req, res) => {
   }
 };
 
-
-// Get all posts by user ID - key for post manager page
 export const getPostsByUserId = (req, res) => {
   try {
     const { userId } = req.params;
@@ -39,7 +34,6 @@ export const getPostsByUserId = (req, res) => {
   }
 };
 
-// Create a new post
 export const createPost = (req, res) => {
   try {
     const postData = req.body;
@@ -50,7 +44,6 @@ export const createPost = (req, res) => {
   }
 };
 
-// Update an existing post
 export const updatePost = (req, res) => {
   try {
     const { id } = req.params;
@@ -68,7 +61,6 @@ export const updatePost = (req, res) => {
   }
 };
 
-// Delete a post
 export const deletePost = (req, res) => {
   try {
     const { id } = req.params;

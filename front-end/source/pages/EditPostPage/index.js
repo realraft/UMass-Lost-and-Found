@@ -19,7 +19,6 @@ export class EditPostPage extends BasePage {
     this.#postId = postData.id;
     this.#tags = postData.tags || [];
     
-    // If the container already exists, update its content
     if (this.#container) {
       this.#updateFormFields();
     }
@@ -27,7 +26,6 @@ export class EditPostPage extends BasePage {
 
   render() {
     if (this.#container) {
-      // Update form fields if we have post data
       if (this.#postData) {
         this.#updateFormFields();
       }
@@ -40,7 +38,6 @@ export class EditPostPage extends BasePage {
     this.#setupMainContent();
     this.#attachEventListeners();
     
-    // Initialize form fields if we have post data
     if (this.#postData) {
       this.#updateFormFields();
     }
@@ -179,18 +176,15 @@ export class EditPostPage extends BasePage {
     const anonInput = form.querySelector('#anonymousCheck');
     const imagePreview = form.querySelector(".image-preview");
     
-    // Set form values from post data
     titleInput.value = this.#postData.title || '';
     descInput.value = this.#postData.description || '';
     
-    // Format date properly for the date input (YYYY-MM-DD)
     if (this.#postData.date) {
       try {
         const date = new Date(this.#postData.date);
         const formattedDate = date.toISOString().split('T')[0];
         dateInput.value = formattedDate;
       } catch (e) {
-        // In case of invalid date format, just use the raw value
         dateInput.value = this.#postData.date;
       }
     }
@@ -198,11 +192,9 @@ export class EditPostPage extends BasePage {
     locationInput.value = this.#postData.location || '';
     anonInput.checked = this.#postData.anonymous || false;
     
-    // Set tags
     this.#tags = this.#postData.tags || [];
     this.#renderTags(tagContainer);
     
-    // Set image if available
     if (this.#postData.image) {
       imagePreview.src = this.#postData.image;
       imagePreview.style.display = "block";
@@ -210,7 +202,6 @@ export class EditPostPage extends BasePage {
   }
 
   #attachEventListeners() {
-    const hub = EventHub.getEventHubInstance();
     const form = this.#container.querySelector(".form-container");
     
     // Image upload handling
@@ -259,9 +250,7 @@ export class EditPostPage extends BasePage {
 
     // Submit handling
     const submitBtn = form.querySelector(".submit-button");
-    submitBtn.addEventListener("click", () => {
-      this.#handleSubmit(form);
-    });
+    submitBtn.addEventListener("click", () => this.#handleSubmit(form));
   }
 
   async #handleSubmit(form) {
@@ -299,7 +288,6 @@ export class EditPostPage extends BasePage {
 
       if (response.ok) {
         const result = await response.json();
-        // Publish event that a post was updated
         EventHub.getEventHubInstance().publish(Events.PostUpdated, result.data);
         EventHub.getEventHubInstance().publish(Events.NavigateTo, "/PostManagerPage");
         alert('Post updated successfully!');

@@ -10,7 +10,6 @@ export class PostManagerPage extends BasePage {
   constructor() {
     super();
     this.loadCSS("pages/PostManagerPage", "PostManagerPage");
-    // Get userId from localStorage or use a default value if not available
     this.#userId = localStorage.getItem('userId') || '101';
   }
 
@@ -36,7 +35,6 @@ export class PostManagerPage extends BasePage {
     if (!this.#container) return;
     
     const sidebar = this.#createSidebar();
-    
     const mainContent = document.createElement("div");
     mainContent.className = "main-content";
     
@@ -55,18 +53,13 @@ export class PostManagerPage extends BasePage {
   #createSidebar() {
     const sidebar = document.createElement("div");
     sidebar.className = "sidebar";
-    
-    // Create sort-by section
     const sortBySection = this.#createSortBySection();
     
-    // Create filters section
     const filtersSection = document.createElement("div");
     filtersSection.className = "filters";
-    
     const filtersTitle = document.createElement("h3");
     filtersTitle.textContent = "Filters";
     
-    // Create filter groups
     const locationFilterGroup = this.#createFilterGroup("Location", "location-filters");
     const tagFilterGroup = this.#createFilterGroup("Tags", "tag-filters");
     
@@ -79,11 +72,9 @@ export class PostManagerPage extends BasePage {
   #createSortBySection() {
     const sortBySection = document.createElement("div");
     sortBySection.className = "sort-by";
-    
     const sortTitle = document.createElement("h3");
     sortTitle.textContent = "Sort By";
     
-    // Helper function to create radio buttons
     const createRadio = (id, label, checked = false) => {
       const radio = document.createElement("input");
       radio.type = "radio";
@@ -142,9 +133,7 @@ export class PostManagerPage extends BasePage {
       this.#checkForSearchQuery();
       
       const loadingIndicator = this.#listingContainer?.querySelector('.loading-indicator');
-      if (loadingIndicator) {
-        loadingIndicator.remove();
-      }
+      if (loadingIndicator) loadingIndicator.remove();
     } catch (error) {
       console.error('Error loading data:', error);
       if (this.#listingContainer) {
@@ -157,12 +146,7 @@ export class PostManagerPage extends BasePage {
     const hub = EventHub.getEventHubInstance();
     document.addEventListener('search-query', (e) => this.#sortListingsByRelevance(e.detail.query));
     hub.subscribe(Events.NewPost, (newPost) => this.#addNewPost(newPost));
-    
-    // Add subscription to post update events
-    hub.subscribe(Events.PostUpdated, () => {
-      // Refresh the listings when a post is updated
-      this.#renderListings();
-    });
+    hub.subscribe(Events.PostUpdated, () => this.#renderListings());
   }
 
   #initializeSorting() {
@@ -212,7 +196,6 @@ export class PostManagerPage extends BasePage {
 
   async #initializeFilters() {
     try {
-      // Get posts for the current user for filtering
       const response = await fetch(`http://localhost:3000/api/posts/user/${this.#userId}`);
       
       if (!response.ok) {
@@ -227,7 +210,6 @@ export class PostManagerPage extends BasePage {
       
       posts.forEach(post => {
         if (post.location) locations.add(post.location);
-        
         if (post.tags?.length) {
           post.tags.forEach(tag => tag && tags.add(tag));
         }
@@ -269,7 +251,6 @@ export class PostManagerPage extends BasePage {
   #applyFilters() {
     const listings = document.querySelectorAll('.listing');
     
-    // Helper function to get selected values
     const getSelectedValues = (selector) => Array.from(
       document.querySelectorAll(selector)
     ).map(input => input.value);
@@ -283,7 +264,6 @@ export class PostManagerPage extends BasePage {
     listings.forEach(listing => {
       let showListing = true;
       
-      // Location filter
       if (locationFilterActive && selectedLocations.length === 0) {
         showListing = false;
       } else if (selectedLocations.length > 0) {
@@ -293,7 +273,6 @@ export class PostManagerPage extends BasePage {
         }
       }
       
-      // Tag filter
       if (showListing && tagFilterActive && selectedTags.length === 0) {
         showListing = false;
       } else if (showListing && selectedTags.length > 0) {
@@ -408,10 +387,8 @@ export class PostManagerPage extends BasePage {
         }
       }
       
-      // Create listing elements for each post
       posts.forEach(post => this.#createListingElement(post));
 
-      // If no posts are found
       if (posts.length === 0 && this.#listingContainer) {
         this.#listingContainer.innerHTML = '<div class="no-posts-message">You have no posts yet.</div>';
       }
@@ -426,13 +403,10 @@ export class PostManagerPage extends BasePage {
 
   #addNewPost(post) {
     if (!this.#listingContainer) return;
-
-    // Create the listing element and update filters
     this.#createListingElement(post, true);
     this.#updateFiltersForNewPost(post);
     this.#applyFilters();
     
-    // Apply date sorting if active
     const dateRadio = document.getElementById('date-posted');
     if (dateRadio?.checked) {
       this.#sortListingsByDate();
@@ -476,30 +450,24 @@ export class PostManagerPage extends BasePage {
       listing.appendChild(wrapper);
     });
     
-    // Create a container for our buttons
     const buttonContainer = document.createElement("div");
     buttonContainer.className = "button-container";
     
-    // Edit button
     const editBtn = document.createElement("button");
     editBtn.classList.add("edit-button");
     editBtn.textContent = "Edit Post";
     editBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
-      
-      // Navigate to the EditPostPage with the current post data
       EventHub.getEventHubInstance().publish(Events.EditPost, post);
       EventHub.getEventHubInstance().publish(Events.NavigateTo, "/EditPostPage");
     });
     
-    // Delete button
     const deleteBtn = document.createElement("button");
     deleteBtn.classList.add("delete-button");
     deleteBtn.textContent = "Delete Post";
     deleteBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
       
-      // Confirm deletion
       if (confirm('Are you sure you want to delete this post?')) {
         try {
           const response = await fetch(`http://localhost:3000/api/posts/${post.id}`, {
@@ -507,11 +475,9 @@ export class PostManagerPage extends BasePage {
           });
           
           if (response.ok) {
-            // Remove the listing from the DOM
             listing.remove();
             alert('Post deleted successfully!');
             
-            // Check if there are no more listings
             const remainingListings = this.#listingContainer.querySelectorAll('.listing');
             if (remainingListings.length === 0) {
               this.#listingContainer.innerHTML = '<div class="no-posts-message">You have no posts yet.</div>';
