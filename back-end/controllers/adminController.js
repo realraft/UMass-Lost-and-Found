@@ -1,6 +1,37 @@
 // Admin controller to handle admin-related operations
 import * as postModel from '../models/index.js';
 
+// Create a new report
+export const createReport = (req, res) => {
+  try {
+    const reportData = req.body;
+    
+    if (!reportData.post_id || !reportData.reason || !reportData.reported_by) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Missing required fields: post_id, reason, and reported_by are required' 
+      });
+    }
+
+    const post = postModel.getPostById(reportData.post_id);
+    if (!post) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Post not found' 
+      });
+    }
+    
+    const newReport = postModel.createReport(reportData);
+    res.status(201).json({ 
+      success: true, 
+      data: newReport,
+      message: 'Report created successfully' 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Get all reported posts for admin review
 export const getReportedPosts = (req, res) => {
   try {
@@ -53,7 +84,14 @@ export const deletePost = (req, res) => {
       return res.status(404).json({ success: false, message: 'Post not found' });
     }
     
-    res.status(200).json({ success: true, data: deletedPost, message: 'Post has been deleted' });
+    // Also remove any reports associated with this post
+    postModel.deleteReports(id);
+    
+    res.status(200).json({ 
+      success: true, 
+      data: deletedPost, 
+      message: 'Post and associated reports have been deleted' 
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
