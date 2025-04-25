@@ -7,8 +7,8 @@
     "date": "2025-04-01",
     "user_id": "101",
     "imageUrl": null,
-    "createdAt": "2025-04-25T19:44:03.531Z",
-    "updatedAt": "2025-04-25T19:44:03.531Z"
+    "createdAt": "2025-04-25T20:08:59.601Z",
+    "updatedAt": "2025-04-25T20:08:59.601Z"
   },
   {
     "id": "2",
@@ -18,21 +18,19 @@
     "date": "2025-03-30",
     "user_id": "102",
     "imageUrl": null,
-    "createdAt": "2025-04-25T19:44:03.531Z",
-    "updatedAt": "2025-04-25T19:44:03.531Z"
+    "createdAt": "2025-04-25T20:08:59.601Z",
+    "updatedAt": "2025-04-25T20:08:59.601Z"
   },
   {
     "id": "3",
     "title": "Lost Phone",
-    "description": "my update boutta bustttttt",
+    "description": "",
     "location": "Train Station",
     "date": "2025-04-02",
     "user_id": "103",
     "imageUrl": null,
-    "createdAt": "2025-04-25T19:44:03.531Z",
-    "updatedAt": "2025-04-25T19:57:47.022Z",
-    "tags": [],
-    "anonymous": false
+    "createdAt": "2025-04-25T20:08:59.601Z",
+    "updatedAt": "2025-04-25T20:08:59.601Z"
   },
   {
     "id": "4",
@@ -42,8 +40,8 @@
     "date": "2025-04-05",
     "user_id": "104",
     "imageUrl": null,
-    "createdAt": "2025-04-25T19:44:03.531Z",
-    "updatedAt": "2025-04-25T19:44:03.531Z"
+    "createdAt": "2025-04-25T20:08:59.601Z",
+    "updatedAt": "2025-04-25T20:08:59.601Z"
   },
   {
     "id": "5",
@@ -53,8 +51,8 @@
     "date": "2025-04-03",
     "user_id": "105",
     "imageUrl": null,
-    "createdAt": "2025-04-25T19:44:03.531Z",
-    "updatedAt": "2025-04-25T19:44:03.531Z"
+    "createdAt": "2025-04-25T20:08:59.601Z",
+    "updatedAt": "2025-04-25T20:08:59.601Z"
   },
   {
     "id": "6",
@@ -64,8 +62,8 @@
     "date": "2025-04-04",
     "user_id": "106",
     "imageUrl": null,
-    "createdAt": "2025-04-25T19:44:03.531Z",
-    "updatedAt": "2025-04-25T19:44:03.531Z"
+    "createdAt": "2025-04-25T20:08:59.601Z",
+    "updatedAt": "2025-04-25T20:08:59.601Z"
   },
   {
     "id": "7",
@@ -75,8 +73,8 @@
     "date": "2025-04-07",
     "user_id": "107",
     "imageUrl": null,
-    "createdAt": "2025-04-25T19:44:03.531Z",
-    "updatedAt": "2025-04-25T19:44:03.531Z"
+    "createdAt": "2025-04-25T20:08:59.601Z",
+    "updatedAt": "2025-04-25T20:08:59.601Z"
   },
   {
     "id": "8",
@@ -86,8 +84,8 @@
     "date": "2025-04-06",
     "user_id": "108",
     "imageUrl": null,
-    "createdAt": "2025-04-25T19:44:03.531Z",
-    "updatedAt": "2025-04-25T19:44:03.531Z"
+    "createdAt": "2025-04-25T20:08:59.601Z",
+    "updatedAt": "2025-04-25T20:08:59.601Z"
   },
   {
     "id": "9",
@@ -97,8 +95,8 @@
     "date": "2025-04-08",
     "user_id": "109",
     "imageUrl": null,
-    "createdAt": "2025-04-25T19:44:03.531Z",
-    "updatedAt": "2025-04-25T19:44:03.531Z"
+    "createdAt": "2025-04-25T20:08:59.601Z",
+    "updatedAt": "2025-04-25T20:08:59.601Z"
   },
   {
     "id": "10",
@@ -108,7 +106,20 @@
     "date": "2025-04-05",
     "user_id": "110",
     "imageUrl": null,
-    "createdAt": "2025-04-25T19:44:03.531Z",
-    "updatedAt": "2025-04-25T19:44:03.531Z"
+    "createdAt": "2025-04-25T20:08:59.601Z",
+    "updatedAt": "2025-04-25T20:08:59.601Z"
+  },
+  {
+    "id": "1745611755393",
+    "title": "stinky test post but now its edited",
+    "description": "",
+    "location": "",
+    "date": "",
+    "user_id": "103",
+    "imageUrl": null,
+    "createdAt": "2025-04-25T20:09:15.393Z",
+    "updatedAt": "2025-04-25T20:09:26.173Z",
+    "tags": [],
+    "anonymous": false
   }
 ]

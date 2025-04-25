@@ -427,34 +427,16 @@ export class PostManagerPage extends BasePage {
   #addNewPost(post) {
     if (!this.#listingContainer) return;
 
-    // Add the new post to our backend
-    fetch('http://localhost:3000/api/posts', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...post,
-        user_id: this.#userId // Use the stored userId
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Create the listing element with the saved post data
-      this.#createListingElement(data.data, true);
-      this.#updateFiltersForNewPost(data.data);
-      this.#applyFilters();
-      
-      const dateRadio = document.getElementById('date-posted');
-      if (dateRadio?.checked) {
-        this.#sortListingsByDate();
-      }
-    })
-    .catch(error => {
-      console.error('Error saving post:', error);
-      // Even if the API call fails, we still want to show the post in the UI
-      this.#createListingElement(post, true);
-    });
+    // Create the listing element and update filters
+    this.#createListingElement(post, true);
+    this.#updateFiltersForNewPost(post);
+    this.#applyFilters();
+    
+    // Apply date sorting if active
+    const dateRadio = document.getElementById('date-posted');
+    if (dateRadio?.checked) {
+      this.#sortListingsByDate();
+    }
   }
 
   #createListingElement(post, addToBeginning = false) {
