@@ -1,184 +1,135 @@
-.post-item-page .header-container {
-  display: flex;
-  justify-content: space-between;
-  height: 150px;
-  border: 2px solid black;
-  margin: 10px;
-}
-
-.post-item-page .name-container {
-  width: 500px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.post-item-page #header-text {
-  font-weight: bolder;
-  color: black;
-  font-size: 48px;
-}
-
-.post-item-page .search-container {
-  width: 289.89px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-.post-item-page .search-bar {
-  display: flex;
-  max-width: 600px; /* ↑ increase from 400px → controls overall width */
-  width: 100%; /* lets it grow to its container's width */
+/* Modern form styling for post item page */
+.post-item-page {
+  max-width: 1200px;
   margin: 0 auto;
-  justify-content: center;
-  align-items: center;
-  gap: 0.75rem;
+  padding: 2rem;
+  background-color: #f8f9fa;
 }
 
-.post-item-page .search-bar input {
-  flex: 1;
-  width: 100%;
-  padding: 0.75rem 1.25rem; /* ↑ bigger padding for height */
-  font-size: 1.25rem; /* ↑ larger text */
-  height: 3rem; /* explicit height */
-  border: 1px solid #ccc;
-  border-radius: 6px;
+.post-item-page .form-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 800px;
 }
 
-.post-item-page .post-button-container {
-  width: 289.89px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.post-item-page .form-group {
+  margin-bottom: 1.5rem;
 }
 
-.post-item-page .post-button {
-  background-color: oklch(0.505 0.213 27.518); /* ✅ Primary brand color */
-  color: #fff; /* ✅ High contrast text */
-  padding: 0.75rem 1.5rem; /* ↑ Comfortable click area */
-  font-size: 1rem;
+.post-item-page .form-label {
+  display: block;
   font-weight: 600;
-  border: none;
-  border-radius: 0.5rem; /* Rounded corners for friendliness */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  margin-bottom: 0.5rem;
+  color: #333;
 }
 
-.post-item-page .left-content-container,
-.post-item-page .right-content-container {
-  width: 350px;
-  height: 450px;
-  margin: 50px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-.post-item-page .post-img-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid black;
-}
-.post-item-page .post-img-container img,
-.post-item-page .GPS-map-container img {
+.post-item-page .form-control {
   width: 100%;
-  height: 100%;
-  object-fit: contain; /* scales image to fit inside, letterboxing if needed */
+  padding: 0.75rem;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
 }
 
-.post-item-page .post-options-container {
-  display: flex;
-  flex-direction: column;
-  height: 200px;
-  /* border: 2px solid black; */
-  justify-content: center;
-  gap: 10px;
-}
-.post-item-page .date-options-container,
-.post-item-page .anonymous-options-container {
-  display: flex;
-  gap: 5px;
-}
-
-.post-item-page .date-found-option,
-.post-item-page .date-picker,
-.post-item-page .anonymous-text,
-.post-item-page .anonymous-button {
-  width: 100%;
-  height: 100%;
-  border: 2px solid black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.post-item-page main {
-  display: flex;
-  justify-content: space-around;
+.post-item-page .form-control:focus {
+  border-color: #881c1c;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(136, 28, 28, 0.1);
 }
 
 .post-item-page .description-box {
-  width: 100%; /* Fill its parent container */
-  max-width: 600px; /* Optional limit */
-  height: 150px; /* Control vertical size */
-  padding: 0.75rem; /* Space inside the box */
-  font-size: 1rem; /* Readable text size */
-  border: 1px solid #ccc; /* Light border */
-  border-radius: 4px;
-  resize: vertical; /* Allow user to resize height only */
-  box-sizing: border-box; /* Include padding/border in width */
-}
-.post-item-page .description-box-input-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  min-height: 150px;
+  resize: vertical;
 }
 
-.post-item-page .tag-input-container {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 150px; /* adjust as needed */
-  padding: 0.5rem 1rem;
-  background-color: #f0f0f0;
+.post-item-page .image-upload-container {
+  border: 2px dashed #dee2e6;
   border-radius: 8px;
-  border: 1px solid #ccc;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.post-item-page .tag-icon {
-  font-size: 1.25rem;
-  margin-right: 0.75rem;
+.post-item-page .image-upload-container:hover {
+  background-color: #f8f9fa;
 }
 
-.post-item-page .tag-input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font-size: 1rem;
-  outline: none;
+.post-item-page .image-preview {
+  max-width: 300px;
+  max-height: 300px;
+  margin: 1rem auto;
+  border-radius: 8px;
+  display: none;
 }
 
-.post-item-page .GPS-map-container img {
-  border: 2px solid black;
-}
-
-.post-item-page .posts-container {
-  width: 100%;
-  height: 100%;
+.post-item-page .tag-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
-.post-item-page .post {
-  height: 100%;
-  width: 45%;
-  display: flex;
-  justify-content: center;
+
+.post-item-page .tag {
+  background: #f0f0f0;
+  border-radius: 16px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  display: inline-flex;
   align-items: center;
+  gap: 0.25rem;
+}
+
+.post-item-page .tag .remove {
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.post-item-page .tag .remove:hover {
+  opacity: 1;
+}
+
+.post-item-page .location-picker {
+  height: 300px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+.post-item-page .form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.post-item-page .submit-button {
+  background-color: #881c1c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.post-item-page .submit-button:hover {
+  background-color: #6d1616;
+}
+
+.post-item-page .error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
 }
 
 
