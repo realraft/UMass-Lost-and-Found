@@ -231,6 +231,12 @@ export class HomePageSignedIn extends BasePage {
     const hub = EventHub.getEventHubInstance();
     document.addEventListener('search-query', (e) => this.#sortListingsByRelevance(e.detail.query));
     hub.subscribe(Events.NewPost, (newPost) => this.#addNewPost(newPost));
+    
+    // Subscribe to post update events to refresh listings when a post is edited
+    hub.subscribe(Events.PostUpdated, () => {
+      // Refresh the listings when a post is updated
+      this.#renderListings();
+    });
   }
 
   #initializeSorting() {

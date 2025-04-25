@@ -157,6 +157,12 @@ export class PostManagerPage extends BasePage {
     const hub = EventHub.getEventHubInstance();
     document.addEventListener('search-query', (e) => this.#sortListingsByRelevance(e.detail.query));
     hub.subscribe(Events.NewPost, (newPost) => this.#addNewPost(newPost));
+    
+    // Add subscription to post update events
+    hub.subscribe(Events.PostUpdated, () => {
+      // Refresh the listings when a post is updated
+      this.#renderListings();
+    });
   }
 
   #initializeSorting() {
@@ -499,39 +505,9 @@ export class PostManagerPage extends BasePage {
     editBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
       
-      // In a real application, you would open a form to edit the post
-      // For this example, we'll just simulate an edit
-      const updatedPost = {
-        ...post,
-        title: `${post.title} (Updated)`,
-        updatedAt: new Date().toISOString()
-      };
-      
-      try {
-        const response = await fetch(`http://localhost:3000/api/posts/${post.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(updatedPost)
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          // Update the listing with the updated post data
-          const titleElement = listing.querySelector('.title');
-          if (titleElement) {
-            titleElement.textContent = result.data.title;
-          }
-          alert('Post updated successfully!');
-        } else {
-          console.error('Failed to update post');
-          alert('Failed to update post. Please try again later.');
-        }
-      } catch (error) {
-        console.error('Error updating post:', error);
-        alert('Error updating post. Please try again later.');
-      }
+      // Navigate to the EditPostPage with the current post data
+      EventHub.getEventHubInstance().publish(Events.EditPost, post);
+      EventHub.getEventHubInstance().publish(Events.NavigateTo, "/EditPostPage");
     });
     
     // Delete button

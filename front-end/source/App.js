@@ -8,6 +8,7 @@ import { PostedItemPage } from "./pages/PostedItemPage/index.js";
 import { MessagingPage } from "./pages/MessagingPage/index.js";
 import { AdminPage } from "./pages/AdminPage/index.js";
 import { PostManagerPage } from "./pages/PostManagerPage/index.js";
+import { EditPostPage } from "./pages/EditPostPage/index.js";
 
 export default class App {
   constructor() {
@@ -32,6 +33,15 @@ export default class App {
       }
     });
     
+    // Add EditPost event handler
+    this._hub.subscribe(Events.EditPost, (postData) => {
+      // Update the EditPostPage component with the data
+      const editPostPage = this._pageComponents.editPost;
+      if (editPostPage) {
+        editPostPage.setPostData(postData);
+      }
+    });
+    
     this._pageComponents = {
       home: new HomePageSignedOut(),
       homeSignedIn: new HomePageSignedIn(),
@@ -39,7 +49,8 @@ export default class App {
       postedItem: new PostedItemPage(),
       messaging: new MessagingPage(1), // Initialize with default user ID 1
       admin: new AdminPage(),
-      postManager: new PostManagerPage()
+      postManager: new PostManagerPage(),
+      editPost: new EditPostPage()
     };
     this._navbar = new NavBar();
   }
@@ -106,6 +117,9 @@ export default class App {
         break;
       case "/PostManagerPage":
         this._currentPage = "postManager";
+        break;
+      case "/EditPostPage":
+        this._currentPage = "editPost";
         break;
       default:
         this._currentPage = "home";
