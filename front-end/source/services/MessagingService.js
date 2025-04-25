@@ -12,9 +12,9 @@ export class MessagingService extends Service { //database specific to messaging
     }
 
     async initDB() {
-        return new Promise((resolve, reject) => { 
+        return new Promise((resolve, reject) => {
             const request = indexedDB.open(this.dbName, 1)
-            request.onsuccess = (event) => { 
+            request.onsuccess = (event) => {
                 this.db = event.target.result
                 resolve()
             }
