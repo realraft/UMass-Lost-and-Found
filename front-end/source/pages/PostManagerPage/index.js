@@ -157,6 +157,12 @@ export class PostManagerPage extends BasePage {
     const hub = EventHub.getEventHubInstance();
     document.addEventListener('search-query', (e) => this.#sortListingsByRelevance(e.detail.query));
     hub.subscribe(Events.NewPost, (newPost) => this.#addNewPost(newPost));
+    
+    // Add subscription to post update events
+    hub.subscribe(Events.PostUpdated, () => {
+      // Refresh the listings when a post is updated
+      this.#renderListings();
+    });
   }
 
   #initializeSorting() {

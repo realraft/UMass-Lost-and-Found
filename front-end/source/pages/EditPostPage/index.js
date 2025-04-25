@@ -299,6 +299,8 @@ export class EditPostPage extends BasePage {
 
       if (response.ok) {
         const result = await response.json();
+        // Publish event that a post was updated
+        EventHub.getEventHubInstance().publish(Events.PostUpdated, result.data);
         EventHub.getEventHubInstance().publish(Events.NavigateTo, "/PostManagerPage");
         alert('Post updated successfully!');
       } else {

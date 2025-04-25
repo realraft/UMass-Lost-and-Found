@@ -3,6 +3,7 @@ export const Events = {
     NavigateTo: "NavigateTo",
     NewPost: "NewPost",
     ViewPost: "ViewPost",
-    EditPost: "EditPost"  // Add new event for editing posts
+    EditPost: "EditPost",
+    PostUpdated: "PostUpdated"  // Add new event for post updates
 };
 
