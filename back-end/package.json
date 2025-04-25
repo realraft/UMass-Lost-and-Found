@@ -2,7 +2,7 @@
     "name": "back-end",
     "version": "1.0.0",
     "description": "",
-    "main": "Server.js",
+    "main": "source/Server.js",
     "type": "module",
     "scripts": {
       "start": "node source/Server.js",

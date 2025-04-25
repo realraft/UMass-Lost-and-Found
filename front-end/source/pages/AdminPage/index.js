@@ -12,288 +12,180 @@ export class AdminPage extends BasePage {
   }
 
   render() {
-    document.body.className = 'admin-link';
-  
+    document.body.className = 'admin-page';
+    
     if (this.#container) {
       setTimeout(() => this.#checkForSearchQuery(), 0);
       return this.#container;
     }
-  
+    
     this.#container = document.createElement("div");
     this.#container.className = "page-container";
-  
-    this.#createAdminModal();
+    
+    this.#createModal();
     this.#setupContainerContent();
     this.#attachEventListeners();
     this.#loadData();
-  
-    this.#loadCommentsFromIndexedDB();
-  
+
     return this.#container;
   }
 
-  #createAdminModal() {
+  #createModal() {
     const overlay = document.createElement('div');
     overlay.className = 'overlay';
-    overlay.id = 'report-overlay';
-  
+    overlay.id = 'admin-overlay';
+    
     const modal = document.createElement('div');
     modal.className = 'modal';
-  
-    // Add a close button (X) to the modal
-    const closeButton = document.createElement('button');
-    closeButton.className = 'close';
-    closeButton.textContent = '×'; // Unicode for the "X" symbol
-    closeButton.addEventListener('click', () => this.#closeAdminModal());
-    modal.appendChild(closeButton);
-  
-    overlay.appendChild(modal);
-  
-    // Add event listener to the overlay to close the modal when clicked
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) {
-        this.#closeAdminModal();
-      }
-    });
-  
-    document.body.appendChild(overlay);
+    modal.id = 'admin-modal';
+    
+    const close = document.createElement('span');
+    close.className = 'close';
+    close.innerHTML = '&times;';
+    close.addEventListener('click', () => this.#closeModal());
+    
+    const content = document.createElement('div');
+    content.className = 'modal-content';
+    content.id = 'admin-modal-content';
+    
+    modal.append(close, content);
+    this.#container.append(overlay, modal);
   }
 
-  #openAdminModal(postTitle) {
-    fetch('/front-end/source/Fake-Server/server.json')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
-        }
-        return response.json();
-      })
-      .then(async (data) => {
-        const post = data.posts.find(p => p.title === postTitle);
-  
-        const overlay = document.getElementById('report-overlay');
-        const modal = overlay.querySelector('.modal');
-  
-        modal.innerHTML = ''; // Clear any existing content
-  
-        // Add the close button
-        const closeButton = document.createElement('button');
-        closeButton.className = 'close';
-        closeButton.textContent = '×';
-        closeButton.addEventListener('click', () => this.#closeAdminModal());
-        modal.appendChild(closeButton);
-  
-        // Add post details
-        const postDetails = document.createElement('div');
-        postDetails.className = 'post-details';
-        postDetails.innerHTML = `
-          <h3>${post.title}</h3>
-          <p><strong>Description:</strong> ${post.description || 'Not supplied'}</p>
-        `;
-        modal.appendChild(postDetails);
-  
-        // Add notes section
-        const notesSection = document.createElement('div');
-        notesSection.className = 'notes-section';
-  
-        const notesTitle = document.createElement('h4');
-        notesTitle.textContent = 'Notes';
-        notesSection.appendChild(notesTitle);
-  
-        const notesDisplay = document.createElement('p');
-        notesDisplay.className = 'notes-display';
-        notesSection.appendChild(notesDisplay);
-  
-        const notesTextBox = document.createElement('textarea');
-        notesTextBox.className = 'notes-textbox';
-        notesTextBox.style.display = 'none';
-        notesSection.appendChild(notesTextBox);
-  
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = 'notes-buttons';
-  
-        // Create the Comment button
-        const commentButton = document.createElement('button');
-        commentButton.textContent = 'Comment';
-        commentButton.addEventListener('click', () => {
-          notesTextBox.style.display = 'block';
-          commentButton.style.display = 'none'; // Hide the Comment button
-          saveButton.style.display = 'inline-block'; // Show Save button
-          editButton.style.display = 'inline-block'; // Show Edit button
-          cancelButton.style.display = 'inline-block'; // Show Cancel button
-          notesTextBox.value = notesDisplay.textContent || '';
-          notesTextBox.focus();
-        });
-  
-        // Create the Save button
-        const saveButton = document.createElement('button');
-        saveButton.textContent = 'Save';
-        saveButton.style.display = 'none'; // Initially hidden
-        saveButton.addEventListener('click', async () => {
-          const note = notesTextBox.value.trim();
-          if (note) {
-            await this.#saveNoteToIndexedDB(post.id, note);
-            notesDisplay.textContent = note;
-            notesTextBox.style.display = 'none';
-            commentButton.style.display = 'inline-block'; // Show Comment button
-            saveButton.style.display = 'none'; // Hide Save button
-            editButton.style.display = 'none'; // Hide Edit button
-            cancelButton.style.display = 'none'; // Hide Cancel button
-  
-            // Update the corresponding post element on the main page
-            const postElement = document.getElementById(`post-${post.id}`);
-            if (postElement) {
-              let commentElement = postElement.querySelector('.post-comment');
-              if (!commentElement) {
-                commentElement = document.createElement('p');
-                commentElement.className = 'post-comment';
-                postElement.appendChild(commentElement);
-              }
-              commentElement.textContent = `Comment: ${note}`;
-            }
-          }
-        });
-  
-        // Create the Edit button
-        const editButton = document.createElement('button');
-        editButton.textContent = 'Edit';
-        editButton.style.display = 'none'; // Initially hidden
-        editButton.addEventListener('click', () => {
-          notesTextBox.style.display = 'block';
-          notesTextBox.value = notesDisplay.textContent || '';
-          notesTextBox.focus();
-        });
-  
-        // Create the Cancel button
-        const cancelButton = document.createElement('button');
-        cancelButton.textContent = 'Cancel';
-        cancelButton.style.display = 'none'; // Initially hidden
-        cancelButton.addEventListener('click', () => {
-          notesTextBox.style.display = 'none';
-          commentButton.style.display = 'inline-block'; // Show Comment button
-          saveButton.style.display = 'none'; // Hide Save button
-          editButton.style.display = 'none'; // Hide Edit button 
-          cancelButton.style.display = 'none'; // Hide Cancel button
-        });
-  
-        // Create the Exit button
-        const exitButton = document.createElement('button');
-        exitButton.textContent = 'Exit';
-        exitButton.addEventListener('click', () => {
-          this.#closeAdminModal(); // Close the modal
-        });
-  
-        // Create the Keep button
-        const keepButton = document.createElement('button');
-        keepButton.textContent = 'Keep';
-        keepButton.className = 'keep-button';
-        keepButton.addEventListener('click', () => {
-          this.#keepPost(post.id); 
-          this.#closeAdminModal(); 
-        });
-  
-        // Create the Delete button
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.className = 'delete-button';
-        deleteButton.addEventListener('click', () => {
-          this.#deletePost(post.id); 
-        });
-  
-        // Append buttons to the container
-        buttonContainer.append(
-          commentButton,
-          saveButton,
-          editButton,
-          cancelButton,
-          exitButton,
-          keepButton,
-          deleteButton
-        );
-        notesSection.appendChild(buttonContainer);
-  
-        // Load the saved note from IndexedDB
-        const savedNote = await this.#getNoteFromIndexedDB(post.id);
-        if (savedNote) {
-          notesDisplay.textContent = savedNote.note;
-  
-          // Update the corresponding post element on the main page
-          const postElement = document.getElementById(post.id);
-          if (postElement) {
-            let commentElement = postElement.querySelector('.post-comment');
-            if (!commentElement) {
-              commentElement = document.createElement('p');
-              commentElement.className = 'post-comment';
-              postElement.appendChild(commentElement);
-            }
-            commentElement.textContent = `Comment: ${savedNote.note}`;
-          }
-        } else {
-          notesDisplay.textContent = 'No notes available.';
-        }
-  
-        modal.appendChild(notesSection);
-  
-        // Show the modal
-        overlay.style.display = 'block';
-        modal.style.display = 'block';
-      })
-      .catch(error => {
-        console.error('Error fetching post or report data:', error);
+  #openModal(report) {
+    const elements = {
+      overlay: document.getElementById('admin-overlay'),
+      modal: document.getElementById('admin-modal'),
+      content: document.getElementById('admin-modal-content')
+    };
+    
+    if (Object.values(elements).every(el => el)) {
+      elements.content.innerHTML = '';
+      
+      // Create modal content
+      const title = document.createElement('h3');
+      title.className = 'title';
+      title.textContent = report.title || "Not Supplied";
+
+      const details = [
+        { label: "Date Reported: ", text: new Date(report.createdAt).toLocaleDateString(), className: 'date' },
+        { label: "Description: ", text: report.description || "Not supplied", className: 'description' },
+        { label: "Report Reason: ", text: report.reason || "Not supplied", className: 'reason' },
+        { label: "Location: ", text: report.location || "Not supplied", className: 'location' },
+        { label: "Status: ", text: report.status || "Pending", className: 'status' }
+      ];
+
+      const detailsElements = details.map(detail => {
+        const wrapper = document.createElement('p');
+        wrapper.textContent = detail.label;
+        const span = this.#createSpan(detail.className, detail.text);
+        wrapper.appendChild(span);
+        return wrapper;
       });
+
+      // Comments section
+      const commentsSection = document.createElement("div");
+      commentsSection.className = "comments-section";
+      
+      const commentsTitle = document.createElement("h4");
+      commentsTitle.textContent = "Admin Comments";
+      commentsSection.appendChild(commentsTitle);
+
+      const commentsList = document.createElement("div");
+      commentsList.className = "comments-list";
+      commentsList.id = `comments-${report.id}`;
+
+      // Add comment form
+      const commentForm = document.createElement("div");
+      commentForm.className = "comment-form";
+      commentForm.style.display = 'none';
+
+      const commentInput = document.createElement("textarea");
+      commentInput.className = "comment-input";
+      commentInput.placeholder = "Add an admin comment...";
+
+      const saveCommentBtn = document.createElement("button");
+      saveCommentBtn.className = "save-comment-button";
+      saveCommentBtn.textContent = "Save Comment";
+      saveCommentBtn.addEventListener('click', () => {
+        this.#addComment(report.id, commentInput.value);
+        commentForm.style.display = 'none';
+        addCommentBtn.style.display = 'block';
+      });
+
+      const cancelCommentBtn = document.createElement("button");
+      cancelCommentBtn.className = "cancel-comment-button";
+      cancelCommentBtn.textContent = "Cancel";
+      cancelCommentBtn.addEventListener('click', () => {
+        commentForm.style.display = 'none';
+        addCommentBtn.style.display = 'block';
+        commentInput.value = '';
+      });
+
+      const commentBtns = document.createElement("div");
+      commentBtns.className = "comment-buttons";
+      commentBtns.append(saveCommentBtn, cancelCommentBtn);
+
+      commentForm.append(commentInput, commentBtns);
+
+      const addCommentBtn = document.createElement("button");
+      addCommentBtn.className = "add-comment-button";
+      addCommentBtn.textContent = "Add Comment";
+      addCommentBtn.addEventListener('click', () => {
+        commentForm.style.display = 'block';
+        addCommentBtn.style.display = 'none';
+      });
+
+      commentsSection.append(commentsList, addCommentBtn, commentForm);
+
+      // Action buttons
+      const actionButtons = document.createElement("div");
+      actionButtons.className = "action-buttons";
+
+      const keepButton = document.createElement("button");
+      keepButton.textContent = "Keep Post";
+      keepButton.className = "keep-button";
+      keepButton.addEventListener('click', () => this.#keepPost(report.id));
+
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "Delete Post";
+      deleteButton.className = "delete-button";
+      deleteButton.addEventListener('click', () => {
+        if (confirm('Are you sure you want to delete this post?')) {
+          this.#deletePost(report.id);
+        }
+      });
+
+      actionButtons.append(keepButton, deleteButton);
+
+      elements.content.append(
+        title,
+        ...detailsElements,
+        commentsSection,
+        actionButtons
+      );
+
+      elements.overlay.style.display = 'block';
+      elements.modal.style.display = 'block';
+
+      this.#loadComments(report.id);
+    }
   }
 
-  #closeAdminModal() {
-    const overlay = document.getElementById('report-overlay');
-    if (overlay) {
+  #closeModal() {
+    const overlay = document.getElementById('admin-overlay');
+    const modal = document.getElementById('admin-modal');
+    
+    if (overlay && modal) {
       overlay.style.display = 'none';
+      modal.style.display = 'none';
     }
-  }
-
-  //PARTIALLY COMPLETE. WILL BE USED IN A MILESTONE USING BACKEND
-  #keepPost(postId) {
-    // Remove the post from the Administration Page
-    const postElement = document.getElementById(postId);
-    if (postElement) {
-      postElement.remove();
-    }
-  
-    // Display a confirmation message
-    alert(`Post with ID ${postId} has been kept and removed from the Administration Page.`);
-  }
-  #deletePost(postId) {
-    // Fetch the current data from server.json
-    fetch('/front-end/source/Fake-Server/server.json')
-      .then(response => response.json())
-      .then(data => {
-        // Remove the post and its associated report
-        const updatedPosts = data.posts.filter(post => post.id !== postId);
-        const updatedReports = data.reports.filter(report => report.post_id !== postId);
-  
-        // Simulate saving the updated data back to the server
-        console.log('Updated posts:', updatedPosts);
-        console.log('Updated reports:', updatedReports);
-  
-        alert(`Post with ID ${postId} has been deleted.`);
-  
-        // Remove the post from the Administration Page
-        const postElement = document.getElementById(postId);
-        if (postElement) {
-          postElement.remove();
-        }
-      })
-      .catch(error => {
-        console.error('Error deleting post:', error);
-      });
-  
-    // Close the modal
-    this.#closeAdminModal();
   }
 
   #setupContainerContent() {
     if (!this.#container) return;
     
     const sidebar = this.#createSidebar();
-    
     const mainContent = document.createElement("div");
     mainContent.className = "main-content";
     
@@ -302,7 +194,7 @@ export class AdminPage extends BasePage {
     
     const loadingIndicator = document.createElement("div");
     loadingIndicator.className = "loading-indicator";
-    loadingIndicator.textContent = "Loading listings...";
+    loadingIndicator.textContent = "Loading reported items...";
     this.#listingContainer.appendChild(loadingIndicator);
     
     mainContent.appendChild(this.#listingContainer);
@@ -313,18 +205,22 @@ export class AdminPage extends BasePage {
     const sidebar = document.createElement("div");
     sidebar.className = "sidebar";
     
+    // Create sort-by section
     const sortBySection = this.#createSortBySection();
     
+    // Create filters section
     const filtersSection = document.createElement("div");
     filtersSection.className = "filters";
     
     const filtersTitle = document.createElement("h3");
     filtersTitle.textContent = "Filters";
     
-    const locationFilterGroup = this.#createFilterGroup("Location", "location-filters");
-    const tagFilterGroup = this.#createFilterGroup("Tags", "tag-filters");
+    // Create filter groups
+    const statusFilter = this.#createFilterGroup("Status", "status-filters");
+    const locationFilter = this.#createFilterGroup("Location", "location-filters");
+    const reasonFilter = this.#createFilterGroup("Report Reason", "reason-filters");
     
-    filtersSection.append(filtersTitle, locationFilterGroup, tagFilterGroup);
+    filtersSection.append(filtersTitle, statusFilter, locationFilter, reasonFilter);
     sidebar.append(sortBySection, filtersSection);
     
     return sidebar;
@@ -337,6 +233,7 @@ export class AdminPage extends BasePage {
     const sortTitle = document.createElement("h3");
     sortTitle.textContent = "Sort By";
     
+    // Helper function to create radio buttons
     const createRadio = (id, label, checked = false) => {
       const radio = document.createElement("input");
       radio.type = "radio";
@@ -409,7 +306,6 @@ export class AdminPage extends BasePage {
   #attachEventListeners() {
     const hub = EventHub.getEventHubInstance();
     document.addEventListener('search-query', (e) => this.#sortListingsByRelevance(e.detail.query));
-    hub.subscribe(Events.NewPost, (newPost) => this.#addNewPost(newPost));
   }
 
   #initializeSorting() {
@@ -444,7 +340,7 @@ export class AdminPage extends BasePage {
   }
 
   #setupToggleButtons() {
-    ['location-filters', 'tag-filters'].forEach(filterId => {
+    ['status-filters', 'location-filters', 'reason-filters'].forEach(filterId => {
       const toggleBtn = document.getElementById(`toggle-${filterId}`);
       toggleBtn?.addEventListener('click', () => this.#toggleFilters(filterId));
     });
@@ -459,23 +355,28 @@ export class AdminPage extends BasePage {
 
   async #initializeFilters() {
     try {
-      const response = await fetch('/front-end/source/Fake-Server/server.json');
-      const data = await response.json();
-      const posts = data.posts;
+      const response = await fetch('http://localhost:3000/api/admin/reports');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch filter data: ${response.status} ${response.statusText}`);
+      }
+      
+      const responseData = await response.json();
+      const reports = responseData.data || [];
       
       const locations = new Set();
-      const tags = new Set();
+      const statuses = new Set(['pending', 'dismissed']);
+      const reasons = new Set();
       
-      posts.forEach(post => {
-        if (post.location) locations.add(post.location);
-        
-        if (post.tags?.length) {
-          post.tags.forEach(tag => tag && tags.add(tag));
-        }
+      reports.forEach(report => {
+        if (report.location) locations.add(report.location);
+        if (report.status) statuses.add(report.status);
+        if (report.reason) reasons.add(report.reason);
       });
       
       this.#populateFilterOptions('location-filters', Array.from(locations));
-      this.#populateFilterOptions('tag-filters', Array.from(tags));
+      this.#populateFilterOptions('status-filters', Array.from(statuses));
+      this.#populateFilterOptions('reason-filters', Array.from(reasons));
       
       document.querySelectorAll('.filter-option input[type="checkbox"]')
         .forEach(checkbox => checkbox.addEventListener('change', () => this.#applyFilters()));
@@ -510,42 +411,42 @@ export class AdminPage extends BasePage {
   #applyFilters() {
     const listings = document.querySelectorAll('.listing');
     
-    // Helper function to get selected values
     const getSelectedValues = (selector) => Array.from(
       document.querySelectorAll(selector)
     ).map(input => input.value);
     
     const selectedLocations = getSelectedValues('#location-filters .filter-option input:checked');
-    const selectedTags = getSelectedValues('#tag-filters .filter-option input:checked');
+    const selectedStatuses = getSelectedValues('#status-filters .filter-option input:checked');
+    const selectedReasons = getSelectedValues('#reason-filters .filter-option input:checked');
     
     const locationFilterActive = document.querySelectorAll('#location-filters .filter-option input').length > 0;
-    const tagFilterActive = document.querySelectorAll('#tag-filters .filter-option input').length > 0;
+    const statusFilterActive = document.querySelectorAll('#status-filters .filter-option input').length > 0;
+    const reasonFilterActive = document.querySelectorAll('#reason-filters .filter-option input').length > 0;
     
     listings.forEach(listing => {
       let showListing = true;
       
       // Location filter
-      if (locationFilterActive && selectedLocations.length === 0) {
-        showListing = false;
-      } else if (selectedLocations.length > 0) {
+      if (locationFilterActive && selectedLocations.length > 0) {
         const locationText = listing.querySelector('.location')?.textContent.trim() || '';
         if (!selectedLocations.includes(locationText)) {
           showListing = false;
         }
       }
       
-      // Tag filter
-      if (showListing && tagFilterActive && selectedTags.length === 0) {
-        showListing = false;
-      } else if (showListing && selectedTags.length > 0) {
-        const tagsText = listing.querySelector('.tags')?.textContent.trim() || '';
-        if (tagsText === "Not supplied") {
+      // Status filter
+      if (showListing && statusFilterActive && selectedStatuses.length > 0) {
+        const statusText = listing.querySelector('.status')?.textContent.trim() || '';
+        if (!selectedStatuses.includes(statusText)) {
           showListing = false;
-        } else {
-          const listingTags = tagsText.split(',').map(tag => tag.trim());
-          if (!listingTags.some(tag => selectedTags.includes(tag))) {
-            showListing = false;
-          }
+        }
+      }
+      
+      // Reason filter
+      if (showListing && reasonFilterActive && selectedReasons.length > 0) {
+        const reasonText = listing.querySelector('.reason')?.textContent.trim() || '';
+        if (!selectedReasons.includes(reasonText)) {
+          showListing = false;
         }
       }
       
@@ -593,7 +494,7 @@ export class AdminPage extends BasePage {
     
     listings.forEach(listing => listingContainer.appendChild(listing));
   }
-    
+
   #sortListingsByRelevance(query) {
     if (!query?.trim()) return;
     
@@ -606,13 +507,13 @@ export class AdminPage extends BasePage {
     
     const listingScores = Array.from(listings).map(listing => {
       const title = listing.querySelector('.title')?.textContent.toLowerCase() || '';
-      const category = listing.querySelector('.category')?.textContent.toLowerCase() || '';
+      const reason = listing.querySelector('.reason')?.textContent.toLowerCase() || '';
       const location = listing.querySelector('.location')?.textContent.toLowerCase() || '';
       const description = listing.querySelector('.description')?.textContent.toLowerCase() || '';
       
       let score = 0;
       if (title.includes(query)) score += 3;
-      if (category.includes(query)) score += 2;
+      if (reason.includes(query)) score += 2;
       if (location.includes(query)) score += 2;
       if (description.includes(query)) score += 1;
       
@@ -629,113 +530,36 @@ export class AdminPage extends BasePage {
       );
     }
   }
-  
-  async #renderListings() {
-    try {
-      const response = await fetch('/front-end/source/Fake-Server/server.json');
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch listings: ${response.status} ${response.statusText}`);
-      }
-      
-      const json_data = await response.json();
-      const posts = json_data.posts;
-      const reports = json_data.reports;
-  
-      // Associate reports with posts
-      const postsWithReports = posts.map(post => {
-        post.reports = reports.filter(report => report.post_id === post.id);
-        return post;
-      });
-  
-      if (this.#listingContainer) {
-        const loadingIndicator = this.#listingContainer.querySelector('.loading-indicator');
-        this.#listingContainer.innerHTML = '';
-        if (loadingIndicator) {
-          this.#listingContainer.appendChild(loadingIndicator);
-        }
-      }
-  
-      postsWithReports.forEach(post => this.#createListingElement(post));
-    } catch (error) {
-      console.error("Error rendering listings:", error);
-      
-      if (this.#listingContainer) {
-        this.#listingContainer.innerHTML = '<div class="error-message">Failed to load listings. Please try again later.</div>';
-      }
-    }
-  }
 
-  #addNewPost(post) {
-    if (!this.#listingContainer) return;
-
-    this.#createListingElement(post, true);
-    this.#updateFiltersForNewPost(post);
-    this.#applyFilters();
-    
-    const dateRadio = document.getElementById('date-posted');
-    if (dateRadio?.checked) {
-      this.#sortListingsByDate();
-    }
-  }
-
-  #createListingElement(post, addToBeginning = false) {
+  #createListingElement(report) {
     if (!this.#listingContainer) return;
   
     const listing = document.createElement("div");
     listing.classList.add("listing");
-    listing.id = post.id;
-    listing.style.cursor = 'pointer';
-  
-    // Add event listener to the listing itself
-    listing.addEventListener('click', (e) => {
-      if (!e.target.classList.contains('view-button')) {
-        EventHub.getEventHubInstance().publish(Events.ViewPost, post);
-      }
-    });
+    listing.id = report.id;
+    listing.addEventListener('click', () => this.#openModal(report));
   
     const elements = [
-      { tag: "h3", className: "title", text: post.title || "Not Supplied" },
-      { tag: "p", label: "Date found: ", className: "date", text: post.date || "Not supplied" },
-      { tag: "p", label: "Description: ", className: "description", text: post.description || "Not supplied" },
-      { tag: "p", label: "Tags: ", className: "tags", 
-        text: post.tags?.length > 0 ? post.tags.join(", ") : "Not supplied" },
-      { tag: "p", label: "Location: ", className: "location", text: post.location || "Not supplied" }
+      { tag: "h3", className: "title", text: report.title || "Not Supplied" },
+      { tag: "p", label: "Date Reported: ", className: "date", text: new Date(report.createdAt).toLocaleDateString() },
+      { tag: "p", label: "Description: ", className: "description", text: report.description || "Not supplied" },
+      { tag: "p", label: "Report Reason: ", className: "reason", text: report.reason || "Not supplied" },
+      { tag: "p", label: "Location: ", className: "location", text: report.location || "Not supplied" },
+      { tag: "p", label: "Status: ", className: "status", text: report.status || "Pending" }
     ];
   
     elements.forEach(el => {
       const wrapper = document.createElement(el.tag);
-  
       if (el.tag === "h3") {
         wrapper.appendChild(this.#createSpan(el.className, el.text));
       } else {
         wrapper.textContent = el.label;
         wrapper.appendChild(this.#createSpan(el.className, el.text));
       }
-  
       listing.appendChild(wrapper);
     });
   
-    // Create the "View Item" button
-    const viewButton = document.createElement("button");
-    viewButton.classList.add("view-button");
-    viewButton.textContent = "View Item";
-  
-    // Add event listener to the button to open the modal
-    viewButton.addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent the event from propagating to the parent element
-      e.preventDefault(); // Prevent any default behavior
-      this.#openAdminModal(post.title); // Open the modal window
-    });
-  
-    listing.appendChild(viewButton);
-  
-    if (addToBeginning && this.#listingContainer.firstChild) {
-      this.#listingContainer.insertBefore(listing, this.#listingContainer.firstChild);
-    } else {
-      this.#listingContainer.appendChild(listing);
-    }
-  
+    this.#listingContainer.appendChild(listing);
     return listing;
   }
 
@@ -746,96 +570,255 @@ export class AdminPage extends BasePage {
     return span;
   }
 
-  #updateFiltersForNewPost(post) {
-    if (post.tags?.length > 0) {
-      this.#updateFilterOptions(document.getElementById('tag-filters'), post.tags);
-    }
+  async #keepPost(reportId) {
+    try {
+      const response = await fetch(`http://localhost:3000/api/admin/reports/${reportId}/keep`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-    if (post.location) {
-      this.#updateFilterOptions(document.getElementById('location-filters'), [post.location]);
+      if (!response.ok) {
+        throw new Error(`Failed to keep post: ${response.status} ${response.statusText}`);
+      }
+
+      const listingElement = document.getElementById(reportId);
+      if (listingElement) {
+        listingElement.remove();
+      }
+
+      if (this.#listingContainer && this.#listingContainer.children.length === 0) {
+        this.#listingContainer.innerHTML = '<div class="no-posts-message">No reported posts to review.</div>';
+      }
+
+      alert('Post has been kept and removed from reports.');
+      this.#closeModal();
+    } catch (error) {
+      console.error("Error keeping post:", error);
+      alert('Failed to keep post. Please try again.');
     }
   }
 
-  #updateFilterOptions(container, newValues) {
-    if (!container) return;
-    
-    newValues.forEach(value => {
-      const existingFilter = container.querySelector(`input[value="${value}"]`);
-      if (!existingFilter) {
-        const filterId = container.id;
-        const filterOption = document.createElement('div');
-        filterOption.className = 'filter-option';
+  async #deletePost(reportId) {
+    try {
+      const response = await fetch(`http://localhost:3000/api/admin/reports/${reportId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete post: ${response.status} ${response.statusText}`);
+      }
+
+      const listingElement = document.getElementById(reportId);
+      if (listingElement) {
+        listingElement.remove();
+      }
+
+      if (this.#listingContainer && this.#listingContainer.children.length === 0) {
+        this.#listingContainer.innerHTML = '<div class="no-posts-message">No reported posts to review.</div>';
+      }
+
+      alert('Post has been deleted successfully.');
+      this.#closeModal();
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      alert('Failed to delete post. Please try again.');
+    }
+  }
+
+  async #loadComments(postId) {
+    try {
+      const response = await fetch(`http://localhost:3000/api/admin/comments/${postId}`);
+      if (!response.ok) {
+        throw new Error(`Failed to load comments: ${response.status} ${response.statusText}`);
+      }
+
+      const responseData = await response.json();
+      const comments = responseData.data.comments || [];
+
+      const commentsList = document.getElementById(`comments-${postId}`);
+      const addCommentBtn = document.querySelector('.add-comment-button');
+      
+      if (commentsList) {
+        commentsList.innerHTML = '';
         
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.value = value;
-        checkbox.id = `${filterId}-${value.replace(/\s+/g, '-').toLowerCase()}`;
-        checkbox.checked = true;
-        checkbox.addEventListener('change', () => this.#applyFilters());
-        
-        const label = document.createElement('label');
-        label.htmlFor = checkbox.id;
-        label.textContent = value;
-        
-        filterOption.append(checkbox, label);
-        container.appendChild(filterOption);
+        if (comments.length === 0) {
+          const noComments = document.createElement("p");
+          noComments.className = "no-comments";
+          noComments.textContent = "No comments yet";
+          commentsList.appendChild(noComments);
+          if (addCommentBtn) {
+            addCommentBtn.style.display = 'block';
+          }
+        } else {
+          comments.forEach(comment => {
+            const commentElement = this.#createCommentElement(comment);
+            commentsList.appendChild(commentElement);
+          });
+          if (addCommentBtn) {
+            addCommentBtn.style.display = 'none';
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error loading comments:", error);
+    }
+  }
+
+  #createCommentElement(comment) {
+    const commentElement = document.createElement("div");
+    commentElement.className = "comment";
+    commentElement.id = `comment-${comment.id}`;
+
+    const commentText = document.createElement("p");
+    commentText.className = "comment-text";
+    commentText.textContent = comment.comment;
+
+    const commentDate = document.createElement("span");
+    commentDate.className = "comment-date";
+    commentDate.textContent = new Date(comment.createdAt).toLocaleString();
+
+    const editButton = document.createElement("button");
+    editButton.className = "edit-comment-button";
+    editButton.textContent = "Edit";
+    editButton.addEventListener('click', () => this.#editComment(comment));
+
+    commentElement.append(commentText, commentDate, editButton);
+    return commentElement;
+  }
+
+  async #addComment(postId, commentText) {
+    if (!commentText.trim()) {
+      alert('Please enter a comment');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/admin/comments/${postId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ comment: commentText })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to add comment: ${response.status} ${response.statusText}`);
+      }
+
+      // Refresh comments list
+      this.#loadComments(postId);
+
+      // Clear input
+      const commentInput = document.querySelector(`#${postId} .comment-input`);
+      if (commentInput) {
+        commentInput.value = '';
+      }
+      
+      alert('Comment added successfully.');
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      alert('Failed to add comment. Please try again.');
+    }
+  }
+
+  #editComment(comment) {
+    const commentElement = document.getElementById(`comment-${comment.id}`);
+    if (!commentElement) return;
+
+    const commentText = commentElement.querySelector('.comment-text');
+    const currentText = commentText.textContent;
+
+    const input = document.createElement("textarea");
+    input.className = "edit-comment-input";
+    input.value = currentText;
+
+    const saveButton = document.createElement("button");
+    saveButton.className = "save-comment-button";
+    saveButton.textContent = "Save Comment";
+
+    const cancelButton = document.createElement("button");
+    cancelButton.className = "cancel-comment-button";
+    cancelButton.textContent = "Cancel";
+
+    const editActions = document.createElement("div");
+    editActions.className = "comment-buttons";
+    editActions.append(saveButton, cancelButton);
+
+    // Replace text with input and hide edit button
+    commentText.replaceWith(input);
+    const editButton = commentElement.querySelector('.edit-comment-button');
+    editButton.style.display = 'none';
+    commentElement.appendChild(editActions);
+
+    cancelButton.addEventListener('click', () => {
+      input.replaceWith(commentText);
+      editActions.remove();
+      editButton.style.display = 'block';
+    });
+
+    saveButton.addEventListener('click', async () => {
+      const newText = input.value.trim();
+      if (!newText) {
+        alert('Comment cannot be empty');
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/admin/comments/${comment.post_id}/${comment.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ comment: newText })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to update comment: ${response.status} ${response.statusText}`);
+        }
+
+        // Update UI
+        commentText.textContent = newText;
+        input.replaceWith(commentText);
+        editActions.remove();
+        editButton.style.display = 'block';
+      } catch (error) {
+        console.error("Error updating comment:", error);
+        alert('Failed to update comment. Please try again.');
       }
     });
   }
 
-  //FEATURE TO BE FULLY IMPLEMENTED IN FUTURE MILESTONE WITH BACKEND
-  async #saveNoteToIndexedDB(postId, note) {
-    const db = await this.#openNotesDatabase();
-    const transaction = db.transaction('notes', 'readwrite');
-    const store = transaction.objectStore('notes');
-    store.put({ postId, note });
-    return transaction.complete;
-  }
-  
-  async #getNoteFromIndexedDB(postId) {
-    const db = await this.#openNotesDatabase();
-    const transaction = db.transaction('notes', 'readonly');
-    const store = transaction.objectStore('notes');
-    return store.get(postId);
-  }
-  
-  async #openNotesDatabase() {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open('AdminPageNotesDB', 1);
-  
-      request.onupgradeneeded = (event) => {
-        const db = event.target.result;
-        if (!db.objectStoreNames.contains('notes')) {
-          db.createObjectStore('notes', { keyPath: 'postId' });
-        }
-      };
-  
-      request.onsuccess = (event) => {
-        resolve(event.target.result);
-      };
-  
-      request.onerror = (event) => {
-        reject(event.target.error);
-      };
-    });
-  }
-  async #loadCommentsFromIndexedDB() {
-    const db = await this.#openNotesDatabase();
-    const transaction = db.transaction('notes', 'readonly');
-    const store = transaction.objectStore('notes');
-    const allNotes = await store.getAll();
-  
-    allNotes.forEach(note => {
-      const postElement = document.getElementById(`post-${note.postId}`);
-      if (postElement) {
-        let commentElement = postElement.querySelector('.post-comment');
-        if (!commentElement) {
-          commentElement = document.createElement('p');
-          commentElement.className = 'post-comment';
-          postElement.appendChild(commentElement);
-        }
-        commentElement.textContent = `Comment: ${note.note}`;
+  async #renderListings() {
+    try {
+      const response = await fetch('http://localhost:3000/api/admin/reports');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch listings: ${response.status} ${response.statusText}`);
       }
-    });
+      
+      const responseData = await response.json();
+      const reports = responseData.data || [];
+      
+      if (this.#listingContainer) {
+        const loadingIndicator = this.#listingContainer.querySelector('.loading-indicator');
+        this.#listingContainer.innerHTML = '';
+        if (loadingIndicator) {
+          this.#listingContainer.appendChild(loadingIndicator);
+        }
+      }
+      
+      reports.forEach(report => this.#createListingElement(report));
+
+      if (reports.length === 0 && this.#listingContainer) {
+        this.#listingContainer.innerHTML = '<div class="no-posts-message">No reported posts to review.</div>';
+      }
+    } catch (error) {
+      console.error("Error rendering listings:", error);
+      if (this.#listingContainer) {
+        this.#listingContainer.innerHTML = '<div class="error-message">Failed to load listings. Please try again later.</div>';
+      }
+    }
   }
 }
