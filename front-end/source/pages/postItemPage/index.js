@@ -195,26 +195,60 @@ export class PostItemPage extends BasePage {
 
     // Submit handling
     const submitBtn = form.querySelector(".submit-button");
-    submitBtn.addEventListener("click", () => {
+    submitBtn.addEventListener("click", async () => {
       const titleInput = form.querySelector('.form-group:nth-child(1) input');
       const descInput = form.querySelector('.description-box');
       const dateInput = form.querySelector('input[type="date"]');
       const locationInput = form.querySelector('.form-group:nth-child(5) input');
       const anonInput = form.querySelector('#anonymousCheck');
 
+      // Create the post object with initial data
       const newPost = {
-        id: Date.now().toString(),
         title: titleInput.value,
         description: descInput.value,
         date: dateInput.value,
         location: locationInput.value,
         tags: this.#tags,
         anonymous: anonInput.checked,
-        image: this.#imageFile ? URL.createObjectURL(this.#imageFile) : null
+        user_id: localStorage.getItem('userId') || '101'
       };
 
-      hub.publish(Events.NewPost, newPost);
-      hub.publish(Events.NavigateTo, "/HomePageSignedIn");
+      try {
+        // Disable the button while sending data
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Creating Post...";
+        
+        // Send the post to the server first
+        const response = await fetch('http://localhost:3000/api/posts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newPost)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to create post: ${response.status} ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        const savedPost = result.data;
+
+        // If we have an image, add it to the result object
+        // In a real app, you'd upload this to a server/CDN 
+        if (this.#imageFile) {
+          savedPost.image = URL.createObjectURL(this.#imageFile);
+        }
+
+        // Now publish event with the server-returned data (that has a proper ID)
+        hub.publish(Events.NewPost, savedPost);
+        hub.publish(Events.NavigateTo, "/HomePageSignedIn");
+      } catch (error) {
+        console.error("Error creating post:", error);
+        alert("Failed to create post. Please try again.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Create Post";
+      }
     });
   }
 
