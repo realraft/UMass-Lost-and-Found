@@ -75,142 +75,50 @@ export class MessagingPage extends BasePage {
         }
     }
 
-    #createContainer() {
-        this.#container = document.createElement("div");
-        this.#container.className = "messaging-page";
-        
-        // Create the inner structure
-        const template = `
-            <div class="posts-container">
-            </div>        
-            <div class="message-container">
-                <div class="messages-content"></div>
-                <form id="messageForm">
-                    <div>
-                        <label for="newMessage">Message: </label>
-                        <input id="newMessage" type="text" />
-                        <input id="send-message" type="submit" value="=>" />
-                    </div>
-                </form>
-            </div>
-        `;
-        
-        this.#container.innerHTML = template;
-        console.log('Container created with template');
+    #createContainer() { //creates div
+        this.#container = document.createElement("div")
+        this.#container.className = "messaging-page"
+        this.#container.innerHTML = this.#getTemplate()
     }
 
-    async render() {
-        console.log('Rendering MessagingPage, userId:', this.userId);
-        if (this.#container) {
-            console.log('Container exists, returning existing');
-            return this.#container;
-        }
-        
-        this.#createContainer();
-        console.log('Created container');
-        
-        // Ensure container is properly created before continuing
-        if (!this.#container) {
-            console.error('Failed to create container');
-            return document.createElement('div');
-        }
 
-        try {
-            await this.#renderFirstMessagePage();
-            this.#addEventListeners();
-            this.#addSubscriptions();
-            console.log('MessagingPage render complete');
-        } catch (error) {
-            console.error('Error during MessagingPage render:', error);
-            this.#container.innerHTML = '<div class="error-message">Failed to load messaging page. Please try again.</div>';
-        }
-
-        return this.#container;
+    render() { //render messaging page
+        this.#createContainer()
+        this.#renderFirstMessagePage()
+        setTimeout(() => {
+            this.#addEventListeners()
+            this.#addSubscriptions()
+        }, 100)
+        return this.#container
     }
+
 
     async #renderFirstMessagePage() { //render first conversation
-        try {
-            const [postsMessages, posts] = await Promise.all([
-                this.#getPostsMessages(),
-                this.#getPosts()
-            ]);
-
-            if (!Array.isArray(postsMessages)) {
-                throw new Error('Invalid conversations data received');
-            }
-
-            // Filter conversations where current user is either user1 or user2
-            const userPostMessages = postsMessages.filter(p => {
-                try {
-                    const [, user1, user2] = p.id.split("-");
-                    return String(user1) === String(this.userId) || String(user2) === String(this.userId);
-                } catch (err) {
-                    console.error('Invalid conversation ID format:', p.id);
-                    return false;
+        const postsMessages = await this.#getPostsMessages() //messages
+        const posts = await this.#getPosts() // posts
+        const userPostMessages = postsMessages.filter(p => {
+                const idarr = p.id.split("-")
+                return idarr[1] === String(this.userId)
+            })
+        if (userPostMessages.length > 0) {
+            userPostMessages.forEach(pM => {
+                const pid = parseInt(pM.id.split("-")[0])
+                const post = posts.find(p => p.id === pid)
+                if (post) {
+                    this.#addPosttoSidebar(post, pM.id, pM.messages)
                 }
-            });
+            })
 
-            const postsContainer = this.#container.querySelector(".posts-container");
-            const messageContainer = this.#container.querySelector('.message-container');
 
-            if (!postsContainer || !messageContainer) {
-                throw new Error('Required containers not found');
-            }
-
-            // Clear existing content
-            postsContainer.innerHTML = '';
-            messageContainer.querySelector('.messages-content').innerHTML = '';
-
-            if (userPostMessages.length > 0) {
-                // Map conversations to rendering promises
-                const renderedConversations = userPostMessages.map(async (pM) => {
-                    try {
-                        const [postId] = pM.id.split("-");
-                        const post = posts.find(p => String(p.id) === String(postId));
-                        if (post) {
-                            this.#addPosttoSidebar(post, pM.id, pM.messages || []);
-                        }
-                    } catch (err) {
-                        console.error('Error rendering conversation:', err);
-                    }
-                });
-
-                await Promise.all(renderedConversations);
-
-                // Handle active conversation if one is set
-                const activeConversationId = localStorage.getItem('activeConversationId');
-                if (activeConversationId) {
-                    const activeButton = this.#container.querySelector(`button[id="id: ${activeConversationId}"]`);
-                    if (activeButton) {
-                        activeButton.classList.add('active');
-                        const conversation = userPostMessages.find(p => p.id === activeConversationId);
-                        if (conversation) {
-                            this.#clearMessages_content();
-                            this.#renderConversation(activeConversationId, conversation.messages || []);
-                        }
-                        localStorage.removeItem('activeConversationId');
-                        return;
-                    }
+            // Set first conversation as active
+            const firstPostButton = this.#container.querySelector('.post-button')
+            if (firstPostButton) {
+                firstPostButton.classList.add('active')
+                const firstPostId = firstPostButton.id.replace('id: ', '')
+                const firstPostMessages = userPostMessages.find(p => p.id === firstPostId)
+                if (firstPostMessages) {
+                    this.#renderConversation(firstPostId, firstPostMessages.messages)
                 }
-
-                // Show first conversation if no active one
-                const firstPostButton = this.#container.querySelector('.post-button');
-                if (firstPostButton) {
-                    firstPostButton.classList.add('active');
-                    const firstPostId = firstPostButton.id.replace('id: ', '');
-                    const firstPostMessages = userPostMessages.find(p => p.id === firstPostId);
-                    if (firstPostMessages) {
-                        this.#renderConversation(firstPostId, firstPostMessages.messages || []);
-                    }
-                }
-            } else {
-                messageContainer.innerHTML = '<div class="no-messages">No conversations yet</div>';
-            }
-        } catch (error) {
-            console.error('Error rendering messages:', error);
-            const messageContainer = this.#container.querySelector('.message-container');
-            if (messageContainer) {
-                messageContainer.innerHTML = '<div class="error-message">Failed to load messages. Please try again later.</div>';
             }
         }
     }
