@@ -114,7 +114,7 @@ export class NavBar extends BasePage {
 
   #setupNav() {
     const hub = EventHub.getEventHubInstance();
-    
+        
     // Set up navigation links
     const navLinks = [
       { selector: '.home-link', path: '/HomePageSignedIn' },
@@ -130,7 +130,7 @@ export class NavBar extends BasePage {
       if (element) {
         element.addEventListener('click', (event) => {
           event.preventDefault();
-          hub.publish(Events.NavigateTo, link.path);
+                    hub.publish(Events.NavigateTo, link.path);
         });
       }
     });

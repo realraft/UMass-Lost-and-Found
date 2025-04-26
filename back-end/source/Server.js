@@ -2,6 +2,7 @@ import express from "express";
 import userRoutes from "../routes/userRoutes.js";
 import adminRoutes from "../routes/adminRoutes.js";
 import postRoutes from "../routes/postRoutes.js";
+import messagesRoutes from "../routes/messagesRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/conversations", messagesRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

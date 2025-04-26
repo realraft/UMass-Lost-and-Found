@@ -1,18 +1,18 @@
 import express from 'express';
-import * as messagesController from '../controllers/messageController.js';
+import * as messagesController from '../controllers/messagesController.js';
 
 const router = express.Router();
 
-//get conversation
-router.get("/conversation/:id", messagesController.getAllMessagesForPostandUsers)
+// Get all conversations
+router.get("/conversation", messagesController.getAllConversations);
 
-//get a single message
-router.get("/message/:id", messagesController.getSingleMessage)
+//get conversation messages
+router.get("/conversation/:id", messagesController.getAllMessagesForPostandUsers);
 
 //create a conversation 
-router.post("/conversation", messagesController.createConversation)
+router.post("/conversation", messagesController.createConversation);
 
 //add a message
-router.put("/conversation/:id/message", messagesController.addMessage)
+router.put("/conversation/:id/message", messagesController.addMessagetoConversation);
 
 export default router;

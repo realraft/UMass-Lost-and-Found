@@ -47,7 +47,7 @@ export default class App {
       homeSignedIn: new HomePageSignedIn(),
       postItem: new PostItemPage(),
       postedItem: new PostedItemPage(),
-      messaging: new MessagingPage(1), // Initialize with default user ID 1
+      messaging: new MessagingPage(),
       admin: new AdminPage(),
       postManager: new PostManagerPage(),
       editPost: new EditPostPage()
@@ -110,10 +110,12 @@ export default class App {
         this._currentPage = "postedItem";
         break;
       case "/MessagingPage":
+        // Reset the messaging page component to ensure fresh state
+        this._pageComponents.messaging = new MessagingPage();
         this._currentPage = "messaging";
         break;
       case "/AdminPage":
-        this._currentPage = "admin"
+        this._currentPage = "admin";
         break;
       case "/PostManagerPage":
         this._currentPage = "postManager";
