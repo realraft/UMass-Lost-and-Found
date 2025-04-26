@@ -22,7 +22,6 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir);
 }
 
-// Initialize with empty arrays
 if (!fs.existsSync(postsFilePath)) {
   fs.writeFileSync(postsFilePath, JSON.stringify([]), 'utf8');
 }

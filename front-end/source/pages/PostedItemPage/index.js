@@ -118,11 +118,38 @@ export class PostedItemPage extends BasePage {
 
         // Contact button
         const contactButton = document.createElement('button');
-        contactButton.className = 'contact-button';
-        contactButton.textContent = 'Contact Finder';
-        contactButton.addEventListener('click', () => {
-            const hub = EventHub.getEventHubInstance();
-            hub.publish(Events.NavigateTo, '/MessagingPage');
+        contactButton.className = 'contact-button'
+        contactButton.textContent = 'Contact Finder'
+        contactButton.addEventListener('click', async () => {
+            try {
+                const currentUserId = localStorage.getItem('userId') || '101';
+                const postOwnerId = this.#currentPost.user_id;
+                                const conversationId = `${this.#currentPost.id}-${currentUserId}-${postOwnerId}`;
+
+                                const response = await fetch('http://localhost:3000/api/conversations/conversation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        postId: this.#currentPost.id,
+                        user1: currentUserId,
+                        user2: postOwnerId
+                    })
+                });
+
+                const responseData = await response.json();
+                if (!response.ok) {
+                    throw new Error(responseData.message || 'Failed to create conversation');
+                }
+
+                localStorage.setItem('activeConversationId', conversationId);
+                const hub = EventHub.getEventHubInstance();
+                hub.publish(Events.NavigateTo, '/MessagingPage');
+            } catch (error) {
+                console.error('Error creating conversation:', error);
+                alert('Failed to start conversation. Please try again.');
+            }
         });
         details.appendChild(contactButton);
 

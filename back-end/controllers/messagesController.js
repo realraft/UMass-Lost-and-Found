@@ -1,38 +1,95 @@
 import * as MessagesModel from '../models/Messages/index.js';
 
+export const getAllConversations = (req, res) => {
+    try {
+        const conversations = MessagesModel.getAllPostsMessages();
+        if (!Array.isArray(conversations)) {
+            throw new Error('Invalid conversations data');
+        }
+        res.status(200).json({ success: true, data: conversations });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
 export const getAllMessagesForPostandUsers = (req, res) => {
     try {
-      const { id } = req.params
-      const conversation = MessagesModel.getConversationById(id)
-      if (!conversation) {
-        return res.status(404).json({ success: false, message: "Conversation not found" })
-      }
-      res.status(200).json({ success: true, data: conversation.messages })
+        const { id } = req.params;
+        const conversation = MessagesModel.getConversationById(id);
+        if (!conversation) {
+            return res.status(404).json({ success: false, message: "Conversation not found" });
+        }
+        res.status(200).json({ success: true, data: conversation });
     } catch (error) {
-      res.status(500).json({ success: false, message: error.message })
+        res.status(500).json({ success: false, message: error.message });
     }
 }
 
 export const createConversation = (req, res) => {
     try {
-      const { postId, user1, user2 } = req.body
-      const newConversation = MessagesModel.createConversationById(postId, user1, user2)
-      res.status(201).json({ success: true, data: newConversation })
+        const { postId, user1, user2 } = req.body;
+        console.log('Creating conversation request:', { postId, user1, user2 });
+
+        if (!postId || !user1 || !user2) {
+            console.error('Missing required fields:', { postId, user1, user2 });
+            return res.status(400).json({ 
+                success: false, 
+                message: "Missing required fields: postId, user1, or user2" 
+            });
+        }
+
+        // Ensure consistent string format for IDs
+        const conversationId = `${String(postId)}-${String(user1)}-${String(user2)}`;
+        console.log('Generated conversation ID:', conversationId);
+        
+        // Check if conversation already exists
+        const existingConversation = MessagesModel.getConversationById(conversationId);
+        if (existingConversation) {
+            console.log('Found existing conversation:', existingConversation);
+            return res.status(200).json({ success: true, data: existingConversation });
+        }
+        
+        // Create new conversation
+        const newConversation = MessagesModel.createConversationById(conversationId);
+        console.log('Created new conversation:', newConversation);
+        return res.status(201).json({ success: true, data: newConversation });
     } catch (error) {
-      res.status(500).json({ success: false, message: error.message })
+        console.error('Error in createConversation:', error);
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 
 export const addMessagetoConversation = (req, res) => {
     try {
-      const { id } = req.params
-      const { user, text } = req.body
-      const updatedConversation = MessagesModel.addMessage(id, { user, text })
-      if (!updatedConversation) {
-        return res.status(404).json({ success: false, message: "Conversation not found" })
-      }
-      res.status(200).json({ success: true, data: updatedConversation })
+        const { id } = req.params;
+        const { user, text } = req.body;
+        
+        if (!user || !text) {
+            console.error('Missing message fields:', { user, text });
+            return res.status(400).json({ 
+                success: false, 
+                message: "Missing required fields: user or text" 
+            });
+        }
+
+        // Convert user ID to string for consistency
+        const messageData = {
+            user: String(user),
+            text: text
+        };
+
+        console.log('Adding message to conversation:', id, messageData);
+        const updatedConversation = MessagesModel.addMessage(id, messageData);
+        
+        if (!updatedConversation) {
+            console.error('Conversation not found:', id);
+            return res.status(404).json({ success: false, message: "Conversation not found" });
+        }
+        
+        console.log('Message added successfully to:', id);
+        res.status(200).json({ success: true, data: updatedConversation });
     } catch (error) {
-      res.status(500).json({ success: false, message: error.message })
+        console.error('Error in addMessagetoConversation:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 }

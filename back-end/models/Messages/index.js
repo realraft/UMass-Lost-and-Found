@@ -1,75 +1,75 @@
-import { Message, Conversation } from "./Messages.js"
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import { Message, Conversation } from "./Messages.js";
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const messagesFilePath = path.join(__dirname, '../data/postsMessages.json')
-
-const dataDir = path.join(__dirname, '../data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir);
-}
+const messagesFilePath = path.join(__dirname, '../../data/postsMessages.json');
 
 if (!fs.existsSync(messagesFilePath)) {
-  fs.writeFileSync(messagesFilePath, JSON.stringify([]), 'utf8');
+    fs.writeFileSync(messagesFilePath, JSON.stringify([]), 'utf8');
 }
 
-let postsMessages = []
+let postsMessages = [];
 
 try {
-  postsMessages = JSON.parse(fs.readFileSync(messagesFilePath, 'utf8'))
+    const data = fs.readFileSync(messagesFilePath, 'utf8');
+    postsMessages = JSON.parse(data);
+    // Convert existing conversations to ensure proper format
+    postsMessages = postsMessages.map(conv => new Conversation(conv));
 } catch (error) {
-  console.error('Error loading data:', error);
+    console.error('Error loading messages data:', error);
+    postsMessages = [];
 }
 
 const saveData = () => {
-  try {
-    fs.writeFileSync(messagesFilePath, JSON.stringify(postsMessages, null, 2), 'utf8')
-  } catch (error) {
-    console.error('Error saving data:', error);
-  }
-}
+    try {
+        fs.writeFileSync(messagesFilePath, JSON.stringify(postsMessages, null, 2), 'utf8');
+    } catch (error) {
+        console.error('Error saving messages data:', error);
+    }
+};
 
-const getAllPostsMessages = () => postsMessages
+const getAllPostsMessages = () => postsMessages;
 
 const addMessage = (id, message) => {
-    const conversation = postsMessages.find(p => p.id === id)
+    const conversation = postsMessages.find(p => String(p.id) === String(id));
     if (conversation) {
-        conversation.messages.push(message)
-    } else {
-        postsMessages.push(new Message(id, message))
+        const newMessage = new Message({
+            user: String(message.user),
+            text: message.text
+        });
+        conversation.messages.push(newMessage);
+        saveData();
+        return conversation;
     }
-    saveData()
-}
+    return null;
+};
 
-const createConversationById = (postId, user1, user2) => {
-    const conversation = postsMessages.find(p => p.id === postId)
-    if (conversation) {
-        return conversation
-    } else {
-        const newConversation = new Conversation(`${postId}-${user1}-${user2}`, [])
-        postsMessages.push(newConversation)
-        saveData()
-        return newConversation
+const createConversationById = (conversationId) => {
+    const existingConversation = postsMessages.find(p => String(p.id) === String(conversationId));
+    if (existingConversation) {
+        return existingConversation;
     }
-}
+    
+    const newConversation = new Conversation({
+        id: String(conversationId),
+        messages: []
+    });
+    postsMessages.push(newConversation);
+    saveData();
+    return newConversation;
+};
 
 const getConversationById = (id) => {
-    const conversation = postsMessages.find(p => p.id === id)
-    if (conversation) {
-        return conversation
-    } else {
-        return null
-    }
-}
-
+    return postsMessages.find(p => String(p.id) === String(id)) || null;
+};
 
 export {
     addMessage,
     createConversationById,
     getConversationById,
     getAllPostsMessages
-}
+};
