@@ -52,7 +52,7 @@ export class AdminPage extends BasePage {
     this.#container.append(overlay, modal);
   }
 
-  #openModal(report) {
+  #openModal(post) {
     const elements = {
       overlay: document.getElementById('admin-overlay'),
       modal: document.getElementById('admin-modal'),
@@ -65,14 +65,14 @@ export class AdminPage extends BasePage {
       // Create modal content
       const title = document.createElement('h3');
       title.className = 'title';
-      title.textContent = report.title || "Not Supplied";
+      title.textContent = post.title || "Not Supplied";
 
       const details = [
-        { label: "Date Reported: ", text: new Date(report.createdAt).toLocaleDateString(), className: 'date' },
-        { label: "Description: ", text: report.description || "Not supplied", className: 'description' },
-        { label: "Report Reason: ", text: report.reason || "Not supplied", className: 'reason' },
-        { label: "Location: ", text: report.location || "Not supplied", className: 'location' },
-        { label: "Status: ", text: report.status || "Pending", className: 'status' }
+        { label: "Date Reported: ", text: new Date(post.reportedAt).toLocaleDateString(), className: 'date' },
+        { label: "Description: ", text: post.description || "Not supplied", className: 'description' },
+        { label: "Report Reason: ", text: post.reportReason || "Not supplied", className: 'reason' },
+        { label: "Location: ", text: post.location || "Not supplied", className: 'location' },
+        { label: "Status: ", text: post.reportStatus || "Pending", className: 'status' }
       ];
 
       const detailsElements = details.map(detail => {
@@ -93,7 +93,7 @@ export class AdminPage extends BasePage {
 
       const commentsList = document.createElement("div");
       commentsList.className = "comments-list";
-      commentsList.id = `comments-${report.id}`;
+      commentsList.id = `comments-${post.id}`;
 
       // Add comment form
       const commentForm = document.createElement("div");
@@ -108,7 +108,7 @@ export class AdminPage extends BasePage {
       saveCommentBtn.className = "save-comment-button";
       saveCommentBtn.textContent = "Save Comment";
       saveCommentBtn.addEventListener('click', () => {
-        this.#addComment(report.id, commentInput.value);
+        this.#addComment(post.id, commentInput.value);
         commentForm.style.display = 'none';
         addCommentBtn.style.display = 'block';
       });
@@ -145,14 +145,14 @@ export class AdminPage extends BasePage {
       const keepButton = document.createElement("button");
       keepButton.textContent = "Keep Post";
       keepButton.className = "keep-button";
-      keepButton.addEventListener('click', () => this.#keepPost(report.id));
+      keepButton.addEventListener('click', () => this.#keepPost(post.id));
 
       const deleteButton = document.createElement("button");
       deleteButton.textContent = "Delete Post";
       deleteButton.className = "delete-button";
       deleteButton.addEventListener('click', () => {
         if (confirm('Are you sure you want to delete this post?')) {
-          this.#deletePost(report.id);
+          this.#deletePost(post.id);
         }
       });
 
@@ -168,7 +168,7 @@ export class AdminPage extends BasePage {
       elements.overlay.style.display = 'block';
       elements.modal.style.display = 'block';
 
-      this.#loadComments(report.id);
+      this.#loadComments(post.id);
     }
   }
 
@@ -306,6 +306,14 @@ export class AdminPage extends BasePage {
   #attachEventListeners() {
     const hub = EventHub.getEventHubInstance();
     document.addEventListener('search-query', (e) => this.#sortListingsByRelevance(e.detail.query));
+    
+    // Subscribe to NewReport events
+    hub.subscribe(Events.NewReport, (reportData) => {
+      // Fetch the complete updated list of reports
+      this.#renderListings();
+      // Re-initialize filters to include any new locations or reasons
+      this.#initializeFilters();
+    });
   }
 
   #initializeSorting() {
@@ -531,21 +539,21 @@ export class AdminPage extends BasePage {
     }
   }
 
-  #createListingElement(report) {
+  #createListingElement(post) {
     if (!this.#listingContainer) return;
   
     const listing = document.createElement("div");
     listing.classList.add("listing");
-    listing.id = report.id;
-    listing.addEventListener('click', () => this.#openModal(report));
+    listing.id = post.id;
+    listing.addEventListener('click', () => this.#openModal(post));
   
     const elements = [
-      { tag: "h3", className: "title", text: report.title || "Not Supplied" },
-      { tag: "p", label: "Date Reported: ", className: "date", text: new Date(report.createdAt).toLocaleDateString() },
-      { tag: "p", label: "Description: ", className: "description", text: report.description || "Not supplied" },
-      { tag: "p", label: "Report Reason: ", className: "reason", text: report.reason || "Not supplied" },
-      { tag: "p", label: "Location: ", className: "location", text: report.location || "Not supplied" },
-      { tag: "p", label: "Status: ", className: "status", text: report.status || "Pending" }
+      { tag: "h3", className: "title", text: post.title || "Not Supplied" },
+      { tag: "p", label: "Date Reported: ", className: "date", text: new Date(post.reportedAt).toLocaleDateString() },
+      { tag: "p", label: "Description: ", className: "description", text: post.description || "Not supplied" },
+      { tag: "p", label: "Report Reason: ", className: "reason", text: post.reportReason || "Not supplied" },
+      { tag: "p", label: "Location: ", className: "location", text: post.location || "Not supplied" },
+      { tag: "p", label: "Status: ", className: "status", text: post.reportStatus || "Pending" }
     ];
   
     elements.forEach(el => {
@@ -559,7 +567,12 @@ export class AdminPage extends BasePage {
       listing.appendChild(wrapper);
     });
   
-    this.#listingContainer.appendChild(listing);
+    // Insert at the beginning of the container instead of appending
+    if (this.#listingContainer.firstChild) {
+      this.#listingContainer.insertBefore(listing, this.#listingContainer.firstChild);
+    } else {
+      this.#listingContainer.appendChild(listing);
+    }
     return listing;
   }
 
@@ -602,13 +615,20 @@ export class AdminPage extends BasePage {
 
   async #deletePost(reportId) {
     try {
-      const response = await fetch(`http://localhost:3000/api/admin/reports/${reportId}`, {
-        method: 'DELETE'
+      // First delete the post itself through the regular posts API
+      const response = await fetch(`http://localhost:3000/api/posts/${reportId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
       if (!response.ok) {
         throw new Error(`Failed to delete post: ${response.status} ${response.statusText}`);
       }
+
+      // Publish event to update HomePageSignedIn before removing from admin view
+      EventHub.getEventHubInstance().publish(Events.PostUpdated);
 
       const listingElement = document.getElementById(reportId);
       if (listingElement) {
@@ -707,16 +727,30 @@ export class AdminPage extends BasePage {
         throw new Error(`Failed to add comment: ${response.status} ${response.statusText}`);
       }
 
-      // Refresh comments list
-      this.#loadComments(postId);
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to add comment');
+      }
 
-      // Clear input
-      const commentInput = document.querySelector(`#${postId} .comment-input`);
+      // Clear input 
+      const commentInput = document.querySelector('.comment-input');
       if (commentInput) {
         commentInput.value = '';
       }
-      
-      alert('Comment added successfully.');
+
+      // Update UI immediately with the new comment
+      const commentsList = document.getElementById(`comments-${postId}`);
+      if (commentsList) {
+        // Remove "no comments" message if it exists
+        const noComments = commentsList.querySelector('.no-comments');
+        if (noComments) {
+          noComments.remove();
+        }
+        
+        // Add the new comment to the list
+        const commentElement = this.#createCommentElement(result.data.comment);
+        commentsList.appendChild(commentElement);
+      }
     } catch (error) {
       console.error("Error adding comment:", error);
       alert('Failed to add comment. Please try again.');
@@ -799,7 +833,7 @@ export class AdminPage extends BasePage {
       }
       
       const responseData = await response.json();
-      const reports = responseData.data || [];
+      const reportedPosts = responseData.data || [];
       
       if (this.#listingContainer) {
         const loadingIndicator = this.#listingContainer.querySelector('.loading-indicator');
@@ -809,9 +843,9 @@ export class AdminPage extends BasePage {
         }
       }
       
-      reports.forEach(report => this.#createListingElement(report));
+      reportedPosts.forEach(post => this.#createListingElement(post));
 
-      if (reports.length === 0 && this.#listingContainer) {
+      if (reportedPosts.length === 0 && this.#listingContainer) {
         this.#listingContainer.innerHTML = '<div class="no-posts-message">No reported posts to review.</div>';
       }
     } catch (error) {

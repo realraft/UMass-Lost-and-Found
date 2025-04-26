@@ -1,47 +1,5 @@
 [
   {
-    "id": "1",
-    "post_id": "1",
-    "reason": "This watch looks suspicious and may be stolen",
-    "reported_by": "102",
-    "status": "pending",
-    "createdAt": "2025-04-26T03:31:09.087Z",
-    "updatedAt": "2025-04-26T03:31:09.088Z"
-  },
-  {
-    "id": "2",
-    "post_id": "2",
-    "reason": "These keys may belong to someone else, possible fraudulent post",
-    "reported_by": "103",
-    "status": "pending",
-    "createdAt": "2025-04-26T03:31:09.088Z",
-    "updatedAt": "2025-04-26T03:31:09.088Z"
-  },
-  {
-    "id": "3",
-    "post_id": "3",
-    "reason": "This phone might be stolen, serial number matches reported theft",
-    "reported_by": "104",
-    "status": "pending",
-    "createdAt": "2025-04-26T03:31:09.088Z",
-    "updatedAt": "2025-04-26T03:31:09.088Z"
-  },
-  {
-    "id": "4",
-    "post_id": "4",
-    "reason": "Someone reported these sunglasses as counterfeit merchandise",
-    "reported_by": "105",
-    "status": "pending",
-    "createdAt": "2025-04-26T03:31:09.088Z",
-    "updatedAt": "2025-04-26T03:31:09.088Z"
-  },
-  {
-    "id": "5",
-    "post_id": "5",
-    "reason": "This backpack contains sensitive materials that need verification",
-    "reported_by": "106",
-    "status": "pending",
-    "createdAt": "2025-04-26T03:31:09.088Z",
-    "updatedAt": "2025-04-26T03:31:09.088Z"
+
   }
 ]

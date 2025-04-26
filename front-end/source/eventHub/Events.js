@@ -4,6 +4,7 @@ export const Events = {
     NewPost: "NewPost",
     ViewPost: "ViewPost",
     EditPost: "EditPost",
-    PostUpdated: "PostUpdated"  // Add new event for post updates
+    PostUpdated: "PostUpdated",
+    NewReport: "NewReport"  // Add new event for reports
 };
 
