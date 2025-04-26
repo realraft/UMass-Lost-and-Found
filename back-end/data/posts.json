@@ -1,82 +1,5 @@
 [
   {
-    "id": "1",
-    "title": "Lost Watch",
-    "description": "A silver watch was lost near the Central Park fountain.",
-    "location": "Central Park",
-    "date": "2025-04-01",
-    "user_id": "101",
-    "imageUrl": null,
-    "createdAt": "2025-04-26T03:31:09.087Z",
-    "updatedAt": "2025-04-26T03:31:09.087Z"
-  },
-  {
-    "id": "2",
-    "title": "Found Keys",
-    "description": "Set of keys found outside the library.",
-    "location": "City Library",
-    "date": "2025-03-30",
-    "user_id": "102",
-    "imageUrl": null,
-    "createdAt": "2025-04-26T03:31:09.087Z",
-    "updatedAt": "2025-04-26T03:31:09.087Z"
-  },
-  {
-    "id": "3",
-    "title": "Lost Phone",
-    "description": "",
-    "location": "Train Station",
-    "date": "2025-04-02",
-    "user_id": "103",
-    "imageUrl": null,
-    "createdAt": "2025-04-26T03:31:09.087Z",
-    "updatedAt": "2025-04-26T03:31:09.087Z"
-  },
-  {
-    "id": "4",
-    "title": "Missing Sunglasses",
-    "description": "Pair of Ray-Ban sunglasses lost at the downtown cafe.",
-    "location": "Downtown Cafe",
-    "date": "2025-04-05",
-    "user_id": "104",
-    "imageUrl": null,
-    "createdAt": "2025-04-26T03:31:09.087Z",
-    "updatedAt": "2025-04-26T03:31:09.087Z"
-  },
-  {
-    "id": "5",
-    "title": "Found Backpack",
-    "description": "",
-    "location": "Train Station",
-    "date": "2025-04-03",
-    "user_id": "105",
-    "imageUrl": null,
-    "createdAt": "2025-04-26T03:31:09.087Z",
-    "updatedAt": "2025-04-26T03:31:09.087Z"
-  },
-  {
-    "id": "6",
-    "title": "Lost Laptop",
-    "description": "Black laptop left on a bus. Might have sensitive data.",
-    "location": "Bus Stop",
-    "date": "2025-04-04",
-    "user_id": "106",
-    "imageUrl": null,
-    "createdAt": "2025-04-26T03:31:09.087Z",
-    "updatedAt": "2025-04-26T03:31:09.087Z"
-  },
-  {
-    "id": "7",
-    "title": "Found Wallet",
-    "description": "Brown leather wallet found at City Park.",
-    "location": "City Park",
-    "date": "2025-04-07",
-    "user_id": "107",
-    "imageUrl": null,
-    "createdAt": "2025-04-26T03:31:09.087Z",
-    "updatedAt": "2025-04-26T03:31:09.087Z"
-  },
-  {
     "id": "8",
     "title": "Lost Headphones",
     "description": "Wireless earbuds dropped on the subway platform.",
@@ -84,8 +7,10 @@
     "date": "2025-04-06",
     "user_id": "108",
     "imageUrl": null,
-    "createdAt": "2025-04-26T03:31:09.087Z",
-    "updatedAt": "2025-04-26T03:31:09.087Z"
+
+    "createdAt": "2025-04-25T23:07:02.004Z",
+    "updatedAt": "2025-04-25T23:07:02.004Z"
+
   },
   {
     "id": "9",
@@ -95,8 +20,10 @@
     "date": "2025-04-08",
     "user_id": "109",
     "imageUrl": null,
-    "createdAt": "2025-04-26T03:31:09.087Z",
-    "updatedAt": "2025-04-26T03:31:09.087Z"
+
+    "createdAt": "2025-04-25T23:07:02.004Z",
+    "updatedAt": "2025-04-25T23:07:02.004Z"
+
   },
   {
     "id": "10",
@@ -106,7 +33,8 @@
     "date": "2025-04-05",
     "user_id": "110",
     "imageUrl": null,
-    "createdAt": "2025-04-26T03:31:09.087Z",
-    "updatedAt": "2025-04-26T03:31:09.087Z"
+
+    "createdAt": "2025-04-25T23:07:02.004Z",
+    "updatedAt": "2025-04-25T23:07:02.004Z"
   }
 ]

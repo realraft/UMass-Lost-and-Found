@@ -24,7 +24,12 @@ export const createReport = (req, res) => {
     const newReport = postModel.createReport(reportData);
     res.status(201).json({ 
       success: true, 
-      data: newReport,
+      data: {
+        ...post,
+        reportedAt: newReport.createdAt,
+        reportReason: newReport.reason,
+        reportStatus: newReport.status
+      },
       message: 'Report created successfully' 
     });
   } catch (error) {

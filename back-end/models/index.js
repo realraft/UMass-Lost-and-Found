@@ -125,8 +125,17 @@ const getReportsByPostId = (postId) => {
 };
 
 const getReportedPosts = () => {
-  const reportedPostIds = [...new Set(reports.filter(r => r.status === 'pending').map(r => r.post_id))];
-  return posts.filter(post => reportedPostIds.includes(post.id));
+  const reportedPostIds = new Set(reports.filter(r => r.status === 'pending').map(r => r.post_id));
+  const reportedPosts = posts.filter(post => reportedPostIds.has(post.id)).map(post => {
+    const report = reports.find(r => r.post_id === post.id && r.status === 'pending');
+    return {
+      ...post,
+      reportedAt: report.createdAt,
+      reportReason: report.reason,
+      reportStatus: report.status
+    };
+  });
+  return reportedPosts;
 };
 
 const getReportedPostById = (id) => {
