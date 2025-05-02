@@ -1,22 +1,70 @@
-class Message {
-    constructor({ user, text }) {
-      this.user = String(user);
-      this.text = text;
-      this.createdAt = new Date();
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config.js';
+
+class Message extends Model {}
+
+Message.init({
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  conversation_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Conversations',
+      key: 'id'
     }
-}
-  
-class Conversation {
-    constructor({ id, messages = [] }) {
-      this.id = String(id);
-      this.messages = messages.map(msg => new Message(msg));
+  },
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Users',
+      key: 'id'
     }
-  
-    addMessage(user, text) {
-      const newMessage = new Message({ user, text });
-      this.messages.push(newMessage);
-      return newMessage;
+  },
+  text: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  }
+}, {
+  sequelize,
+  modelName: 'Message',
+  timestamps: true
+});
+
+class Conversation extends Model {}
+
+Conversation.init({
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  post_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'Posts',
+      key: 'id'
     }
-}
-  
-export { Message, Conversation }
+  }
+}, {
+  sequelize,
+  modelName: 'Conversation',
+  timestamps: true
+});
+
+// Define associations
+Conversation.hasMany(Message, {
+  foreignKey: 'conversation_id',
+  as: 'messages'
+});
+
+Message.belongsTo(Conversation, {
+  foreignKey: 'conversation_id'
+});
+
+export { Message, Conversation };

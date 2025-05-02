@@ -5,6 +5,7 @@ import postRoutes from "../routes/postRoutes.js";
 import messagesRoutes from "../routes/messagesRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import { testConnection, syncDatabase } from "../models/index.js";
 
 // Get the directory name of the current module
 const __filename = fileURLToPath(import.meta.url);
@@ -25,6 +26,21 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
+
+// Initialize database connection
+(async () => {
+  try {
+    // Test database connection
+    await testConnection();
+    
+    // Sync database models with the database
+    await syncDatabase();
+    
+    console.log('Database initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize database:', error);
+  }
+})();
 
 // Routes
 app.use("/api/admin", adminRoutes);
