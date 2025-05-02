@@ -1,10 +1,8 @@
-// Seed script to populate the database with sample data
+// Seed script to populate the database with sample data using Sequelize
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import Post from '../models/Post.js';
-import User from '../models/User.js';
-import Report from '../models/Report.js';
+import { User, Post, Report, AdminComment, sequelize, syncDatabase } from '../models/index.js';
 
 // Get the directory name
 const __filename = fileURLToPath(import.meta.url);
@@ -14,127 +12,129 @@ const __dirname = path.dirname(__filename);
 const serverJsonPath = path.join(__dirname, '..', '..', 'front-end', 'source', 'Fake-Server', 'server.json');
 const serverData = JSON.parse(fs.readFileSync(serverJsonPath, 'utf8'));
 
-// Create sample users based on user IDs in the posts
-const uniqueUserIds = [...new Set(serverData.posts.map(post => post.user_id))];
-const users = uniqueUserIds.map(id => {
-  return new User({
-    id: id.toString(),
-    username: `user${id}`,
-    email: `user${id}@umass.edu`,
-    password: 'password123',
-    role: id === 101 ? 'admin' : 'user' // Make the first user an admin
-  });
-});
-
-// Add an explicit admin user if needed
-users.push(
-  new User({
-    id: 'admin',
-    username: 'admin',
-    email: 'admin@umass.edu',
-    password: 'adminpass',
-    role: 'admin'
-  })
-);
-
-// Convert server.json posts to our Post model format
-const posts = serverData.posts.map(post => {
-  return new Post({
-    id: post.id.toString(),
-    title: post.title,
-    description: post.description,
-    type: post.title.toLowerCase().includes('lost') ? 'lost' : 'found', // Determine type based on title
-    location: post.location,
-    date: post.date,
-    user_id: post.user_id.toString(),
-    status: 'active',
-    imageUrl: null // No image URLs in server.json
-  });
-});
-
-// Create sample reports with proper format
-const reports = [
-  {
-    id: "1",
-    post_id: "1",
-    reason: "This watch looks suspicious and may be stolen",
-    reported_by: "102",
-    status: "pending",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: "2",
-    post_id: "2",
-    reason: "These keys may belong to someone else, possible fraudulent post",
-    reported_by: "103",
-    status: "pending",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: "3",
-    post_id: "3",
-    reason: "This phone might be stolen, serial number matches reported theft",
-    reported_by: "104",
-    status: "pending",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: "4",
-    post_id: "4",
-    reason: "Someone reported these sunglasses as counterfeit merchandise",
-    reported_by: "105",
-    status: "pending",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: "5",
-    post_id: "5",
-    reason: "This backpack contains sensitive materials that need verification",
-    reported_by: "106",
-    status: "pending",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+async function seedDatabase() {
+  try {
+    // Sync database models
+    await syncDatabase();
+    
+    console.log('Database synchronized. Beginning seeding...');
+    
+    // Create sample users based on user IDs in the posts
+    const uniqueUserIds = [...new Set(serverData.posts.map(post => post.user_id))];
+    const userPromises = uniqueUserIds.map(id => {
+      return User.create({
+        username: `user${id}`,
+        email: `user${id}@umass.edu`,
+        password: 'password123',
+        role: id === 101 ? 'admin' : 'user' // Make user 101 an admin
+      });
+    });
+    
+    // Add an explicit admin user
+    userPromises.push(
+      User.create({
+        username: 'admin',
+        email: 'admin@umass.edu',
+        password: 'adminpass',
+        role: 'admin'
+      })
+    );
+    
+    const createdUsers = await Promise.all(userPromises);
+    console.log(`Created ${createdUsers.length} users`);
+    
+    // Create a mapping of original user IDs to new Sequelize IDs
+    const userIdMap = {};
+    createdUsers.forEach((user, index) => {
+      if (index < uniqueUserIds.length) {
+        userIdMap[uniqueUserIds[index]] = user.id;
+      }
+    });
+    
+    // Create posts
+    const postPromises = serverData.posts.map(post => {
+      return Post.create({
+        title: post.title,
+        description: post.description,
+        location: post.location,
+        date: new Date(post.date),
+        user_id: userIdMap[post.user_id] || createdUsers[0].id, // Use the first user as fallback
+        imageUrl: null // No image URLs in server.json
+      });
+    });
+    
+    const createdPosts = await Promise.all(postPromises);
+    console.log(`Created ${createdPosts.length} posts`);
+    
+    // Create a mapping of original post IDs to new Sequelize IDs
+    const postIdMap = {};
+    createdPosts.forEach((post, index) => {
+      postIdMap[serverData.posts[index].id] = post.id;
+    });
+    
+    // Create sample reports
+    const reportData = [
+      {
+        post_id: postIdMap[1] || createdPosts[0].id,
+        reason: "This watch looks suspicious and may be stolen",
+        reported_by: userIdMap[102] || createdUsers[1].id,
+        status: "pending"
+      },
+      {
+        post_id: postIdMap[2] || createdPosts[1].id,
+        reason: "These keys may belong to someone else, possible fraudulent post",
+        reported_by: userIdMap[103] || createdUsers[2].id,
+        status: "pending"
+      },
+      {
+        post_id: postIdMap[3] || createdPosts[2].id,
+        reason: "This phone might be stolen, serial number matches reported theft",
+        reported_by: userIdMap[104] || createdUsers[3].id, 
+        status: "pending"
+      },
+      {
+        post_id: postIdMap[4] || createdPosts[3].id,
+        reason: "Someone reported these sunglasses as counterfeit merchandise",
+        reported_by: userIdMap[105] || createdUsers[4].id,
+        status: "pending"
+      },
+      {
+        post_id: postIdMap[5] || createdPosts[4].id,
+        reason: "This backpack contains sensitive materials that need verification",
+        reported_by: userIdMap[106] || createdUsers[5].id,
+        status: "pending"
+      }
+    ];
+    
+    const createdReports = await Report.bulkCreate(reportData);
+    console.log(`Created ${createdReports.length} reports`);
+    
+    // Add some admin comments
+    const adminCommentData = [
+      {
+        post_id: createdPosts[0].id,
+        comment: "Please provide more details about when this item was found",
+        admin_id: createdUsers.find(u => u.role === 'admin').id
+      },
+      {
+        post_id: createdPosts[1].id,
+        comment: "This post has been verified",
+        admin_id: createdUsers.find(u => u.role === 'admin').id
+      }
+    ];
+    
+    const createdAdminComments = await AdminComment.bulkCreate(adminCommentData);
+    console.log(`Created ${createdAdminComments.length} admin comments`);
+    
+    console.log('Database seeded successfully!');
+    
+  } catch (error) {
+    console.error('Error seeding database:', error);
+  } finally {
+    // Close the database connection
+    await sequelize.close();
   }
-];
+}
 
-// Create empty admin comments array
-const adminComments = [];
-
-// Write seed data to files
-fs.writeFileSync(
-  path.join(__dirname, 'users.json'),
-  JSON.stringify(users, null, 2),
-  'utf8'
-);
-
-fs.writeFileSync(
-  path.join(__dirname, 'posts.json'),
-  JSON.stringify(posts, null, 2),
-  'utf8'
-);
-
-// Write our properly formatted reports
-fs.writeFileSync(
-  path.join(__dirname, 'reports.json'),
-  JSON.stringify(reports, null, 2),
-  'utf8'
-);
-
-fs.writeFileSync(
-  path.join(__dirname, 'postsMessages.json'),
-  JSON.stringify(serverData.postsMessages, null, 2),
-  'utf8'
-);
-
-// Write empty admin comments file
-fs.writeFileSync(
-  path.join(__dirname, 'adminComments.json'),
-  JSON.stringify(adminComments, null, 2),
-  'utf8'
-);
-
-console.log('Seed data has been generated successfully!');
+// Run the seed function
+seedDatabase();

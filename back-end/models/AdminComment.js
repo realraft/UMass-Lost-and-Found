@@ -1,9 +1,9 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from './config.js';
 
-class Report extends Model {}
+class AdminComment extends Model {}
 
-Report.init({
+AdminComment.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -17,26 +17,22 @@ Report.init({
       key: 'id'
     }
   },
-  reason: {
+  comment: {
     type: DataTypes.TEXT,
     allowNull: false
   },
-  reported_by: {
+  admin_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'Users',
       key: 'id'
     }
-  },
-  status: {
-    type: DataTypes.ENUM('pending', 'dismissed', 'resolved'),
-    defaultValue: 'pending'
   }
 }, {
   sequelize,
-  modelName: 'Report',
+  modelName: 'AdminComment',
   timestamps: true
 });
 
-export default Report;
+export default AdminComment;

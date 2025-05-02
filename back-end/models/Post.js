@@ -1,18 +1,47 @@
-// Post model definition
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from './config.js';
 
-class Post {
-  constructor({id, title, description, location, date, user_id, imageUrl = null}) {
-    this.id = id;
-    this.title = title;
-    this.description = description;
-    this.location = location;
-    this.date = date;
-    this.user_id = user_id;
-    this.imageUrl = imageUrl;
-    this.createdAt = new Date();
-    this.updatedAt = new Date();
+class Post extends Model {}
+
+Post.init({
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  location: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  date: {
+    type: DataTypes.DATE,
+    allowNull: false
+  },
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Users',
+      key: 'id'
+    }
+  },
+  imageUrl: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
-}
+}, {
+  sequelize,
+  modelName: 'Post',
+  timestamps: true
+});
 
 export default Post;
 
