@@ -5,8 +5,8 @@
     "email": "user101@umass.edu",
     "password": "password123",
     "role": "admin",
-    "createdAt": "2025-04-25T23:07:02.004Z",
-    "updatedAt": "2025-04-25T23:07:02.004Z"
+    "createdAt": "2025-04-25T23:28:57.386Z",
+    "updatedAt": "2025-04-25T23:28:57.386Z"
   },
   {
     "id": "102",
@@ -14,8 +14,8 @@
     "email": "user102@umass.edu",
     "password": "password123",
     "role": "user",
-    "createdAt": "2025-04-25T23:07:02.004Z",
-    "updatedAt": "2025-04-25T23:07:02.004Z"
+    "createdAt": "2025-04-25T23:28:57.386Z",
+    "updatedAt": "2025-04-25T23:28:57.386Z"
   },
   {
     "id": "103",
@@ -23,8 +23,8 @@
     "email": "user103@umass.edu",
     "password": "password123",
     "role": "user",
-    "createdAt": "2025-04-25T23:07:02.004Z",
-    "updatedAt": "2025-04-25T23:07:02.004Z"
+    "createdAt": "2025-04-25T23:28:57.386Z",
+    "updatedAt": "2025-04-25T23:28:57.386Z"
   },
   {
     "id": "104",
@@ -32,8 +32,8 @@
     "email": "user104@umass.edu",
     "password": "password123",
     "role": "user",
-    "createdAt": "2025-04-25T23:07:02.004Z",
-    "updatedAt": "2025-04-25T23:07:02.004Z"
+    "createdAt": "2025-04-25T23:28:57.386Z",
+    "updatedAt": "2025-04-25T23:28:57.386Z"
   },
   {
     "id": "105",
@@ -41,8 +41,8 @@
     "email": "user105@umass.edu",
     "password": "password123",
     "role": "user",
-    "createdAt": "2025-04-25T23:07:02.004Z",
-    "updatedAt": "2025-04-25T23:07:02.004Z"
+    "createdAt": "2025-04-25T23:28:57.386Z",
+    "updatedAt": "2025-04-25T23:28:57.386Z"
   },
   {
     "id": "106",
@@ -50,8 +50,8 @@
     "email": "user106@umass.edu",
     "password": "password123",
     "role": "user",
-    "createdAt": "2025-04-25T23:07:02.004Z",
-    "updatedAt": "2025-04-25T23:07:02.004Z"
+    "createdAt": "2025-04-25T23:28:57.386Z",
+    "updatedAt": "2025-04-25T23:28:57.386Z"
   },
   {
     "id": "107",
@@ -59,8 +59,8 @@
     "email": "user107@umass.edu",
     "password": "password123",
     "role": "user",
-    "createdAt": "2025-04-25T23:07:02.004Z",
-    "updatedAt": "2025-04-25T23:07:02.004Z"
+    "createdAt": "2025-04-25T23:28:57.386Z",
+    "updatedAt": "2025-04-25T23:28:57.386Z"
   },
   {
     "id": "108",
@@ -68,8 +68,8 @@
     "email": "user108@umass.edu",
     "password": "password123",
     "role": "user",
-    "createdAt": "2025-04-25T23:07:02.004Z",
-    "updatedAt": "2025-04-25T23:07:02.004Z"
+    "createdAt": "2025-04-25T23:28:57.386Z",
+    "updatedAt": "2025-04-25T23:28:57.386Z"
   },
   {
     "id": "109",
@@ -77,8 +77,8 @@
     "email": "user109@umass.edu",
     "password": "password123",
     "role": "user",
-    "createdAt": "2025-04-25T23:07:02.004Z",
-    "updatedAt": "2025-04-25T23:07:02.004Z"
+    "createdAt": "2025-04-25T23:28:57.386Z",
+    "updatedAt": "2025-04-25T23:28:57.386Z"
   },
   {
     "id": "110",
@@ -86,8 +86,8 @@
     "email": "user110@umass.edu",
     "password": "password123",
     "role": "user",
-    "createdAt": "2025-04-25T23:07:02.004Z",
-    "updatedAt": "2025-04-25T23:07:02.004Z"
+    "createdAt": "2025-04-25T23:28:57.386Z",
+    "updatedAt": "2025-04-25T23:28:57.386Z"
   },
   {
     "id": "admin",
@@ -95,7 +95,7 @@
     "email": "admin@umass.edu",
     "password": "adminpass",
     "role": "admin",
-    "createdAt": "2025-04-25T23:07:02.004Z",
-    "updatedAt": "2025-04-25T23:07:02.004Z"
+    "createdAt": "2025-04-25T23:28:57.386Z",
+    "updatedAt": "2025-04-25T23:28:57.386Z"
   }
 ]
