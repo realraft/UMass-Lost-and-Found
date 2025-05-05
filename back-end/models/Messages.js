@@ -10,7 +10,7 @@ Message.init({
     autoIncrement: true
   },
   conversation_id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.TEXT,
     allowNull: false,
     references: {
       model: 'Conversations',
@@ -39,9 +39,9 @@ class Conversation extends Model {}
 
 Conversation.init({
   id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.TEXT,
     primaryKey: true,
-    autoIncrement: true
+    autoIncrement: false
   },
   post_id: {
     type: DataTypes.INTEGER,
@@ -57,14 +57,4 @@ Conversation.init({
   timestamps: true
 });
 
-// Define associations
-Conversation.hasMany(Message, {
-  foreignKey: 'conversation_id',
-  as: 'messages'
-});
-
-Message.belongsTo(Conversation, {
-  foreignKey: 'conversation_id'
-});
-
-export { Message, Conversation };
+export { Message, Conversation }; 
