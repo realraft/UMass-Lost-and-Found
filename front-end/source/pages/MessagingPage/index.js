@@ -1,4 +1,4 @@
-import { EventHub } from "../../eventHub/EventHub.js";
+import { EventHub } from "../../eventHub/EventHub.js"; 
 import { Events } from "../../eventHub/Events.js";
 import { BasePage } from "../BasePage/BasePage.js";
 

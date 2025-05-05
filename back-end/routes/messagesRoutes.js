@@ -1,18 +1,16 @@
 import express from 'express';
 import * as messagesController from '../controllers/messagesController.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Get all conversations
-router.get("/conversation", messagesController.getAllConversations);
-
 //get conversation messages
-router.get("/conversation/:id", messagesController.getAllMessagesForPostandUsers);
+router.get("/conversation/:id", authenticate, messagesController.getConversation);
 
 //create a conversation 
-router.post("/conversation", messagesController.createConversation);
+router.post("/conversation", authenticate, messagesController.createConversation);
 
 //add a message
-router.put("/conversation/:id/message", messagesController.addMessagetoConversation);
+router.put("/conversation/:id/message", authenticate, messagesController.addMessageConversation);
 
 export default router;
