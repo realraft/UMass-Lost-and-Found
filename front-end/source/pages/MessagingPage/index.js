@@ -6,7 +6,6 @@ export class MessagingPage extends BasePage {
     #container = null;
     userId = null;
     conversations = null
-    status = 0
 
     constructor() {
         super();
@@ -87,8 +86,13 @@ export class MessagingPage extends BasePage {
 
     async #renderFirstPage() { 
         this.conversations = await this.#getConversations();
-        const conversation = this.conversations.filter()
-        this.#renderConversation(conversation)
+        if (this.conversations.length > 0) {
+            const conversation = this.conversations[0];
+            this.#renderConversation(conversation);
+            await this.#renderSideBar();
+        } else {
+            console.log('No conversations to display');
+        }
     }
 
     #renderConversation(conversation) { //renders conversation
@@ -104,6 +108,23 @@ export class MessagingPage extends BasePage {
     }    
     
     #addSubscriptions() {//adds subscriptions to the event hub
+
+    }
+
+    async #renderSideBar() {
+        const postsContainer = this.#container.querySelector(".posts-container");
+        if (!postsContainer) return;
+    
+        for (const conversation of this.conversations) {
+            const post = await this.#getPostById(conversation.postId);
+            const messages = conversation.messages;
+            const id = conversation.id;
+            this.#addPosttoSidebar(post, id, messages);
+        }
+    }
+
+    async #getPostById(id) { //get post by id
+
     }
 
     #addPosttoSidebar(post, id, messages) {
