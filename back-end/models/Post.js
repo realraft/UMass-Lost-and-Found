@@ -36,6 +36,16 @@ Post.init({
   imageUrl: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  tags: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: []
+  },
+  anonymous: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   }
 }, {
   sequelize,
