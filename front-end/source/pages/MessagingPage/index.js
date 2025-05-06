@@ -6,6 +6,7 @@ export class MessagingPage extends BasePage {
     #container = null;
     userId = null;
     conversations = null
+    currentConversation = null;
 
     constructor() {
         super();
@@ -13,7 +14,7 @@ export class MessagingPage extends BasePage {
         this.userId = localStorage.getItem('userId') || '101';
     }
 
-    render() { //renders the page -- needs to handle post or menu entrance 
+    render() {
         this.#createContainer();
         this.#renderFirstPage(this.userId);
         setTimeout(() => {
@@ -29,7 +30,7 @@ export class MessagingPage extends BasePage {
         this.#container.innerHTML = this.#getTemplate();
     }
 
-    #getTemplate() { //htm template 
+    #getTemplate() { //html template 
         return `
             <div class="messaging-page-container">
                 <div class="posts-container"></div>        
@@ -70,16 +71,20 @@ export class MessagingPage extends BasePage {
         }
     }
 
-    //other method, getting the current post 
-
     #addEventListeners() {
+        const hub = EventHub.getEventHubInstance();
         const send_button = this.#container.querySelector("#send-message");
         const newMessage = this.#container.querySelector("#newMessage");
 
         if (send_button && newMessage) {
-            send_button.addEventListener('click', (event) => {
-                event.preventDefault();
-                this.#handleNewMessage(newMessage);
+            const m = newMessage.value
+            send_button.addEventListener('click', () => {
+                if (m.length > 0) {
+                    newMessage.value = "";
+                    hub.publish(Events.NewUserMessage, m); //propagate new message text
+                } else {
+                    alert("Please enter a message.");
+                }
             });
         }
     }
@@ -87,8 +92,10 @@ export class MessagingPage extends BasePage {
     async #renderFirstPage() { 
         this.conversations = await this.#getConversations();
         if (this.conversations.length > 0) {
-            const conversation = this.conversations[0];
-            this.#renderConversation(conversation);
+            this.currentConversation = this.conversations.reduce((last, curr) =>
+                curr.id > last.id ? curr : last
+            );
+            this.#renderConversation(this.currentConversation);
             await this.#renderSideBar();
         } else {
             console.log('No conversations to display');
@@ -102,12 +109,18 @@ export class MessagingPage extends BasePage {
         const messages = conversation.messages;
 
         this.#clearMessages_content();
-        messages.forEach(message => {
-            this.#publishNewMessage(message_content, { data: message });
+        messages.forEach(messageObj => {
+            this.#renderNewMessage(messageObj);
         });
     }    
     
     #addSubscriptions() {//adds subscriptions to the event hub
+        const hub = EventHub.getEventHubInstance()
+        hub.subscribe(Events.NewUserMessage, (message) => {
+            this.#handleNewMessage(message) //subscribe sending message to server and rendering it
+            }).catch((error) => {
+                console.error("Error sending message:", error);
+            });
 
     }
 
@@ -117,17 +130,26 @@ export class MessagingPage extends BasePage {
     
         for (const conversation of this.conversations) {
             const post = await this.#getPostById(conversation.postId);
-            const messages = conversation.messages;
             const id = conversation.id;
-            this.#addPosttoSidebar(post, id, messages);
+            this.#addPosttoSidebar(post, conversation);
         }
     }
 
     async #getPostById(id) { //get post by id
-
+        try {
+            const response = await fetch(`/api/posts/${id}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+            return result.data || null;
+        } catch (error) {
+            console.error('Error fetching post:', error);
+            return null;
+        }
     }
 
-    #addPosttoSidebar(post, id, messages) {
+    #addPosttoSidebar(post, conversation) {
         const eventhub = EventHub.getEventHubInstance();
         const postsContainer = this.#container.querySelector(".posts-container");
 
@@ -141,7 +163,7 @@ export class MessagingPage extends BasePage {
         const postMessagesButton = document.createElement("button");
         postMessagesButton.className = "post-button";
         postMessagesButton.textContent = "Post Messages";
-        postMessagesButton.id = `id: ${id}`;
+        postMessagesButton.id = `id: ${id}`; // conversation id
 
         postMessage.appendChild(postButton);
         postMessage.appendChild(postMessagesButton);
@@ -152,49 +174,25 @@ export class MessagingPage extends BasePage {
         });
 
         postMessagesButton.addEventListener("click", () => {
-            this.#container.querySelectorAll('.post-button').forEach(btn => btn.classList.remove('active'));
-            postMessagesButton.classList.add('active');
             this.#clearMessages_content();
-            this.#renderConversation(id, messages);
+            this.currentConversation = conversation
+            this.#renderConversation(conversation);
         });
     }
 
-    #handleNewMessage(newMessage) {
-        const message = newMessage.value.trim();
-        if (!message) return alert("Please enter a message");
-
-        const activePostButton = this.#container.querySelector('.post-button.active');
-        if (!activePostButton) return alert("Please select a conversation first");
-
-        const sendButton = this.#container.querySelector('#send-message');
-        sendButton.disabled = true;
-        sendButton.value = "Sending...";
-
-        const conversationId = activePostButton.id.replace('id: ', '');
-        const messageObj = { user: this.userId, text: message };
-
-        const info = {
-            id: conversationId,
-            text: messageObj
-        };
-
-        EventHub.getEventHubInstance().publish(Events.NewUserMessage, info);
-        newMessage.value = "";
-
-        setTimeout(() => {
-            sendButton.disabled = false;
-            sendButton.value = "=>";
-        }, 500);
+    #handleNewMessage(newMessage) { //send to server and render
+        this.#renderNewMessage({ text: newMessage, user_id: this.userId });
+        this.#sendMessagetoServer(newMessage)
     }
 
-    #publishNewMessage(info) {
+    #renderNewMessage(messageObj) {
         const message_content = this.#container.querySelector('.messages-content');
         if (!message_content) return;
 
         const messageDiv = document.createElement("div");
-        messageDiv.className = String(this.userId) === String(info.message) ? "myMessage" : "otherMessage";
+        messageDiv.className = String(this.userId) === String(messageObj.user_id) ? "myMessage" : "otherMessage";
         const messageText = document.createElement("h3");
-        messageText.textContent = info.data.text;
+        messageText.textContent = messageObj.text;
         messageDiv.appendChild(messageText);
         message_content.appendChild(messageDiv);
         message_content.scrollTop = message_content.scrollHeight;
@@ -205,25 +203,22 @@ export class MessagingPage extends BasePage {
         if (message_content) message_content.innerHTML = '';
     }
 
-    async #sendMessagetoServer(info) {
+    async #sendMessagetoServer(message) {
         try {
-            const token = localStorage.getItem('token');
-            const sendResponse = await fetch(`/api/conversation/${info.id}/message`, {
+            const response = await fetch(`/conversation/message/${this.currentConversation.id}/${this.userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ text: info.text.text })
+                body: JSON.stringify({ text: message })
             });
-
-            if (!sendResponse.ok) {
-                const errorData = await sendResponse.json();
-                throw new Error(errorData.message || "Failed to add message to conversation");
+    
+            if (!response.ok) {
+                throw new Error("Error sending message to server: " + response.statusText);
             }
-
-            const result = await sendResponse.json();
-            return result.data;
+    
+            const result = await response.json();
+            return result;
         } catch (error) {
             console.error("Error sending message to server:", error);
             throw error;

@@ -15,7 +15,7 @@ const addMessage = async (id, message, user) => {
         }
         const newMessage = await Message.create({
             conversation_id: id,
-            user_id: user.id,
+            user_id: user,
             text: message
         });
         return newMessage;
