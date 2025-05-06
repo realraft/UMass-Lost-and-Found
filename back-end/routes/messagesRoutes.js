@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/conversation/ids/:postId/:user1Id/:user2Id", messagesController.createConversation);
 
 //add a message
-router.put("/conversation/:id/message", messagesController.addMessageConversation);
+router.put("/conversation/message/:cid/:userid", messagesController.addMessageConversation);
 
 //get all conversations for a user
 router.get("/conversation/user/:userId", messagesController.getAllConversationsforUser);

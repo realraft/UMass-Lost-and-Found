@@ -25,8 +25,7 @@ export const createConversation = async (req, res) => {
 
 export const addMessageConversation = async (req, res) => {
     try {
-        const { id } = req.params;
-        const user = req.user;
+        const { id, user } = req.params;
         const { text } = req.body;
 
         if (!text) {
