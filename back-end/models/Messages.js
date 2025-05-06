@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '../config.js';
+import { sequelize } from './config.js';
 
 class Message extends Model {}
 
@@ -73,4 +73,4 @@ Conversation.init({
   timestamps: true
 });
 
-export { Message, Conversation }; 
+export { Message, Conversation };

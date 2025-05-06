@@ -1,5 +1,5 @@
 import { Message, Conversation } from '../Messages.js';
-import { User } from '../Users.js';
+import User from '../User.js';
 
 /**
  * Add a message to a conversation.

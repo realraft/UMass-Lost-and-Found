@@ -1,4 +1,4 @@
-import MessagesOps from "../models/operations/messagesOperations.js";
+import * as MessagesOps from "../models/operations/messagesOperations.js";
 
 export const createConversation = async (req, res) => {
     try {

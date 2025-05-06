@@ -2,7 +2,7 @@
 import * as postModel from '../models/index.js';
 
 // Create a new report
-export const createReport = (req, res) => {
+export const createReport = async (req, res) => {
   try {
     const reportData = req.body;
     
@@ -13,7 +13,7 @@ export const createReport = (req, res) => {
       });
     }
 
-    const post = postModel.getPostById(reportData.post_id);
+    const post = await postModel.getPostById(reportData.post_id);
     if (!post) {
       return res.status(404).json({ 
         success: false, 
@@ -21,11 +21,11 @@ export const createReport = (req, res) => {
       });
     }
     
-    const newReport = postModel.createReport(reportData);
+    const newReport = await postModel.createReport(reportData);
     res.status(201).json({ 
       success: true, 
       data: {
-        ...post,
+        ...post.toJSON(),
         reportedAt: newReport.createdAt,
         reportReason: newReport.reason,
         reportStatus: newReport.status
@@ -38,9 +38,9 @@ export const createReport = (req, res) => {
 };
 
 // Get all reported posts for admin review
-export const getReportedPosts = (req, res) => {
+export const getReportedPosts = async (req, res) => {
   try {
-    const reportedPosts = postModel.getReportedPosts();
+    const reportedPosts = await postModel.getReportedPosts();
     res.status(200).json({ success: true, data: reportedPosts });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -48,10 +48,10 @@ export const getReportedPosts = (req, res) => {
 };
 
 // Get a specific reported post by ID
-export const getReportedPostById = (req, res) => {
+export const getReportedPostById = async (req, res) => {
   try {
     const { id } = req.params;
-    const post = postModel.getReportedPostById(id);
+    const post = await postModel.getReportedPostById(id);
     
     if (!post) {
       return res.status(404).json({ success: false, message: 'Reported post not found' });
@@ -64,10 +64,10 @@ export const getReportedPostById = (req, res) => {
 };
 
 // Keep a reported post (remove from reported list)
-export const keepPost = (req, res) => {
+export const keepPost = async (req, res) => {
   try {
     const { id } = req.params;
-    const keptPost = postModel.keepPost(id);
+    const keptPost = await postModel.keepPost(id);
     
     if (!keptPost) {
       return res.status(404).json({ success: false, message: 'Post not found' });
@@ -80,17 +80,17 @@ export const keepPost = (req, res) => {
 };
 
 // Delete a reported post
-export const deletePost = (req, res) => {
+export const deletePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedPost = postModel.deletePost(id);
+    const deletedPost = await postModel.deletePost(id);
     
     if (!deletedPost) {
       return res.status(404).json({ success: false, message: 'Post not found' });
     }
     
     // Also remove any reports associated with this post
-    postModel.deleteReports(id);
+    await postModel.deleteReports(id);
     
     res.status(200).json({ 
       success: true, 
@@ -103,7 +103,7 @@ export const deletePost = (req, res) => {
 };
 
 // Add an admin comment to a post
-export const addComment = (req, res) => {
+export const addComment = async (req, res) => {
   try {
     const { id } = req.params;
     const { comment } = req.body;
@@ -112,7 +112,7 @@ export const addComment = (req, res) => {
       return res.status(400).json({ success: false, message: 'Comment is required' });
     }
     
-    const updatedPost = postModel.addAdminComment(id, comment);
+    const updatedPost = await postModel.addAdminComment(id, comment);
     
     if (!updatedPost) {
       return res.status(404).json({ success: false, message: 'Post not found' });
@@ -125,10 +125,10 @@ export const addComment = (req, res) => {
 };
 
 // Get all comments for a post
-export const getComments = (req, res) => {
+export const getComments = async (req, res) => {
   try {
     const { id } = req.params;
-    const comments = postModel.getAdminComments(id);
+    const comments = await postModel.getAdminComments(id);
     
     if (!comments) {
       return res.status(404).json({ success: false, message: 'Post not found' });
@@ -141,7 +141,7 @@ export const getComments = (req, res) => {
 };
 
 // Edit an admin comment
-export const editComment = (req, res) => {
+export const editComment = async (req, res) => {
   try {
     const { postId, commentId } = req.params;
     const { comment } = req.body;
@@ -150,7 +150,7 @@ export const editComment = (req, res) => {
       return res.status(400).json({ success: false, message: 'Comment is required' });
     }
     
-    const updatedComment = postModel.editAdminComment(postId, commentId, comment);
+    const updatedComment = await postModel.editAdminComment(postId, commentId, comment);
     
     if (!updatedComment) {
       return res.status(404).json({ success: false, message: 'Comment not found' });
