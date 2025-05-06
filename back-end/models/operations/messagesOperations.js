@@ -4,6 +4,7 @@ import { User } from '../Users.js';
 /**
  * Add a message to a conversation.
  * @param {string} id - conversation ID
+ * @param {User} user - user object
  * @returns {Promise<Object>} message object
  */
 const addMessage = async (id, message, user) => {
@@ -25,46 +26,75 @@ const addMessage = async (id, message, user) => {
 
 /**
  * Create a conversation.
- * @param {string} id - conversation ID
+ * @param {string} postId - post ID
+ * @param {string} user1Id - user1 ID
+ * @param {string} user2Id - user2 ID
  * @returns {Promise<Object>} Conversation object
  */
-const createConversationById = async (id) => {
+const createConversationByIds = async (postId, user1Id, user2Id) => {
     try {
-        let conversation = await Conversation.findOne({ where: { id } });
+        let conversation = await Conversation.findOne({
+            where: {
+                post_id: postId,
+                user1_id: user1Id,
+                user2_id: user2Id
+            }
+        });
+
         if (!conversation) {
-            conversation = await Conversation.create({ id });
+            conversation = await Conversation.create({
+                post_id: postId,
+                user1_id: user1Id,
+                user2_id: user2Id
+            });
         }
         return conversation;
     } catch (error) {
-        throw new Error(`Error creating the conversation ${id}: ${error.message}`);
+        throw new Error(`Error creating or finding conversation: ${error.message}`);
     }
 };
 
 /**
- * Get a conversation.
+ * Get all conversations for a user.
  * @param {string} id - conversation ID
- * @returns {Promise<Object>} Conversation object
+ * @returns {Promise<Object[]>} Conversation object[]
  */
-const getConversationById = async (id) => {
+const getAllConversationsforUserId = async (userId) => {
     try {
-        const conversation = await Conversation.findByPk(id, {
-            include: [{
-                model: Message,
-                as: 'messages',
-                include: [{
+        const conversations = await Conversation.findAll({
+            where: {
+                [Op.or]: [
+                    { user1_id: userId },
+                    { user2_id: userId }
+                ]
+            },
+            include: [
+                {
                     model: User,
-                    as: 'user'
-                }]
-            }]
-        })
-        return conversation
+                    as: 'User1',
+                    attributes: ['id', 'name']
+                },
+                {
+                    model: User,
+                    as: 'User2',
+                    attributes: ['id', 'name']
+                },
+                {
+                    model: Message,
+                    attributes: ['id', 'user_id', 'text', 'createdAt'],
+                    order: [['createdAt', 'DESC']]
+                }
+            ],
+            order: [['updatedAt', 'DESC']]
+        });
+        return conversations;
     } catch (error) {
-        throw new Error(`Error getting the conversation ${id}: ${error.message}`);
+        throw new Error(`Error getting the conversation for user ${userId}: ${error.message}`);
     }
 };
 
 export {
     addMessage,
-    createConversationById,
-    getConversationById,
+    createConversationByIds,
+    getAllConversationsforUserId
 }

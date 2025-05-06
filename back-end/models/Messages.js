@@ -39,15 +39,31 @@ class Conversation extends Model {}
 
 Conversation.init({
   id: {
-    type: DataTypes.TEXT,
+    type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: false
+    autoIncrement: true
   },
   post_id: {
     type: DataTypes.INTEGER,
     allowNull: true,
     references: {
       model: 'Posts',
+      key: 'id'
+    }
+  },
+  user1_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Users',
+      key: 'id'
+    }
+  },
+  user2_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Users',
       key: 'id'
     }
   }
