@@ -1,5 +1,5 @@
 // Post database operations
-import { Post, User } from '../index.js';
+import { Post, User, Report, AdminComment } from '../index.js';
 import { Op } from 'sequelize';
 
 /**
@@ -136,6 +136,229 @@ export const deletePost = async (id) => {
     return deleted > 0;
   } catch (error) {
     console.error(`Error in deletePost(${id}):`, error);
+    throw error;
+  }
+};
+
+/**
+ * Get all reported posts
+ * @returns {Promise<Array>} Array of reported posts with report details
+ */
+export const getReportedPosts = async () => {
+  try {
+    const posts = await Post.findAll({
+      include: [
+        {
+          model: Report,
+          as: 'reports',
+          where: { status: 'pending' },
+          required: true
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'username', 'email']
+        }
+      ]
+    });
+    
+    // Transform the data to include report information
+    return posts.map(post => {
+      const postJson = post.toJSON();
+      const report = postJson.reports[0];
+      return {
+        ...postJson,
+        reportedAt: report.createdAt,
+        reportReason: report.reason,
+        reportStatus: report.status
+      };
+    });
+  } catch (error) {
+    console.error('Error in getReportedPosts:', error);
+    throw error;
+  }
+};
+
+/**
+ * Create a new report
+ * @param {Object} reportData - Report data
+ * @returns {Promise<Object>} Created report
+ */
+export const createReport = async (reportData) => {
+  try {
+    const report = await Report.create(reportData);
+    return report;
+  } catch (error) {
+    console.error('Error in createReport:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get a reported post by ID
+ * @param {number} id - Post ID
+ * @returns {Promise<Object>} Post with report details
+ */
+export const getReportedPostById = async (id) => {
+  try {
+    const post = await Post.findByPk(id, {
+      include: [
+        {
+          model: Report,
+          as: 'reports',
+          where: { status: 'pending' },
+          required: true
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'username', 'email']
+        }
+      ]
+    });
+    
+    if (!post) return null;
+    
+    const postJson = post.toJSON();
+    const report = postJson.reports[0];
+    return {
+      ...postJson,
+      reportedAt: report.createdAt,
+      reportReason: report.reason,
+      reportStatus: report.status
+    };
+  } catch (error) {
+    console.error(`Error in getReportedPostById(${id}):`, error);
+    throw error;
+  }
+};
+
+/**
+ * Keep a reported post (mark reports as dismissed)
+ * @param {number} id - Post ID
+ * @returns {Promise<boolean>} True if successful
+ */
+export const keepPost = async (id) => {
+  try {
+    const updated = await Report.update(
+      { status: 'dismissed' },
+      { where: { post_id: id, status: 'pending' } }
+    );
+    return updated[0] > 0;
+  } catch (error) {
+    console.error(`Error in keepPost(${id}):`, error);
+    throw error;
+  }
+};
+
+/**
+ * Delete reports for a post
+ * @param {number} postId - Post ID
+ * @returns {Promise<boolean>} True if successful
+ */
+export const deleteReports = async (postId) => {
+  try {
+    await Report.destroy({
+      where: { post_id: postId }
+    });
+    return true;
+  } catch (error) {
+    console.error(`Error in deleteReports(${postId}):`, error);
+    throw error;
+  }
+};
+
+/**
+ * Add an admin comment to a post
+ * @param {number} postId - Post ID
+ * @param {string} comment - Comment text
+ * @returns {Promise<Object>} Created comment
+ */
+export const addAdminComment = async (postId, comment) => {
+  try {
+    const newComment = await AdminComment.create({
+      post_id: postId,
+      comment,
+      admin_id: 101 // Using default admin ID, should be from session in production
+    });
+    return newComment;
+  } catch (error) {
+    console.error(`Error in addAdminComment(${postId}):`, error);
+    throw error;
+  }
+};
+
+/**
+ * Get all admin comments for a post
+ * @param {number} postId - Post ID
+ * @returns {Promise<Object>} Comments with post details
+ */
+export const getAdminComments = async (postId) => {
+  try {
+    const post = await Post.findByPk(postId, {
+      include: [
+        {
+          model: AdminComment,
+          as: 'adminComments',
+          include: [
+            {
+              model: User,
+              as: 'admin',
+              attributes: ['id', 'username']
+            }
+          ]
+        }
+      ]
+    });
+    
+    if (!post) return null;
+    
+    return {
+      post: post.toJSON(),
+      comments: post.adminComments
+    };
+  } catch (error) {
+    console.error(`Error in getAdminComments(${postId}):`, error);
+    throw error;
+  }
+};
+
+/**
+ * Edit an admin comment
+ * @param {number} postId - Post ID
+ * @param {number} commentId - Comment ID
+ * @param {string} comment - Updated comment text
+ * @returns {Promise<Object>} Updated comment
+ */
+export const editAdminComment = async (postId, commentId, comment) => {
+  try {
+    const [updated] = await AdminComment.update(
+      { comment },
+      { 
+        where: { 
+          id: commentId,
+          post_id: postId
+        },
+        returning: true
+      }
+    );
+    
+    if (updated) {
+      const updatedComment = await AdminComment.findByPk(commentId, {
+        include: [
+          {
+            model: User,
+            as: 'admin',
+            attributes: ['id', 'username']
+          }
+        ]
+      });
+      return updatedComment;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error(`Error in editAdminComment(${postId}, ${commentId}):`, error);
     throw error;
   }
 };
