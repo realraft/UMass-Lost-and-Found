@@ -4,7 +4,7 @@ import User from './User.js';
 import Post from './Post.js';
 import Report from './Report.js';
 import AdminComment from './AdminComment.js';
-import { Message, Conversation } from './Messages/Messages.js';
+import { Message, Conversation } from './Messages.js';
 
 // Define model associations
 User.hasMany(Post, {
@@ -66,6 +66,21 @@ Conversation.belongsTo(Post, {
   foreignKey: 'post_id',
   as: 'post'
 });
+
+Conversation.hasMany(Message, {
+  foreignKey: 'conversation_id',
+  as: 'messages'
+});
+
+Message.belongsTo(Conversation, {
+  foreignKey: 'conversation_id',
+  as: 'message'
+});
+
+Message.belongsTo(User, { 
+  foreignKey: 'user_id',
+  as: 'user' 
+})
 
 // Database sync function
 const syncDatabase = async () => {
