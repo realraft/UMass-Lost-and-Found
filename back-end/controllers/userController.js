@@ -1,114 +1,117 @@
 import User from '../models/User.js';
 
-const users = [];
-let nextUserId = 1;
-
-export const getUserById = (req, res) => {
+export const getUserById = async (req, res) => {
   try {
     const userId = parseInt(req.params.id);
-    const user = users.find(user => user.id === userId);
+    const user = await User.findByPk(userId);
     
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    const { password, ...userWithoutPassword } = user;
-    res.status(200).json(userWithoutPassword);
+    const userJson = user.toJSON();
+    delete userJson.password;
+    res.status(200).json({ success: true, data: userJson });
   } catch (error) {
-    res.status(500).json({ message: 'Error retrieving user', error: error.message });
+    console.error('Error in getUserById:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const registerUser = (req, res) => {
+export const registerUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
     
     if (!username || !email || !password) {
-      return res.status(400).json({ message: 'Username, email, and password are required' });
+      return res.status(400).json({ success: false, message: 'Username, email, and password are required' });
     }
     
-    if (users.some(user => user.email === email)) {
-      return res.status(400).json({ message: 'User with this email already exists' });
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: 'User with this email already exists' });
     }
     
-    const newUser = new User({
-      id: nextUserId++,
+    const newUser = await User.create({
       username,
       email,
       password,
       role: 'user'
     });
     
-    users.push(newUser);
-    
-    const { password: pwd, ...userWithoutPassword } = newUser;
-    res.status(201).json(userWithoutPassword);
+    const userJson = newUser.toJSON();
+    delete userJson.password;
+    res.status(201).json({ success: true, data: userJson });
   } catch (error) {
-    res.status(500).json({ message: 'Error registering user', error: error.message });
+    console.error('Error in registerUser:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const loginUser = (req, res) => {
+export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     
     if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
+      return res.status(400).json({ success: false, message: 'Email and password are required' });
     }
     
-    const user = users.find(user => user.email === email);
+    const user = await User.findOne({ where: { email } });
     
     if (!user || user.password !== password) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
     
-    const { password: pwd, ...userWithoutPassword } = user;
+    const userJson = user.toJSON();
+    delete userJson.password;
     res.status(200).json({ 
+      success: true, 
       message: 'Login successful',
-      user: userWithoutPassword,
+      data: userJson
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error logging in', error: error.message });
+    console.error('Error in loginUser:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const updateUser = (req, res) => {
+export const updateUser = async (req, res) => {
   try {
     const userId = parseInt(req.params.id);
     const { username, email } = req.body;
     
-    const userIndex = users.findIndex(user => user.id === userId);
+    const user = await User.findByPk(userId);
     
-    if (userIndex === -1) {
-      return res.status(404).json({ message: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
     
-    if (username) users[userIndex].username = username;
-    if (email) users[userIndex].email = email;
+    if (username) user.username = username;
+    if (email) user.email = email;
     
-    users[userIndex].updatedAt = new Date();
+    await user.save();
     
-    const { password, ...userWithoutPassword } = users[userIndex];
-    res.status(200).json(userWithoutPassword);
+    const userJson = user.toJSON();
+    delete userJson.password;
+    res.status(200).json({ success: true, data: userJson });
   } catch (error) {
-    res.status(500).json({ message: 'Error updating user', error: error.message });
+    console.error('Error in updateUser:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const deleteUser = (req, res) => {
+export const deleteUser = async (req, res) => {
   try {
     const userId = parseInt(req.params.id);
+    const user = await User.findByPk(userId);
     
-    const userIndex = users.findIndex(user => user.id === userId);
-    
-    if (userIndex === -1) {
-      return res.status(404).json({ message: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
     
-    users.splice(userIndex, 1);
-    
-    res.status(200).json({ message: 'User deleted successfully' });
+    await user.destroy();
+    res.status(200).json({ success: true, message: 'User deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting user', error: error.message });
+    console.error('Error in deleteUser:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };

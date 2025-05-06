@@ -1,18 +1,19 @@
-import * as postModel from '../models/index.js';
+import * as postModel from '../models/operations/postOperations.js';
 
-export const getAllPosts = (req, res) => {
+export const getAllPosts = async (req, res) => {
   try {
-    const posts = postModel.getAllPosts();
+    const posts = await postModel.getAllPosts();
     res.status(200).json({ success: true, data: posts });
   } catch (error) {
+    console.error('Error in getAllPosts:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const getPostById = (req, res) => {
+export const getPostById = async (req, res) => {
   try {
     const { id } = req.params;
-    const post = postModel.getPostById(id);
+    const post = await postModel.getPostById(id);
     
     if (!post) {
       return res.status(404).json({ success: false, message: 'Post not found' });
@@ -20,36 +21,43 @@ export const getPostById = (req, res) => {
     
     res.status(200).json({ success: true, data: post });
   } catch (error) {
+    console.error('Error in getPostById:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const getPostsByUserId = (req, res) => {
+export const getPostsByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
-    const posts = postModel.getPostsByUserId(userId);
+    const posts = await postModel.getPostsByUserId(userId);
     res.status(200).json({ success: true, data: posts });
   } catch (error) {
+    console.error('Error in getPostsByUserId:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const createPost = (req, res) => {
+export const createPost = async (req, res) => {
   try {
     const postData = req.body;
-    const newPost = postModel.createPost(postData);
-    res.status(201).json({ success: true, data: newPost });
+    const newPost = await postModel.createPost(postData);
+    
+    // Fetch the created post with user data
+    const postWithUser = await postModel.getPostById(newPost.id);
+    
+    res.status(201).json({ success: true, data: postWithUser });
   } catch (error) {
+    console.error('Error in createPost:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const updatePost = (req, res) => {
+export const updatePost = async (req, res) => {
   try {
     const { id } = req.params;
     const postData = req.body;
     
-    const updatedPost = postModel.updatePost(id, postData);
+    const updatedPost = await postModel.updatePost(id, postData);
     
     if (!updatedPost) {
       return res.status(404).json({ success: false, message: 'Post not found' });
@@ -57,14 +65,15 @@ export const updatePost = (req, res) => {
     
     res.status(200).json({ success: true, data: updatedPost });
   } catch (error) {
+    console.error('Error in updatePost:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const deletePost = (req, res) => {
+export const deletePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedPost = postModel.deletePost(id);
+    const deletedPost = await postModel.deletePost(id);
     
     if (!deletedPost) {
       return res.status(404).json({ success: false, message: 'Post not found' });
@@ -72,6 +81,7 @@ export const deletePost = (req, res) => {
     
     res.status(200).json({ success: true, data: deletedPost });
   } catch (error) {
+    console.error('Error in deletePost:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

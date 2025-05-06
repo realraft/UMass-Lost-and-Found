@@ -18,6 +18,12 @@ async function seedDatabase() {
     await syncDatabase();
     
     console.log('Database synchronized. Beginning seeding...');
+
+    // First clear all existing data
+    await AdminComment.destroy({ where: {} });
+    await Report.destroy({ where: {} });
+    await Post.destroy({ where: {} });
+    await User.destroy({ where: {} });
     
     // Create sample users based on user IDs in the posts
     const uniqueUserIds = [...new Set(serverData.posts.map(post => post.user_id))];

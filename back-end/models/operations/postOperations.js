@@ -72,6 +72,13 @@ export const getPostsByUserId = async (userId) => {
   try {
     const posts = await Post.findAll({
       where: { user_id: userId },
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'username', 'email']
+        }
+      ],
       order: [['createdAt', 'DESC']]
     });
     
@@ -89,8 +96,18 @@ export const getPostsByUserId = async (userId) => {
  */
 export const createPost = async (postData) => {
   try {
+    // First check if the user exists
+    const user = await User.findByPk(postData.user_id);
+    if (!user) {
+      throw new Error('Invalid user ID - user does not exist');
+    }
+
+    // Create the post
     const post = await Post.create(postData);
-    return post;
+    
+    // Fetch the complete post with user data
+    const completePost = await getPostById(post.id);
+    return completePost;
   } catch (error) {
     console.error('Error in createPost:', error);
     throw error;
