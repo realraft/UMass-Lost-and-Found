@@ -34,7 +34,7 @@ export const addMessageConversation = async (req, res) => {
         if (isNaN(id) || isNaN(user)) {
             return res.status(400).json({ success: false, message: 'Invalid parameters.' });
         }
-        if (!textObj) {
+        if (!text) {
             return res.status(400).json({ 
                 success: false, 
                 message: "Missing required field: text" 
