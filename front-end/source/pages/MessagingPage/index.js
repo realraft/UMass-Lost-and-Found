@@ -4,7 +4,7 @@ import { BasePage } from "../BasePage/BasePage.js";
 
 export class MessagingPage extends BasePage {
     #container = null;
-    userId = null;
+    user = null;
     conversations = null
     currentConversation = null;
 
