@@ -20,12 +20,12 @@ async function seedDatabase() {
     console.log('Database synchronized. Beginning seeding...');
 
     // First clear all existing data
+    await Message.destroy({ where: {} });
+    await Conversation.destroy({ where: {} });
     await AdminComment.destroy({ where: {} });
     await Report.destroy({ where: {} });
     await Post.destroy({ where: {} });
     await User.destroy({ where: {} });
-    await Conversation.destroy({ where: {} });
-    await Message.destroy({ where: {} });
     
     // Create sample users based on user IDs in the posts
     const uniqueUserIds = [...new Set(serverData.posts.map(post => post.user_id))];
@@ -58,7 +58,7 @@ async function seedDatabase() {
         userIdMap[uniqueUserIds[index]] = user.id;
       }
     });
-    
+
     // Create posts
     const postPromises = serverData.posts.map(post => {
       return Post.create({
@@ -137,13 +137,13 @@ async function seedDatabase() {
     const conversationData = [
       {
         post_id: createdPosts[0].id,
-        user1_id: userIdMap[101] || createdUsers[0].id, // Use mapped ID for user 101
-        user2_id: userIdMap[102] || createdUsers[1].id  // Use mapped ID for user 102
+        user1_id: 1,
+        user2_id: 2
       },
       {
         post_id: createdPosts[1].id,
-        user1_id: userIdMap[102] || createdUsers[1].id, // Use mapped ID for user 102
-        user2_id: userIdMap[103] || createdUsers[2].id  // Use mapped ID for user 103
+        user1_id: 2,
+        user2_id: 3
       }
     ];
     
@@ -153,25 +153,31 @@ async function seedDatabase() {
     const messageData = [
       {
         conversation_id: createdConversations[0].id,
-        user_id: userIdMap[101] || createdUsers[0].id,
+        user_id: 1,
         text: "Hi, is this item still available?"
       },
       {
         conversation_id: createdConversations[0].id,
-        user_id: userIdMap[102] || createdUsers[1].id,
+        user_id: 2,
         text: "Yes, it is. Would you like to meet on campus?"
       },
       {
         conversation_id: createdConversations[1].id,
-        user_id: userIdMap[102] || createdUsers[1].id,
+        user_id: 2,
         text: "Hey, I think I saw this near the library."
       },
       {
         conversation_id: createdConversations[1].id,
-        user_id: userIdMap[103] || createdUsers[2].id,
+        user_id: 3,
         text: "Thanks! I'll go check there."
       }
     ];
+
+    const allConvos = await Conversation.findAll({ raw: true });
+    console.log("All conversations in DB:", allConvos);
+
+    const createdMessages = await Message.bulkCreate(messageData);
+    console.log(`Created ${createdMessages.length} messages`);
     
     console.log('Database seeded successfully!');
 

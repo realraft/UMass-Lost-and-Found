@@ -11,7 +11,7 @@ export class MessagingPage extends BasePage {
     constructor() {
         super();
         this.loadCSS("pages/MessagingPage", "MessagingPage");
-        this.user = {id: 102};
+        this.user = {id: 2};
     }
 
     render() {
@@ -150,7 +150,7 @@ export class MessagingPage extends BasePage {
         const postMessagesButton = document.createElement("button");
         postMessagesButton.className = "post-button";
         postMessagesButton.textContent = "Post Messages";
-        postMessagesButton.id = `id: ${id}`; // conversation id
+        postMessagesButton.id = `id: ${conversation.id}`; // conversation id
 
         postMessage.appendChild(postButton);
         postMessage.appendChild(postMessagesButton);
@@ -161,6 +161,7 @@ export class MessagingPage extends BasePage {
         });
 
         postMessagesButton.addEventListener("click", () => {
+            console.log("Clicked postMessagesButton for conversation:", conversation);
             this.#clearMessages_content();
             this.currentConversation = conversation
             this.#renderConversation(conversation);
@@ -177,7 +178,7 @@ export class MessagingPage extends BasePage {
         if (!message_content) return;
 
         const messageDiv = document.createElement("div");
-        messageDiv.className = String(this.user.id) === String(messageObj.user_id) ? "myMessage" : "otherMessage";
+        messageDiv.className = this.user.id === messageObj.user_id ? "myMessage" : "otherMessage";
         const messageText = document.createElement("h3");
         messageText.textContent = messageObj.text;
         messageDiv.appendChild(messageText);
