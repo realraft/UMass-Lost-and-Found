@@ -240,6 +240,7 @@ export class PostItemPage extends BasePage {
           savedPost.image = URL.createObjectURL(this.#imageFile);
         }
 
+        //new changes
         // Now publish event with the server-returned data (that has a proper ID)
         hub.publish(Events.NewPost, savedPost);
         hub.publish(Events.NavigateTo, "/HomePageSignedIn");
