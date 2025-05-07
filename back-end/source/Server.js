@@ -46,7 +46,7 @@ app.use((req, res, next) => {
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
-app.use("/api/conversations", messagesRoutes);
+app.use("/api/conversation", messagesRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
