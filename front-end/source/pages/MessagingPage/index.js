@@ -169,8 +169,7 @@ export class MessagingPage extends BasePage {
 
     #handleNewMessage(newMessage) { //send to server and render
         this.#renderNewMessage({ text: newMessage, user_id: this.user.id });
-        console.log("message rendered")
-        setTimeout(() => this.#sendMessagetoServer(newMessage), 100000);
+        this.#sendMessagetoServer(newMessage).catch(error => console.error('Failed to send message:', error));
     }
 
     #renderNewMessage(messageObj) {
@@ -193,7 +192,7 @@ export class MessagingPage extends BasePage {
 
     async #sendMessagetoServer(message) {
         try {
-            const response = await fetch(`/api/conversation/message/${this.currentConversation.id}/${this.user.id}`, {
+            const response = await fetch(`http://localhost:3000/api/conversation/message/${this.currentConversation.id}/${this.user.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

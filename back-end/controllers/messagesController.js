@@ -30,17 +30,17 @@ export const addMessageConversation = async (req, res) => {
     try {
         const id = parseInt(req.params.cid, 10);
         const user = parseInt(req.params.userid, 10);
-        const { textObj } = req.body;
+        const { text } = req.body;
         if (isNaN(id) || isNaN(user)) {
             return res.status(400).json({ success: false, message: 'Invalid parameters.' });
         }
-        if (!textObj) {
+        if (!text) {
             return res.status(400).json({ 
                 success: false, 
                 message: "Missing required field: text" 
             });
         }
-        const newMessage = await MessagesOps.addMessage(id, textObj.text, user);
+        const newMessage = await MessagesOps.addMessage(id, text, user);
 
         if (!newMessage) {
             return res.status(404).json({ success: false, message: "Conversation not found or message not added" });
