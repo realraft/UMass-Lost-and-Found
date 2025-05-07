@@ -24,6 +24,8 @@ async function seedDatabase() {
     await Report.destroy({ where: {} });
     await Post.destroy({ where: {} });
     await User.destroy({ where: {} });
+    await Conversation.destroy({ where: {} });
+    await Message.destroy({ where: {} });
     
     // Create sample users based on user IDs in the posts
     const uniqueUserIds = [...new Set(serverData.posts.map(post => post.user_id))];
@@ -134,14 +136,14 @@ async function seedDatabase() {
 
     const conversationData = [ //feed conversation into the database
       {
-        post_id: createdPosts[0].id,
-        user1_id: createdUsers[0].id,
-        user2_id: createdUsers[1].id
+        post_id: createdPosts[0].id, //watch
+        user1_id: createdUsers[0].id, //user 101 created the post
+        user2_id: createdUsers[1].id //user 102 is interested in the watch
       },
       {
-        post_id: createdPosts[1].id,
-        user1_id: createdUsers[1].id,
-        user2_id: createdUsers[2].id
+        post_id: createdPosts[1].id, //keys 
+        user1_id: createdUsers[1].id, //user 102 created the post
+        user2_id: createdUsers[2].id //user 103 is interested in the keys
       }
     ]; //make changes, for now pick a user and create a conversation with other users, frontend too
     

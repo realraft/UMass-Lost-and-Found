@@ -3,11 +3,12 @@ import User from '../User.js';
 
 /**
  * Add a message to a conversation.
- * @param {string} id - conversation ID
- * @param {User} user - user object
+ * @param {number} id - conversation ID
+ * @param {number} userid - user ID
+ * @param {string} message - message text
  * @returns {Promise<Object>} message object
  */
-const addMessage = async (id, message, user) => {
+const addMessage = async (id, message, userid) => {
     try {
         const conversation = await Conversation.findOne({ where: { id } });
         if (!conversation) {
@@ -15,7 +16,7 @@ const addMessage = async (id, message, user) => {
         }
         const newMessage = await Message.create({
             conversation_id: id,
-            user_id: user,
+            user_id: userid,
             text: message
         });
         return newMessage;
@@ -26,9 +27,9 @@ const addMessage = async (id, message, user) => {
 
 /**
  * Create a conversation.
- * @param {string} postId - post ID
- * @param {string} user1Id - user1 ID
- * @param {string} user2Id - user2 ID
+ * @param {number} postId - post ID
+ * @param {number} user1Id - user1 ID
+ * @param {number} user2Id - user2 ID
  * @returns {Promise<Object>} Conversation object
  */
 const createConversationByIds = async (postId, user1Id, user2Id) => {
@@ -56,7 +57,7 @@ const createConversationByIds = async (postId, user1Id, user2Id) => {
 
 /**
  * Get all conversations for a user.
- * @param {string} id - conversation ID
+ * @param {number} id - conversation ID
  * @returns {Promise<Object[]>} Conversation object[]
  */
 const getAllConversationsforUserId = async (userId) => {
@@ -81,11 +82,13 @@ const getAllConversationsforUserId = async (userId) => {
                 },
                 {
                     model: Message,
-                    attributes: ['id', 'user_id', 'text', 'createdAt'],
-                    order: [['createdAt', 'DESC']]
+                    attributes: ['id', 'user_id', 'text', 'createdAt']
                 }
             ],
-            order: [['updatedAt', 'DESC']]
+            order: [
+                ['updatedAt', 'DESC'],
+                [Message, 'createdAt', 'DESC']
+            ]
         });
         return conversations;
     } catch (error) {
