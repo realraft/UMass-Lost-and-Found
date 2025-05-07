@@ -10,7 +10,7 @@ Message.init({
     autoIncrement: true
   },
   conversation_id: {
-    type: DataTypes.TEXT,
+    type: DataTypes.INTEGER,
     allowNull: false,
     references: {
       model: 'Conversations',
