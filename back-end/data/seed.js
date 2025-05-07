@@ -2,7 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { User, Post, Report, AdminComment, sequelize, syncDatabase } from '../models/index.js';
+import { User, Post, Report, AdminComment, sequelize, syncDatabase, Conversation, Message } from '../models/index.js';
 
 // Get the directory name
 const __filename = fileURLToPath(import.meta.url);
