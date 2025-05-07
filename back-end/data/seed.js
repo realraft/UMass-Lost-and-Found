@@ -98,9 +98,51 @@ async function seedDatabase() {
     
     const createdAdminComments = await AdminComment.bulkCreate(adminCommentData);
     console.log(`Created ${createdAdminComments.length} admin comments`);
+
+    const conversationData = [ //feed conversation into the database
+      {
+        post_id: createdPosts[0].id,
+        user1_id: createdUsers[0].id,
+        user2_id: createdUsers[1].id
+      },
+      {
+        post_id: createdPosts[1].id,
+        user1_id: createdUsers[1].id,
+        user2_id: createdUsers[2].id
+      }
+    ]; //make changes, for now pick a user and create a conversation with other users, frontend too
+    
+    const createdConversations = await Conversation.bulkCreate(conversationData);
+    console.log(`Created ${createdConversations.length} conversations`);
+
+    const messageData = [
+      {
+        conversation_id: createdConversations[0].id,
+        user_id: createdUsers[0].id,
+        text: "Hi, is this item still available?"
+      },
+      {
+        conversation_id: createdConversations[0].id,
+        user_id: createdUsers[1].id,
+        text: "Yes, it is. Would you like to meet on campus?"
+      },
+      {
+        conversation_id: createdConversations[1].id,
+        user_id: createdUsers[1].id,
+        text: "Hey, I think I saw this near the library."
+      },
+      {
+        conversation_id: createdConversations[1].id,
+        user_id: createdUsers[2].id,
+        text: "Thanks! Ill go check there."
+      }
+    ];
+    
+    const createdMessages = await Message.bulkCreate(messageData);
+    console.log(`Created ${createdMessages.length} messages`);
     
     console.log('Database seeded successfully!');
-    
+
   } catch (error) {
     console.error('Error seeding database:', error);
   } finally {
