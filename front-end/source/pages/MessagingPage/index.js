@@ -50,16 +50,7 @@ export class MessagingPage extends BasePage {
 
     async #getConversations() { //get conversations for current user
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                console.error('No token found in localStorage');
-                return [];
-            }
-            const response = await fetch(`/api/conversation/user/${this.user.id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await fetch(`/api/conversation/user/${this.user.id}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
