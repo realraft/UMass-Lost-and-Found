@@ -9,7 +9,6 @@ import { MessagingPage } from "./pages/MessagingPage/index.js";
 import { AdminPage } from "./pages/AdminPage/index.js";
 import { PostManagerPage } from "./pages/PostManagerPage/index.js";
 import { EditPostPage } from "./pages/EditPostPage/index.js";
-import { ReportPage } from "./pages/ReportPage/index.js";
 
 export default class App {
   constructor() {
@@ -43,16 +42,6 @@ export default class App {
       }
     });
     
-    // Add ReportPost event handler
-    this._hub.subscribe(Events.ReportPost, (postData) => {
-      // Update the ReportPage component with the data
-      const reportPage = this._pageComponents.report;
-      if (reportPage) {
-        reportPage.setPostData(postData);
-        this._navigateTo("/ReportPage");
-      }
-    });
-    
     this._pageComponents = {
       home: new HomePageSignedOut(),
       homeSignedIn: new HomePageSignedIn(),
@@ -61,8 +50,7 @@ export default class App {
       messaging: new MessagingPage(),
       admin: new AdminPage(),
       postManager: new PostManagerPage(),
-      editPost: new EditPostPage(),
-      report: new ReportPage()
+      editPost: new EditPostPage()
     };
     this._navbar = new NavBar();
   }
@@ -134,9 +122,6 @@ export default class App {
         break;
       case "/EditPostPage":
         this._currentPage = "editPost";
-        break;
-      case "/ReportPage":
-        this._currentPage = "report";
         break;
       default:
         this._currentPage = "home";

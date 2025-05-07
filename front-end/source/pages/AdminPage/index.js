@@ -5,8 +5,6 @@ import { Events } from "../../eventHub/Events.js";
 export class AdminPage extends BasePage {
   #container = null;
   #listingContainer = null;
-  #apiBaseUrl = 'http://localhost:3000/api';
-  #selectedPost = null;
 
   constructor() {
     super();
@@ -32,200 +30,146 @@ export class AdminPage extends BasePage {
     return this.#container;
   }
 
-  // Helper function to create DOM elements with attributes
-  #createElement(tag, attributes = {}, children = []) {
-    const element = document.createElement(tag);
-    
-    // Apply attributes
-    Object.entries(attributes).forEach(([key, value]) => {
-      if (key === 'className') {
-        element.className = value;
-      } else if (key === 'textContent') {
-        element.textContent = value;
-      } else if (key === 'innerHTML') {
-        element.innerHTML = value;
-      } else if (key === 'style' && typeof value === 'object') {
-        Object.assign(element.style, value);
-      } else if (key.startsWith('on') && typeof value === 'function') {
-        const eventName = key.substring(2).toLowerCase();
-        element.addEventListener(eventName, value);
-      } else {
-        element.setAttribute(key, value);
-      }
-    });
-    
-    // Append children
-    children.forEach(child => {
-      if (child instanceof Node) {
-        element.appendChild(child);
-      } else if (child !== null && child !== undefined) {
-        element.appendChild(document.createTextNode(String(child)));
-      }
-    });
-    
-    return element;
-  }
-
   #createModal() {
-    const overlay = this.#createElement('div', { 
-      className: 'overlay', 
-      id: 'admin-overlay', 
-      style: { display: 'none' } 
-    });
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    overlay.id = 'admin-overlay';
     
-    const modal = this.#createElement('div', { 
-      className: 'modal', 
-      id: 'admin-modal', 
-      style: { display: 'none' } 
-    });
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'admin-modal';
     
-    const close = this.#createElement('span', { 
-      className: 'close', 
-      innerHTML: '&times;', 
-      onClick: () => this.#closeModal() 
-    });
+    const close = document.createElement('span');
+    close.className = 'close';
+    close.innerHTML = '&times;';
+    close.addEventListener('click', () => this.#closeModal());
     
-    const content = this.#createElement('div', { 
-      className: 'modal-content', 
-      id: 'admin-modal-content' 
-    });
+    const content = document.createElement('div');
+    content.className = 'modal-content';
+    content.id = 'admin-modal-content';
     
     modal.append(close, content);
     this.#container.append(overlay, modal);
   }
 
   #openModal(post) {
-    this.#selectedPost = post;
     const elements = {
       overlay: document.getElementById('admin-overlay'),
       modal: document.getElementById('admin-modal'),
       content: document.getElementById('admin-modal-content')
     };
     
-    if (!Object.values(elements).every(el => el)) return;
-    
-    elements.content.innerHTML = '';
-    
-    // Create modal content using our helper function
-    const title = this.#createElement('h3', { 
-      className: 'title', 
-      textContent: post.title || "Not Supplied" 
-    });
-
-    const details = [
-      { label: "Date Reported: ", text: new Date(post.reportedAt).toLocaleDateString(), className: 'date' },
-      { label: "Description: ", text: post.description || "Not supplied", className: 'description' },
-      { label: "Report Reason: ", text: post.reportReason || "Not supplied", className: 'reason' },
-      { label: "Location: ", text: post.location || "Not supplied", className: 'location' },
-      { label: "Status: ", text: post.reportStatus || "Pending", className: 'status' }
-    ];
-
-    const detailsElements = details.map(detail => {
-      const span = this.#createElement('span', { 
-        className: detail.className, 
-        textContent: detail.text 
-      });
+    if (Object.values(elements).every(el => el)) {
+      elements.content.innerHTML = '';
       
-      return this.#createElement('p', { textContent: detail.label }, [span]);
-    });
+      // Create modal content
+      const title = document.createElement('h3');
+      title.className = 'title';
+      title.textContent = post.title || "Not Supplied";
 
-    // Create comments section
-    const commentsSection = this.#createCommentsSection(post);
+      const details = [
+        { label: "Date Reported: ", text: new Date(post.reportedAt).toLocaleDateString(), className: 'date' },
+        { label: "Description: ", text: post.description || "Not supplied", className: 'description' },
+        { label: "Report Reason: ", text: post.reportReason || "Not supplied", className: 'reason' },
+        { label: "Location: ", text: post.location || "Not supplied", className: 'location' },
+        { label: "Status: ", text: post.reportStatus || "Pending", className: 'status' }
+      ];
 
-    // Action buttons
-    const actionButtons = this.#createActionButtons(post);
+      const detailsElements = details.map(detail => {
+        const wrapper = document.createElement('p');
+        wrapper.textContent = detail.label;
+        const span = this.#createSpan(detail.className, detail.text);
+        wrapper.appendChild(span);
+        return wrapper;
+      });
 
-    elements.content.append(title, ...detailsElements, commentsSection, actionButtons);
+      // Comments section
+      const commentsSection = document.createElement("div");
+      commentsSection.className = "comments-section";
+      
+      const commentsTitle = document.createElement("h4");
+      commentsTitle.textContent = "Admin Comments";
+      commentsSection.appendChild(commentsTitle);
 
-    elements.overlay.style.display = 'block';
-    elements.modal.style.display = 'block';
+      const commentsList = document.createElement("div");
+      commentsList.className = "comments-list";
+      commentsList.id = `comments-${post.id}`;
 
-    this.#loadComments(post.id);
-  }
+      // Add comment form
+      const commentForm = document.createElement("div");
+      commentForm.className = "comment-form";
+      commentForm.style.display = 'none';
 
-  #createCommentsSection(post) {
-    // Comments section
-    const commentsSection = this.#createElement('div', { className: 'comments-section' });
-    
-    const commentsTitle = this.#createElement('h4', { textContent: 'Admin Comments' });
-    
-    const commentsList = this.#createElement('div', { 
-      className: 'comments-list', 
-      id: `comments-${post.id}` 
-    });
+      const commentInput = document.createElement("textarea");
+      commentInput.className = "comment-input";
+      commentInput.placeholder = "Add an admin comment...";
 
-    // Add comment form
-    const commentForm = this.#createElement('div', { 
-      className: 'comment-form', 
-      style: { display: 'none' } 
-    });
-
-    const commentInput = this.#createElement('textarea', { 
-      className: 'comment-input', 
-      placeholder: 'Add an admin comment...' 
-    });
-
-    const addCommentBtn = this.#createElement('button', { 
-      className: 'add-comment-button', 
-      textContent: 'Add Comment', 
-      onClick: () => {
-        commentForm.style.display = 'block';
-        addCommentBtn.style.display = 'none';
-      }
-    });
-
-    // Create comment action buttons
-    const saveCommentBtn = this.#createElement('button', { 
-      className: 'save-comment-button', 
-      textContent: 'Save Comment', 
-      onClick: () => {
+      const saveCommentBtn = document.createElement("button");
+      saveCommentBtn.className = "save-comment-button";
+      saveCommentBtn.textContent = "Save Comment";
+      saveCommentBtn.addEventListener('click', () => {
         this.#addComment(post.id, commentInput.value);
         commentForm.style.display = 'none';
         addCommentBtn.style.display = 'block';
-      }
-    });
+      });
 
-    const cancelCommentBtn = this.#createElement('button', { 
-      className: 'cancel-comment-button', 
-      textContent: 'Cancel', 
-      onClick: () => {
+      const cancelCommentBtn = document.createElement("button");
+      cancelCommentBtn.className = "cancel-comment-button";
+      cancelCommentBtn.textContent = "Cancel";
+      cancelCommentBtn.addEventListener('click', () => {
         commentForm.style.display = 'none';
         addCommentBtn.style.display = 'block';
         commentInput.value = '';
-      }
-    });
+      });
 
-    const commentBtns = this.#createElement('div', { className: 'comment-buttons' }, [
-      saveCommentBtn, cancelCommentBtn
-    ]);
+      const commentBtns = document.createElement("div");
+      commentBtns.className = "comment-buttons";
+      commentBtns.append(saveCommentBtn, cancelCommentBtn);
 
-    commentForm.append(commentInput, commentBtns);
-    commentsSection.append(commentsTitle, commentsList, addCommentBtn, commentForm);
-    
-    return commentsSection;
-  }
+      commentForm.append(commentInput, commentBtns);
 
-  #createActionButtons(post) {
-    const actionButtons = this.#createElement('div', { className: 'action-buttons' });
+      const addCommentBtn = document.createElement("button");
+      addCommentBtn.className = "add-comment-button";
+      addCommentBtn.textContent = "Add Comment";
+      addCommentBtn.addEventListener('click', () => {
+        commentForm.style.display = 'block';
+        addCommentBtn.style.display = 'none';
+      });
 
-    const keepButton = this.#createElement('button', { 
-      className: 'keep-button', 
-      textContent: 'Keep Post', 
-      onClick: () => this.#keepPost(post.id) 
-    });
+      commentsSection.append(commentsList, addCommentBtn, commentForm);
 
-    const deleteButton = this.#createElement('button', { 
-      className: 'delete-button', 
-      textContent: 'Delete Post', 
-      onClick: () => {
+      // Action buttons
+      const actionButtons = document.createElement("div");
+      actionButtons.className = "action-buttons";
+
+      const keepButton = document.createElement("button");
+      keepButton.textContent = "Keep Post";
+      keepButton.className = "keep-button";
+      keepButton.addEventListener('click', () => this.#keepPost(post.id));
+
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "Delete Post";
+      deleteButton.className = "delete-button";
+      deleteButton.addEventListener('click', () => {
         if (confirm('Are you sure you want to delete this post?')) {
           this.#deletePost(post.id);
         }
-      }
-    });
+      });
 
-    actionButtons.append(keepButton, deleteButton);
-    return actionButtons;
+      actionButtons.append(keepButton, deleteButton);
+
+      elements.content.append(
+        title,
+        ...detailsElements,
+        commentsSection,
+        actionButtons
+      );
+
+      elements.overlay.style.display = 'block';
+      elements.modal.style.display = 'block';
+
+      this.#loadComments(post.id);
+    }
   }
 
   #closeModal() {
@@ -235,7 +179,6 @@ export class AdminPage extends BasePage {
     if (overlay && modal) {
       overlay.style.display = 'none';
       modal.style.display = 'none';
-      this.#selectedPost = null;
     }
   }
 
@@ -243,101 +186,96 @@ export class AdminPage extends BasePage {
     if (!this.#container) return;
     
     const sidebar = this.#createSidebar();
+    const mainContent = document.createElement("div");
+    mainContent.className = "main-content";
     
-    const mainContent = this.#createElement('div', { className: 'main-content' });
+    this.#listingContainer = document.createElement("div");
+    this.#listingContainer.className = "listing-container";
     
-    this.#listingContainer = this.#createElement('div', { className: 'listing-container' });
-    
-    const loadingIndicator = this.#createElement('div', { 
-      className: 'loading-indicator',
-      textContent: 'Loading reported items...'
-    });
-    
+    const loadingIndicator = document.createElement("div");
+    loadingIndicator.className = "loading-indicator";
+    loadingIndicator.textContent = "Loading reported items...";
     this.#listingContainer.appendChild(loadingIndicator);
+    
     mainContent.appendChild(this.#listingContainer);
     this.#container.append(sidebar, mainContent);
   }
 
   #createSidebar() {
-    const sidebar = this.#createElement('div', { className: 'sidebar' });
+    const sidebar = document.createElement("div");
+    sidebar.className = "sidebar";
     
     // Create sort-by section
     const sortBySection = this.#createSortBySection();
     
     // Create filters section
-    const filtersSection = this.#createElement('div', { className: 'filters' });
+    const filtersSection = document.createElement("div");
+    filtersSection.className = "filters";
     
-    const filtersTitle = this.#createElement('h3', { textContent: 'Filters' });
+    const filtersTitle = document.createElement("h3");
+    filtersTitle.textContent = "Filters";
     
     // Create filter groups
-    const filterGroups = ['Status', 'Location', 'Report Reason'].map(title => {
-      const id = title.toLowerCase().replace(/\s+/g, '-') + '-filters';
-      return this.#createFilterGroup(title, id);
-    });
+    const statusFilter = this.#createFilterGroup("Status", "status-filters");
+    const locationFilter = this.#createFilterGroup("Location", "location-filters");
+    const reasonFilter = this.#createFilterGroup("Report Reason", "reason-filters");
     
-    filtersSection.append(filtersTitle, ...filterGroups);
+    filtersSection.append(filtersTitle, statusFilter, locationFilter, reasonFilter);
     sidebar.append(sortBySection, filtersSection);
     
     return sidebar;
   }
 
   #createSortBySection() {
-    const sortBySection = this.#createElement('div', { className: 'sort-by' });
-    const sortTitle = this.#createElement('h3', { textContent: 'Sort By' });
+    const sortBySection = document.createElement("div");
+    sortBySection.className = "sort-by";
     
-    // Create radio inputs for sorting
+    const sortTitle = document.createElement("h3");
+    sortTitle.textContent = "Sort By";
+    
+    // Helper function to create radio buttons
     const createRadio = (id, label, checked = false) => {
-      const radio = this.#createElement('input', { 
-        type: 'radio', 
-        id, 
-        name: 'sort', 
-        value: id,
-        checked 
-      });
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.id = id;
+      radio.name = "sort";
+      radio.value = id;
+      radio.checked = checked;
       
-      const labelElement = this.#createElement('label', { 
-        htmlFor: id, 
-        textContent: label 
-      });
+      const labelElement = document.createElement("label");
+      labelElement.htmlFor = id;
+      labelElement.textContent = label;
       
       return [radio, labelElement];
     };
     
-    const [dateRadio, dateLabel] = createRadio('date-posted', 'Date Posted', true);
-    const [relevanceRadio, relevanceLabel] = createRadio('relevance', 'Relevance');
+    const [dateRadio, dateLabel] = createRadio("date-posted", "Date Posted", true);
+    const lineBreak = document.createElement("br");
+    const [relevanceRadio, relevanceLabel] = createRadio("relevance", "Relevance");
     
-    sortBySection.append(
-      sortTitle, 
-      dateRadio, 
-      dateLabel, 
-      this.#createElement('br'), 
-      relevanceRadio, 
-      relevanceLabel
-    );
-    
+    sortBySection.append(sortTitle, dateRadio, dateLabel, lineBreak, relevanceRadio, relevanceLabel);
     return sortBySection;
   }
 
   #createFilterGroup(title, filterId) {
-    const filterGroup = this.#createElement('div', { className: 'filter-group' });
+    const filterGroup = document.createElement("div");
+    filterGroup.className = "filter-group";
     
-    const filterTitle = this.#createElement('h4', { 
-      className: 'filter-section-title', 
-      textContent: title 
-    });
+    const filterTitle = document.createElement("h4");
+    filterTitle.className = "filter-section-title";
+    filterTitle.textContent = title;
     
-    const filterHeader = this.#createElement('div', { className: 'filter-header' });
+    const filterHeader = document.createElement("div");
+    filterHeader.className = "filter-header";
     
-    const toggleButton = this.#createElement('button', { 
-      className: 'toggle-filter', 
-      id: `toggle-${filterId}`, 
-      textContent: 'Toggle' 
-    });
+    const toggleButton = document.createElement("button");
+    toggleButton.className = "toggle-filter";
+    toggleButton.id = `toggle-${filterId}`;
+    toggleButton.textContent = "Toggle";
     
-    const filterOptions = this.#createElement('div', { 
-      className: 'filter-options', 
-      id: filterId 
-    });
+    const filterOptions = document.createElement("div");
+    filterOptions.className = "filter-options";
+    filterOptions.id = filterId;
     
     filterHeader.appendChild(toggleButton);
     filterGroup.append(filterTitle, filterHeader, filterOptions);
@@ -370,33 +308,32 @@ export class AdminPage extends BasePage {
     document.addEventListener('search-query', (e) => this.#sortListingsByRelevance(e.detail.query));
     
     // Subscribe to NewReport events
-    hub.subscribe(Events.NewReport, () => {
-      // Fetch updated reports and re-initialize filters
+    hub.subscribe(Events.NewReport, (reportData) => {
+      // Fetch the complete updated list of reports
       this.#renderListings();
+      // Re-initialize filters to include any new locations or reasons
       this.#initializeFilters();
     });
   }
 
   #initializeSorting() {
-    const sortingElements = {
-      dateRadio: document.getElementById('date-posted'),
-      relevanceRadio: document.getElementById('relevance')
-    };
+    const dateRadio = document.getElementById('date-posted');
+    const relevanceRadio = document.getElementById('relevance');
     
-    sortingElements.dateRadio?.addEventListener('change', () => {
-      if (sortingElements.dateRadio.checked) this.#sortListingsByDate();
+    dateRadio?.addEventListener('change', () => {
+      if (dateRadio.checked) this.#sortListingsByDate();
     });
     
-    sortingElements.relevanceRadio?.addEventListener('change', () => {
-      if (sortingElements.relevanceRadio.checked) {
+    relevanceRadio?.addEventListener('change', () => {
+      if (relevanceRadio.checked) {
         const searchBox = document.querySelector('.search-form input');
         const query = searchBox?.value?.trim() || '';
         if (query) this.#sortListingsByRelevance(query);
       }
     });
     
-    if (sortingElements.dateRadio) {
-      sortingElements.dateRadio.checked = true;
+    if (dateRadio) {
+      dateRadio.checked = true;
       this.#sortListingsByDate();
     }
   }
@@ -424,47 +361,35 @@ export class AdminPage extends BasePage {
     this.#applyFilters();
   }
 
-  // Fetch data from API with error handling
-  async #fetchData(endpoint, options = {}) {
-    try {
-      const response = await fetch(`${this.#apiBaseUrl}${endpoint}`, options);
-      
-      if (!response.ok) {
-        throw new Error(`Request failed: ${response.status} ${response.statusText}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error(`Error fetching from ${endpoint}:`, error);
-      throw error;
-    }
-  }
-
   async #initializeFilters() {
     try {
-      const responseData = await this.#fetchData('/admin/reports');
+      const response = await fetch('http://localhost:3000/api/admin/reports');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch filter data: ${response.status} ${response.statusText}`);
+      }
+      
+      const responseData = await response.json();
       const reports = responseData.data || [];
       
-      const dataCollectors = {
-        locations: new Set(),
-        statuses: new Set(['pending', 'dismissed']),
-        reasons: new Set()
-      };
+      const locations = new Set();
+      const statuses = new Set(['pending', 'dismissed']);
+      const reasons = new Set();
       
       reports.forEach(report => {
-        if (report.location) dataCollectors.locations.add(report.location);
-        if (report.status) dataCollectors.statuses.add(report.status);
-        if (report.reportReason) dataCollectors.reasons.add(report.reportReason);
+        if (report.location) locations.add(report.location);
+        if (report.status) statuses.add(report.status);
+        if (report.reason) reasons.add(report.reason);
       });
       
-      this.#populateFilterOptions('location-filters', Array.from(dataCollectors.locations));
-      this.#populateFilterOptions('status-filters', Array.from(dataCollectors.statuses));
-      this.#populateFilterOptions('reason-filters', Array.from(dataCollectors.reasons));
+      this.#populateFilterOptions('location-filters', Array.from(locations));
+      this.#populateFilterOptions('status-filters', Array.from(statuses));
+      this.#populateFilterOptions('reason-filters', Array.from(reasons));
       
       document.querySelectorAll('.filter-option input[type="checkbox"]')
         .forEach(checkbox => checkbox.addEventListener('change', () => this.#applyFilters()));
     } catch (error) {
-      console.error('Error initializing filters:', error);
+      console.error('Error fetching filter data:', error);
     }
   }
 
@@ -472,28 +397,21 @@ export class AdminPage extends BasePage {
     const container = document.getElementById(containerId);
     if (!container) return;
     
-    container.innerHTML = ''; // Clear existing options for refresh scenarios
-    
     options.forEach(option => {
-      const optionId = `${containerId}-${option.replace(/\s+/g, '-').toLowerCase()}`;
+      const filterOption = document.createElement('div');
+      filterOption.className = 'filter-option';
       
-      const checkbox = this.#createElement('input', {
-        type: 'checkbox',
-        value: option,
-        id: optionId,
-        checked: true
-      });
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = option;
+      checkbox.id = `${containerId}-${option.replace(/\s+/g, '-').toLowerCase()}`;
+      checkbox.checked = true;
       
-      const label = this.#createElement('label', {
-        htmlFor: optionId,
-        textContent: option
-      });
+      const label = document.createElement('label');
+      label.htmlFor = checkbox.id;
+      label.textContent = option;
       
-      const filterOption = this.#createElement('div', 
-        { className: 'filter-option' }, 
-        [checkbox, label]
-      );
-      
+      filterOption.append(checkbox, label);
       container.appendChild(filterOption);
     });
   }
@@ -501,41 +419,44 @@ export class AdminPage extends BasePage {
   #applyFilters() {
     const listings = document.querySelectorAll('.listing');
     
-    // Get selected filter values from DOM
-    const getSelectedValues = selector => 
-      Array.from(document.querySelectorAll(selector))
-        .map(input => input.value);
+    const getSelectedValues = (selector) => Array.from(
+      document.querySelectorAll(selector)
+    ).map(input => input.value);
     
-    const filters = {
-      locations: {
-        values: getSelectedValues('#location-filters .filter-option input:checked'),
-        active: document.querySelectorAll('#location-filters .filter-option input').length > 0,
-        selector: '.location'
-      },
-      statuses: {
-        values: getSelectedValues('#status-filters .filter-option input:checked'),
-        active: document.querySelectorAll('#status-filters .filter-option input').length > 0,
-        selector: '.status'
-      },
-      reasons: {
-        values: getSelectedValues('#reason-filters .filter-option input:checked'),
-        active: document.querySelectorAll('#reason-filters .filter-option input').length > 0,
-        selector: '.reason'
-      }
-    };
+    const selectedLocations = getSelectedValues('#location-filters .filter-option input:checked');
+    const selectedStatuses = getSelectedValues('#status-filters .filter-option input:checked');
+    const selectedReasons = getSelectedValues('#reason-filters .filter-option input:checked');
+    
+    const locationFilterActive = document.querySelectorAll('#location-filters .filter-option input').length > 0;
+    const statusFilterActive = document.querySelectorAll('#status-filters .filter-option input').length > 0;
+    const reasonFilterActive = document.querySelectorAll('#reason-filters .filter-option input').length > 0;
     
     listings.forEach(listing => {
       let showListing = true;
       
-      // Check each filter type
-      Object.values(filters).forEach(filter => {
-        if (!showListing || !filter.active || !filter.values.length) return;
-        
-        const textContent = listing.querySelector(filter.selector)?.textContent.trim() || '';
-        if (!filter.values.includes(textContent)) {
+      // Location filter
+      if (locationFilterActive && selectedLocations.length > 0) {
+        const locationText = listing.querySelector('.location')?.textContent.trim() || '';
+        if (!selectedLocations.includes(locationText)) {
           showListing = false;
         }
-      });
+      }
+      
+      // Status filter
+      if (showListing && statusFilterActive && selectedStatuses.length > 0) {
+        const statusText = listing.querySelector('.status')?.textContent.trim() || '';
+        if (!selectedStatuses.includes(statusText)) {
+          showListing = false;
+        }
+      }
+      
+      // Reason filter
+      if (showListing && reasonFilterActive && selectedReasons.length > 0) {
+        const reasonText = listing.querySelector('.reason')?.textContent.trim() || '';
+        if (!selectedReasons.includes(reasonText)) {
+          showListing = false;
+        }
+      }
       
       listing.classList.toggle('hidden', !showListing);
     });
@@ -544,7 +465,7 @@ export class AdminPage extends BasePage {
   }
 
   #updateNoResultsMessage() {
-    const listingContainer = this.#listingContainer;
+    const listingContainer = document.querySelector('.listing-container');
     if (!listingContainer) return;
     
     const visibleListings = listingContainer.querySelectorAll('.listing:not(.hidden)');
@@ -552,23 +473,26 @@ export class AdminPage extends BasePage {
     
     if (visibleListings.length === 0) {
       if (!existingNoResults) {
-        listingContainer.appendChild(
-          this.#createElement('div', {
-            className: 'no-results',
-            textContent: 'No items match your filters.'
-          })
-        );
+        listingContainer.appendChild(this.#createMessageElement('No items match your filters.', 'no-results'));
       }
     } else if (existingNoResults) {
       existingNoResults.remove();
     }
   }
 
+  #createMessageElement(message, className) {
+    const element = document.createElement('div');
+    element.className = className;
+    element.textContent = message;
+    return element;
+  }
+
   #sortListingsByDate() {
-    if (!this.#listingContainer) return;
+    const listingContainer = document.querySelector('.listing-container');
+    if (!listingContainer) return;
     
-    const listings = Array.from(this.#listingContainer.querySelectorAll('.listing:not(.hidden)'));
-    this.#listingContainer.querySelector('.no-results')?.remove();
+    const listings = Array.from(listingContainer.querySelectorAll('.listing:not(.hidden)'));
+    listingContainer.querySelector('.no-results')?.remove();
     
     listings.sort((a, b) => {
       const dateA = new Date(a.querySelector('.date')?.textContent || a.getAttribute('data-date') || 0);
@@ -576,199 +500,186 @@ export class AdminPage extends BasePage {
       return dateB - dateA;
     });
     
-    listings.forEach(listing => this.#listingContainer.appendChild(listing));
+    listings.forEach(listing => listingContainer.appendChild(listing));
   }
 
   #sortListingsByRelevance(query) {
-    if (!query?.trim() || !this.#listingContainer) return;
+    if (!query?.trim()) return;
     
     query = query.toLowerCase();
+    const listingContainer = document.querySelector('.listing-container');
+    if (!listingContainer) return;
     
-    const listings = this.#listingContainer.querySelectorAll('.listing:not(.hidden)');
-    this.#listingContainer.querySelector('.no-results')?.remove();
-    
-    // Calculate relevance scores
-    const contentSelectors = {
-      title: { selector: '.title', weight: 3 },
-      reason: { selector: '.reason', weight: 2 },
-      location: { selector: '.location', weight: 2 },
-      description: { selector: '.description', weight: 1 }
-    };
+    const listings = listingContainer.querySelectorAll('.listing:not(.hidden)');
+    listingContainer.querySelector('.no-results')?.remove();
     
     const listingScores = Array.from(listings).map(listing => {
-      let score = 0;
+      const title = listing.querySelector('.title')?.textContent.toLowerCase() || '';
+      const reason = listing.querySelector('.reason')?.textContent.toLowerCase() || '';
+      const location = listing.querySelector('.location')?.textContent.toLowerCase() || '';
+      const description = listing.querySelector('.description')?.textContent.toLowerCase() || '';
       
-      Object.values(contentSelectors).forEach(({ selector, weight }) => {
-        const content = listing.querySelector(selector)?.textContent.toLowerCase() || '';
-        if (content.includes(query)) score += weight;
-      });
+      let score = 0;
+      if (title.includes(query)) score += 3;
+      if (reason.includes(query)) score += 2;
+      if (location.includes(query)) score += 2;
+      if (description.includes(query)) score += 1;
       
       return { listing, score };
     });
     
-    // Sort and re-append listings
     listingScores
       .sort((a, b) => b.score - a.score)
-      .forEach(item => this.#listingContainer.appendChild(item.listing));
+      .forEach(item => listingContainer.appendChild(item.listing));
     
-    // Show message if no results
     if (listings.length === 0) {
-      this.#listingContainer.appendChild(
-        this.#createElement('div', {
-          className: 'no-results',
-          textContent: 'No items match your search and filters.'
-        })
+      listingContainer.appendChild(
+        this.#createMessageElement('No items match your search and filters.', 'no-results')
       );
     }
   }
 
   #createListingElement(post) {
-    if (!this.#listingContainer) return null;
+    if (!this.#listingContainer) return;
   
-    const listing = this.#createElement('div', {
-      className: 'listing',
-      id: post.id,
-      onClick: () => this.#openModal(post)
-    });
+    const listing = document.createElement("div");
+    listing.classList.add("listing");
+    listing.id = post.id;
+    listing.addEventListener('click', () => this.#openModal(post));
   
     const elements = [
-      { tag: 'h3', className: 'title', text: post.title || 'Not Supplied' },
-      { tag: 'p', label: 'Date Reported: ', className: 'date', text: new Date(post.reportedAt).toLocaleDateString() },
-      { tag: 'p', label: 'Description: ', className: 'description', text: post.description || 'Not supplied' },
-      { tag: 'p', label: 'Report Reason: ', className: 'reason', text: post.reportReason || 'Not supplied' },
-      { tag: 'p', label: 'Location: ', className: 'location', text: post.location || 'Not supplied' },
-      { tag: 'p', label: 'Status: ', className: 'status', text: post.reportStatus || 'Pending' }
+      { tag: "h3", className: "title", text: post.title || "Not Supplied" },
+      { tag: "p", label: "Date Reported: ", className: "date", text: new Date(post.reportedAt).toLocaleDateString() },
+      { tag: "p", label: "Description: ", className: "description", text: post.description || "Not supplied" },
+      { tag: "p", label: "Report Reason: ", className: "reason", text: post.reportReason || "Not supplied" },
+      { tag: "p", label: "Location: ", className: "location", text: post.location || "Not supplied" },
+      { tag: "p", label: "Status: ", className: "status", text: post.reportStatus || "Pending" }
     ];
   
     elements.forEach(el => {
-      if (el.tag === 'h3') {
-        const wrapper = this.#createElement(el.tag);
-        wrapper.appendChild(this.#createElement('span', { 
-          className: el.className, 
-          textContent: el.text 
-        }));
-        listing.appendChild(wrapper);
+      const wrapper = document.createElement(el.tag);
+      if (el.tag === "h3") {
+        wrapper.appendChild(this.#createSpan(el.className, el.text));
       } else {
-        const span = this.#createElement('span', { 
-          className: el.className, 
-          textContent: el.text 
-        });
-        const wrapper = this.#createElement(el.tag, { textContent: el.label }, [span]);
-        listing.appendChild(wrapper);
+        wrapper.textContent = el.label;
+        wrapper.appendChild(this.#createSpan(el.className, el.text));
       }
+      listing.appendChild(wrapper);
     });
   
-    // Insert at the beginning for newest first
+    // Insert at the beginning of the container instead of appending
     if (this.#listingContainer.firstChild) {
       this.#listingContainer.insertBefore(listing, this.#listingContainer.firstChild);
     } else {
       this.#listingContainer.appendChild(listing);
     }
-    
     return listing;
   }
 
   #createSpan(className, text) {
-    return this.#createElement('span', { className, textContent: text });
+    const span = document.createElement("span");
+    span.classList.add(className);
+    span.textContent = text;
+    return span;
   }
 
-  async #performAction(actionType, postId, endpoint, successMsg, errorMsg) {
+  async #keepPost(reportId) {
     try {
-      const method = actionType === 'delete' ? 'DELETE' : 'PUT';
-      const url = `${this.#apiBaseUrl}${endpoint}/${postId}${actionType === 'keep' ? '/keep' : ''}`;
-      
-      console.log(`AdminPage: Attempting to ${actionType} post with ID: ${postId}`);
-      
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' }
+      const response = await fetch(`http://localhost:3000/api/admin/reports/${reportId}/keep`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
-      const result = await response.json();
-      
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || `Failed to ${actionType} post`);
+      if (!response.ok) {
+        throw new Error(`Failed to keep post: ${response.status} ${response.statusText}`);
       }
-      
-      // Remove post from UI
-      const listingElement = document.getElementById(postId);
+
+      const listingElement = document.getElementById(reportId);
       if (listingElement) {
         listingElement.remove();
       }
 
-      // Check if container is now empty
-      if (this.#listingContainer && this.#listingContainer.querySelectorAll('.listing').length === 0) {
-        this.#listingContainer.innerHTML = 
-          `<div class="no-posts-message">No reported posts to review.</div>`;
+      if (this.#listingContainer && this.#listingContainer.children.length === 0) {
+        this.#listingContainer.innerHTML = '<div class="no-posts-message">No reported posts to review.</div>';
       }
 
-      // For delete actions, broadcast the event
-      if (actionType === 'delete') {
-        setTimeout(() => {
-          const eventData = { 
-            action: 'deleted',
-            postId,
-            timestamp: Date.now()
-          };
-          
-          console.log('Broadcasting deletion event with data:', eventData);
-          EventHub.getEventHubInstance().publish(Events.PostUpdated, eventData);
-        }, 50);
-      }
-
-      alert(successMsg);
+      alert('Post has been kept and removed from reports.');
       this.#closeModal();
     } catch (error) {
-      console.error(`Error ${actionType}ing post:`, error);
-      alert(`${errorMsg} ${error.message}`);
+      console.error("Error keeping post:", error);
+      alert('Failed to keep post. Please try again.');
     }
   }
 
-  async #keepPost(postId) {
-    return this.#performAction(
-      'keep', 
-      postId, 
-      '/admin/reports', 
-      'Post has been kept and removed from reports.',
-      'Failed to keep post. Please try again:'
-    );
-  }
+  async #deletePost(reportId) {
+    try {
+      // First delete the post itself through the regular posts API
+      const response = await fetch(`http://localhost:3000/api/posts/${reportId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-  async #deletePost(postId) {
-    return this.#performAction(
-      'delete', 
-      postId, 
-      '/posts', 
-      'Post has been deleted successfully.',
-      'Failed to delete post. Please try again:'
-    );
+      if (!response.ok) {
+        throw new Error(`Failed to delete post: ${response.status} ${response.statusText}`);
+      }
+
+      // Publish event to update HomePageSignedIn before removing from admin view
+      EventHub.getEventHubInstance().publish(Events.PostUpdated);
+
+      const listingElement = document.getElementById(reportId);
+      if (listingElement) {
+        listingElement.remove();
+      }
+
+      if (this.#listingContainer && this.#listingContainer.children.length === 0) {
+        this.#listingContainer.innerHTML = '<div class="no-posts-message">No reported posts to review.</div>';
+      }
+
+      alert('Post has been deleted successfully.');
+      this.#closeModal();
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      alert('Failed to delete post. Please try again.');
+    }
   }
 
   async #loadComments(postId) {
     try {
-      const responseData = await this.#fetchData(`/admin/comments/${postId}`);
+      const response = await fetch(`http://localhost:3000/api/admin/comments/${postId}`);
+      if (!response.ok) {
+        throw new Error(`Failed to load comments: ${response.status} ${response.statusText}`);
+      }
+
+      const responseData = await response.json();
       const comments = responseData.data.comments || [];
 
       const commentsList = document.getElementById(`comments-${postId}`);
       const addCommentBtn = document.querySelector('.add-comment-button');
       
-      if (!commentsList) return;
-      
-      commentsList.innerHTML = '';
-      
-      if (comments.length === 0) {
-        commentsList.appendChild(this.#createElement('p', {
-          className: 'no-comments',
-          textContent: 'No comments yet'
-        }));
+      if (commentsList) {
+        commentsList.innerHTML = '';
         
-        if (addCommentBtn) addCommentBtn.style.display = 'block';
-      } else {
-        comments.forEach(comment => {
-          commentsList.appendChild(this.#createCommentElement(comment));
-        });
-        
-        if (addCommentBtn) addCommentBtn.style.display = 'none';
+        if (comments.length === 0) {
+          const noComments = document.createElement("p");
+          noComments.className = "no-comments";
+          noComments.textContent = "No comments yet";
+          commentsList.appendChild(noComments);
+          if (addCommentBtn) {
+            addCommentBtn.style.display = 'block';
+          }
+        } else {
+          comments.forEach(comment => {
+            const commentElement = this.#createCommentElement(comment);
+            commentsList.appendChild(commentElement);
+          });
+          if (addCommentBtn) {
+            addCommentBtn.style.display = 'none';
+          }
+        }
       }
     } catch (error) {
       console.error("Error loading comments:", error);
@@ -776,26 +687,22 @@ export class AdminPage extends BasePage {
   }
 
   #createCommentElement(comment) {
-    const commentElement = this.#createElement('div', {
-      className: 'comment',
-      id: `comment-${comment.id}`
-    });
+    const commentElement = document.createElement("div");
+    commentElement.className = "comment";
+    commentElement.id = `comment-${comment.id}`;
 
-    const commentText = this.#createElement('p', {
-      className: 'comment-text',
-      textContent: comment.comment
-    });
+    const commentText = document.createElement("p");
+    commentText.className = "comment-text";
+    commentText.textContent = comment.comment;
 
-    const commentDate = this.#createElement('span', {
-      className: 'comment-date',
-      textContent: new Date(comment.createdAt).toLocaleString()
-    });
+    const commentDate = document.createElement("span");
+    commentDate.className = "comment-date";
+    commentDate.textContent = new Date(comment.createdAt).toLocaleString();
 
-    const editButton = this.#createElement('button', {
-      className: 'edit-comment-button',
-      textContent: 'Edit',
-      onClick: () => this.#editComment(comment)
-    });
+    const editButton = document.createElement("button");
+    editButton.className = "edit-comment-button";
+    editButton.textContent = "Edit";
+    editButton.addEventListener('click', () => this.#editComment(comment));
 
     commentElement.append(commentText, commentDate, editButton);
     return commentElement;
@@ -808,26 +715,42 @@ export class AdminPage extends BasePage {
     }
 
     try {
-      const admin_id = localStorage.getItem('userId') || '1';
-      
-      await this.#fetchData(`/admin/comments/${postId}`, {
+      const response = await fetch(`http://localhost:3000/api/admin/comments/${postId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ comment: commentText, admin_id })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ comment: commentText })
       });
 
-      // Reset the UI
-      const commentInput = document.querySelector('.comment-input');
-      if (commentInput) commentInput.value = '';
+      if (!response.ok) {
+        throw new Error(`Failed to add comment: ${response.status} ${response.statusText}`);
+      }
 
-      await this.#loadComments(postId);
-      
-      // Update button visibility
-      const commentForm = document.querySelector('.comment-form');
-      const addCommentBtn = document.querySelector('.add-comment-button');
-      
-      if (commentForm) commentForm.style.display = 'none';
-      if (addCommentBtn) addCommentBtn.style.display = 'block';
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to add comment');
+      }
+
+      // Clear input 
+      const commentInput = document.querySelector('.comment-input');
+      if (commentInput) {
+        commentInput.value = '';
+      }
+
+      // Update UI immediately with the new comment
+      const commentsList = document.getElementById(`comments-${postId}`);
+      if (commentsList) {
+        // Remove "no comments" message if it exists
+        const noComments = commentsList.querySelector('.no-comments');
+        if (noComments) {
+          noComments.remove();
+        }
+        
+        // Add the new comment to the list
+        const commentElement = this.#createCommentElement(result.data.comment);
+        commentsList.appendChild(commentElement);
+      }
     } catch (error) {
       console.error("Error adding comment:", error);
       alert('Failed to add comment. Please try again.');
@@ -840,39 +763,35 @@ export class AdminPage extends BasePage {
 
     const commentText = commentElement.querySelector('.comment-text');
     const currentText = commentText.textContent;
-    const editButton = commentElement.querySelector('.edit-comment-button');
 
-    // Create edit form elements
-    const input = this.#createElement('textarea', {
-      className: 'edit-comment-input',
-      value: currentText
-    });
+    const input = document.createElement("textarea");
+    input.className = "edit-comment-input";
+    input.value = currentText;
 
-    const saveButton = this.#createElement('button', {
-      className: 'save-comment-button',
-      textContent: 'Save Comment'
-    });
+    const saveButton = document.createElement("button");
+    saveButton.className = "save-comment-button";
+    saveButton.textContent = "Save Comment";
 
-    const cancelButton = this.#createElement('button', {
-      className: 'cancel-comment-button',
-      textContent: 'Cancel',
-      onClick: () => {
-        input.replaceWith(commentText);
-        editActions.remove();
-        editButton.style.display = 'block';
-      }
-    });
+    const cancelButton = document.createElement("button");
+    cancelButton.className = "cancel-comment-button";
+    cancelButton.textContent = "Cancel";
 
-    const editActions = this.#createElement('div', {
-      className: 'comment-buttons'
-    }, [saveButton, cancelButton]);
+    const editActions = document.createElement("div");
+    editActions.className = "comment-buttons";
+    editActions.append(saveButton, cancelButton);
 
     // Replace text with input and hide edit button
     commentText.replaceWith(input);
+    const editButton = commentElement.querySelector('.edit-comment-button');
     editButton.style.display = 'none';
     commentElement.appendChild(editActions);
 
-    // Setup save handler
+    cancelButton.addEventListener('click', () => {
+      input.replaceWith(commentText);
+      editActions.remove();
+      editButton.style.display = 'block';
+    });
+
     saveButton.addEventListener('click', async () => {
       const newText = input.value.trim();
       if (!newText) {
@@ -881,11 +800,17 @@ export class AdminPage extends BasePage {
       }
 
       try {
-        await this.#fetchData(`/admin/comments/${comment.post_id}/${comment.id}`, {
+        const response = await fetch(`http://localhost:3000/api/admin/comments/${comment.post_id}/${comment.id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({ comment: newText })
         });
+
+        if (!response.ok) {
+          throw new Error(`Failed to update comment: ${response.status} ${response.statusText}`);
+        }
 
         // Update UI
         commentText.textContent = newText;
@@ -901,13 +826,18 @@ export class AdminPage extends BasePage {
 
   async #renderListings() {
     try {
-      const responseData = await this.#fetchData('/admin/reports');
+      const response = await fetch('http://localhost:3000/api/admin/reports');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch listings: ${response.status} ${response.statusText}`);
+      }
+      
+      const responseData = await response.json();
       const reportedPosts = responseData.data || [];
       
       if (this.#listingContainer) {
         const loadingIndicator = this.#listingContainer.querySelector('.loading-indicator');
         this.#listingContainer.innerHTML = '';
-        
         if (loadingIndicator) {
           this.#listingContainer.appendChild(loadingIndicator);
         }
@@ -916,14 +846,12 @@ export class AdminPage extends BasePage {
       reportedPosts.forEach(post => this.#createListingElement(post));
 
       if (reportedPosts.length === 0 && this.#listingContainer) {
-        this.#listingContainer.innerHTML = 
-          '<div class="no-posts-message">No reported posts to review.</div>';
+        this.#listingContainer.innerHTML = '<div class="no-posts-message">No reported posts to review.</div>';
       }
     } catch (error) {
       console.error("Error rendering listings:", error);
       if (this.#listingContainer) {
-        this.#listingContainer.innerHTML = 
-          '<div class="error-message">Failed to load listings. Please try again later.</div>';
+        this.#listingContainer.innerHTML = '<div class="error-message">Failed to load listings. Please try again later.</div>';
       }
     }
   }

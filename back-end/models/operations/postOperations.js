@@ -146,77 +146,11 @@ export const updatePost = async (id, postData) => {
  */
 export const deletePost = async (id) => {
   try {
-    // Get the post first to ensure it exists and to return it later
-    const post = await Post.findByPk(id);
-    if (!post) {
-      return false; // Post not found
-    }
+    const deleted = await Post.destroy({
+      where: { id }
+    });
     
-    // Store post data before deletion
-    const postData = post.toJSON();
-    
-    // Use sequelize directly for raw SQL to bypass foreign key constraints
-    const { sequelize } = await import('../config.js');
-
-    // Begin a transaction to ensure all operations complete successfully or all roll back
-    const transaction = await sequelize.transaction();
-    
-    try {
-      // 1. Delete all messages tied to conversations for this post
-      await sequelize.query(
-        'DELETE FROM Messages WHERE conversation_id IN (SELECT id FROM Conversations WHERE post_id = ?)',
-        {
-          replacements: [id],
-          transaction
-        }
-      );
-      
-      // 2. Delete all conversations for this post
-      await sequelize.query(
-        'DELETE FROM Conversations WHERE post_id = ?',
-        {
-          replacements: [id],
-          transaction
-        }
-      );
-      
-      // 3. Delete all admin comments for this post
-      await sequelize.query(
-        'DELETE FROM AdminComments WHERE post_id = ?',
-        {
-          replacements: [id],
-          transaction
-        }
-      );
-      
-      // 4. Delete all reports for this post
-      await sequelize.query(
-        'DELETE FROM Reports WHERE post_id = ?',
-        {
-          replacements: [id],
-          transaction
-        }
-      );
-      
-      // 5. Finally delete the post itself
-      const [affectedRows] = await sequelize.query(
-        'DELETE FROM Posts WHERE id = ?',
-        {
-          replacements: [id],
-          transaction
-        }
-      );
-      
-      // Commit the transaction
-      await transaction.commit();
-      
-      // Return the post data for the response
-      return postData;
-    } catch (error) {
-      // If an error occurs, roll back the transaction
-      await transaction.rollback();
-      throw error;
-    }
+    return deleted > 0;
   } catch (error) {
     console.error(`Error in deletePost(${id}):`, error);
     throw error;

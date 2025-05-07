@@ -73,13 +73,13 @@ export const updatePost = async (req, res) => {
 export const deletePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await postModel.deletePost(id);
+    const deletedPost = await postModel.deletePost(id);
     
-    if (!result) {
+    if (!deletedPost) {
       return res.status(404).json({ success: false, message: 'Post not found' });
     }
     
-    res.status(200).json({ success: true, data: result, message: 'Post deleted successfully' });
+    res.status(200).json({ success: true, data: deletedPost });
   } catch (error) {
     console.error('Error in deletePost:', error);
     res.status(500).json({ success: false, message: error.message });

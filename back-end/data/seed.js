@@ -24,6 +24,8 @@ async function seedDatabase() {
     await Report.destroy({ where: {} });
     await Post.destroy({ where: {} });
     await User.destroy({ where: {} });
+    await Conversation.destroy({ where: {} });
+    await Message.destroy({ where: {} });
     
     // Create sample users based on user IDs in the posts
     const uniqueUserIds = [...new Set(serverData.posts.map(post => post.user_id))];
@@ -78,9 +80,42 @@ async function seedDatabase() {
       postIdMap[serverData.posts[index].id] = post.id;
     });
     
-    // No sample reports are created here
-    // This ensures the Admin page starts with no reports
-    console.log('No initial reports created - Admin page will start empty');
+    // Create sample reports
+    const reportData = [
+      {
+        post_id: postIdMap[1] || createdPosts[0].id,
+        reason: "This watch looks suspicious and may be stolen",
+        reported_by: userIdMap[102] || createdUsers[1].id,
+        status: "pending"
+      },
+      {
+        post_id: postIdMap[2] || createdPosts[1].id,
+        reason: "These keys may belong to someone else, possible fraudulent post",
+        reported_by: userIdMap[103] || createdUsers[2].id,
+        status: "pending"
+      },
+      {
+        post_id: postIdMap[3] || createdPosts[2].id,
+        reason: "This phone might be stolen, serial number matches reported theft",
+        reported_by: userIdMap[104] || createdUsers[3].id, 
+        status: "pending"
+      },
+      {
+        post_id: postIdMap[4] || createdPosts[3].id,
+        reason: "Someone reported these sunglasses as counterfeit merchandise",
+        reported_by: userIdMap[105] || createdUsers[4].id,
+        status: "pending"
+      },
+      {
+        post_id: postIdMap[5] || createdPosts[4].id,
+        reason: "This backpack contains sensitive materials that need verification",
+        reported_by: userIdMap[106] || createdUsers[5].id,
+        status: "pending"
+      }
+    ];
+    
+    const createdReports = await Report.bulkCreate(reportData);
+    console.log(`Created ${createdReports.length} reports`);
     
     // Add some admin comments
     const adminCommentData = [
@@ -101,14 +136,14 @@ async function seedDatabase() {
 
     const conversationData = [ //feed conversation into the database
       {
-        post_id: createdPosts[0].id,
-        user1_id: createdUsers[0].id,
-        user2_id: createdUsers[1].id
+        post_id: createdPosts[0].id, //watch
+        user1_id: createdUsers[0].id, //user 101 created the post
+        user2_id: createdUsers[1].id //user 102 is interested in the watch
       },
       {
-        post_id: createdPosts[1].id,
-        user1_id: createdUsers[1].id,
-        user2_id: createdUsers[2].id
+        post_id: createdPosts[1].id, //keys 
+        user1_id: createdUsers[1].id, //user 102 created the post
+        user2_id: createdUsers[2].id //user 103 is interested in the keys
       }
     ]; //make changes, for now pick a user and create a conversation with other users, frontend too
     

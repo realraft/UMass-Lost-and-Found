@@ -11,7 +11,7 @@ export class MessagingPage extends BasePage {
     constructor() {
         super();
         this.loadCSS("pages/MessagingPage", "MessagingPage");
-        this.user = {id: 101};
+        this.user = {id: 102};
     }
 
     render() {
@@ -81,7 +81,7 @@ export class MessagingPage extends BasePage {
     }
 
     async #renderFirstPage() { 
-        this.conversations = await this.#getConversations();
+        this.conversations = await this.#getConversations(); //returns an empty array because of the error
         if (this.conversations.length > 0) {
             this.currentConversation = this.conversations.reduce((last, curr) =>
                 curr.id > last.id ? curr : last

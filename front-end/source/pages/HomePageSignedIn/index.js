@@ -110,14 +110,10 @@ export class HomePageSignedIn extends BasePage {
         return;
       }
 
-      const post_id = parseInt(postElement.id);
-      // Use a consistent user ID (1) instead of relying on localStorage
-      // This aligns with our backend fallback logic
-      const reported_by = 1;
+      const post_id = postElement.id;
+      const reported_by = localStorage.getItem('userId') || '101';
 
-      console.log(`Submitting report for post ID: ${post_id} with reason: ${reason}`);
-
-      // Send report to server using the Sequelize/SQLite backend
+      // Send report to server
       fetch('http://localhost:3000/api/admin/reports', {
         method: 'POST',
         headers: {
@@ -131,16 +127,12 @@ export class HomePageSignedIn extends BasePage {
       })
       .then(response => {
         if (!response.ok) {
-          console.error(`Server error: ${response.status}`);
-          return response.json().then(errorData => {
-            throw new Error(errorData.message || `Server error: ${response.status}`);
-          });
+          throw new Error('Network response was not ok');
         }
         return response.json();
       })
       .then(data => {
         if (data.success) {
-          console.log('Report submitted successfully:', data);
           // Publish the NewReport event with the report data
           EventHub.getEventHubInstance().publish(Events.NewReport, data.data);
           alert('Post reported successfully');
@@ -150,7 +142,7 @@ export class HomePageSignedIn extends BasePage {
       })
       .catch(error => {
         console.error('Error reporting post:', error);
-        alert('Failed to report post. Please try again later: ' + error.message);
+        alert('Failed to report post. Please try again later.');
       });
       
       this.#closeReportModal();
@@ -283,17 +275,10 @@ export class HomePageSignedIn extends BasePage {
     document.addEventListener('search-query', (e) => this.#sortListingsByRelevance(e.detail.query));
     hub.subscribe(Events.NewPost, (newPost) => this.#addNewPost(newPost));
     
-    // Enhanced event listener for post updates
-    hub.subscribe(Events.PostUpdated, (data) => {
-      console.log('HomePageSignedIn received PostUpdated event:', data);
-      
-      if (data && data.action === 'deleted' && data.postId) {
-        // Handle specific post deletion in real-time
-        this.#removeDeletedPost(data.postId);
-      } else {
-        // General update - refresh all listings
-        this.#renderListings();
-      }
+    // Subscribe to post update events to refresh listings when a post is edited
+    hub.subscribe(Events.PostUpdated, () => {
+      // Refresh the listings when a post is updated
+      this.#renderListings();
     });
   }
 
@@ -615,10 +600,7 @@ export class HomePageSignedIn extends BasePage {
     const reportBtn = document.createElement("button");
     reportBtn.classList.add("report-button");
     reportBtn.textContent = "Report Listing";
-    reportBtn.addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent the listing click event
-      this.#openReportModal(post.title);
-    });
+    reportBtn.addEventListener('click', () => this.#openReportModal(post.title));
     listing.appendChild(reportBtn);
     
     if (addToBeginning && this.#listingContainer.firstChild) {
@@ -672,29 +654,5 @@ export class HomePageSignedIn extends BasePage {
         container.appendChild(filterOption);
       }
     });
-  }
-
-  #removeDeletedPost(postId) {
-    console.log(`HomePageSignedIn: Attempting to remove post with ID: ${postId}`);
-    
-    // Find the post element by ID and remove it from the UI
-    const postElement = document.getElementById(postId);
-    if (postElement) {
-      console.log(`HomePageSignedIn: Found post element, removing from UI`);
-      postElement.remove();
-      
-      // Check if there are no more posts and show a message if needed
-      if (this.#listingContainer && this.#listingContainer.querySelectorAll('.listing').length === 0) {
-        this.#listingContainer.innerHTML = '<div class="no-posts-message">No posts found.</div>';
-      } else {
-        // Update the filters in case we've removed the only post with certain criteria
-        this.#applyFilters();
-        this.#updateNoResultsMessage();
-      }
-    } else {
-      console.log(`HomePageSignedIn: Post element not found in UI, refreshing all listings`);
-      // If we couldn't find the post element, refresh all listings from the server
-      this.#renderListings();
-    }
   }
 }
