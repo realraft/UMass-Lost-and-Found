@@ -11,12 +11,12 @@ export class MessagingPage extends BasePage {
     constructor() {
         super();
         this.loadCSS("pages/MessagingPage", "MessagingPage");
-        this.userId = localStorage.getItem('userId') || '101';
+        this.user = {id: 101};
     }
 
     render() {
         this.#createContainer();
-        this.#renderFirstPage(this.userId);
+        this.#renderFirstPage(this.user.id);
         setTimeout(() => {
             this.#addEventListeners();
             this.#addSubscriptions();
@@ -50,16 +50,7 @@ export class MessagingPage extends BasePage {
 
     async #getConversations() { //get conversations for current user
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                console.error('No token found in localStorage');
-                return [];
-            }
-            const response = await fetch(`/api/conversation/user/${this.userId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await fetch(`/api/conversation/user/${this.user.id}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -129,8 +120,7 @@ export class MessagingPage extends BasePage {
         if (!postsContainer) return;
     
         for (const conversation of this.conversations) {
-            const post = await this.#getPostById(conversation.postId);
-            const id = conversation.id;
+            const post = await this.#getPostById(conversation.post_id);
             this.#addPosttoSidebar(post, conversation);
         }
     }
@@ -181,7 +171,7 @@ export class MessagingPage extends BasePage {
     }
 
     #handleNewMessage(newMessage) { //send to server and render
-        this.#renderNewMessage({ text: newMessage, user_id: this.userId });
+        this.#renderNewMessage({ text: newMessage, user_id: this.user.id });
         this.#sendMessagetoServer(newMessage)
     }
 
@@ -190,7 +180,7 @@ export class MessagingPage extends BasePage {
         if (!message_content) return;
 
         const messageDiv = document.createElement("div");
-        messageDiv.className = String(this.userId) === String(messageObj.user_id) ? "myMessage" : "otherMessage";
+        messageDiv.className = String(this.user.id) === String(messageObj.user_id) ? "myMessage" : "otherMessage";
         const messageText = document.createElement("h3");
         messageText.textContent = messageObj.text;
         messageDiv.appendChild(messageText);
@@ -205,7 +195,7 @@ export class MessagingPage extends BasePage {
 
     async #sendMessagetoServer(message) {
         try {
-            const response = await fetch(`/conversation/message/${this.currentConversation.id}/${this.userId}`, {
+            const response = await fetch(`/conversation/message/${this.currentConversation.id}/${this.user.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
