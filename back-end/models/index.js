@@ -79,8 +79,39 @@ Message.belongsTo(Conversation, {
 
 Message.belongsTo(User, { 
   foreignKey: 'user_id',
-  as: 'user' 
+  as: 'sender' 
 })
+
+User.hasMany(Conversation, {
+  foreignKey: 'user1_id',
+  as: 'ConversationsAsUser1'
+});
+
+User.hasMany(Conversation, {
+  foreignKey: 'user2_id',
+  as: 'ConversationsAsUser2'
+});
+
+Conversation.belongsTo(User, {
+  as: 'User1',
+  foreignKey: 'user1_id'
+});
+
+Conversation.belongsTo(User, {
+  as: 'User2',
+  foreignKey: 'user2_id'
+});
+
+// User-Message association (both sides)
+User.hasMany(Message, {
+  foreignKey: 'user_id',
+  as: 'messages'
+});
+
+Message.belongsTo(User, {
+  foreignKey: 'user_id',
+  as: 'user'
+});
 
 // Database sync function
 const syncDatabase = async () => {

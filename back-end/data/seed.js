@@ -134,18 +134,18 @@ async function seedDatabase() {
     const createdAdminComments = await AdminComment.bulkCreate(adminCommentData);
     console.log(`Created ${createdAdminComments.length} admin comments`);
 
-    const conversationData = [ //feed conversation into the database
+    const conversationData = [
       {
-        post_id: createdPosts[0].id, //watch
-        user1_id: createdUsers[0].id, //user 101 created the post
-        user2_id: createdUsers[1].id //user 102 is interested in the watch
+        post_id: createdPosts[0].id,
+        user1_id: userIdMap[101] || createdUsers[0].id, // Use mapped ID for user 101
+        user2_id: userIdMap[102] || createdUsers[1].id  // Use mapped ID for user 102
       },
       {
-        post_id: createdPosts[1].id, //keys 
-        user1_id: createdUsers[1].id, //user 102 created the post
-        user2_id: createdUsers[2].id //user 103 is interested in the keys
+        post_id: createdPosts[1].id,
+        user1_id: userIdMap[102] || createdUsers[1].id, // Use mapped ID for user 102
+        user2_id: userIdMap[103] || createdUsers[2].id  // Use mapped ID for user 103
       }
-    ]; //make changes, for now pick a user and create a conversation with other users, frontend too
+    ];
     
     const createdConversations = await Conversation.bulkCreate(conversationData);
     console.log(`Created ${createdConversations.length} conversations`);
@@ -153,28 +153,25 @@ async function seedDatabase() {
     const messageData = [
       {
         conversation_id: createdConversations[0].id,
-        user_id: createdUsers[0].id,
+        user_id: userIdMap[101] || createdUsers[0].id,
         text: "Hi, is this item still available?"
       },
       {
         conversation_id: createdConversations[0].id,
-        user_id: createdUsers[1].id,
+        user_id: userIdMap[102] || createdUsers[1].id,
         text: "Yes, it is. Would you like to meet on campus?"
       },
       {
         conversation_id: createdConversations[1].id,
-        user_id: createdUsers[1].id,
+        user_id: userIdMap[102] || createdUsers[1].id,
         text: "Hey, I think I saw this near the library."
       },
       {
         conversation_id: createdConversations[1].id,
-        user_id: createdUsers[2].id,
-        text: "Thanks! Ill go check there."
+        user_id: userIdMap[103] || createdUsers[2].id,
+        text: "Thanks! I'll go check there."
       }
     ];
-    
-    const createdMessages = await Message.bulkCreate(messageData);
-    console.log(`Created ${createdMessages.length} messages`);
     
     console.log('Database seeded successfully!');
 

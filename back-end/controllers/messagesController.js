@@ -28,8 +28,8 @@ export const createConversation = async (req, res) => {
 
 export const addMessageConversation = async (req, res) => {
     try {
-        const id = parseInt(req.params.id, 10);
-        const user = parseInt(req.params.user, 10);
+        const id = parseInt(req.params.cid, 10);
+        const user = parseInt(req.params.userid, 10);
         const { text } = req.body;
         if (isNaN(id) || isNaN(user)) {
             return res.status(400).json({ success: false, message: 'Invalid parameters.' });
@@ -55,17 +55,37 @@ export const addMessageConversation = async (req, res) => {
 
 export const getAllConversationsforUser = async (req, res) => {
     try {
-        const userId = parseInt(req.params.userId, 10);
+        const userId = parseInt(req.params.userid, 10);
+        console.log('UserId received:', req.params.userid);
         if (isNaN(userId)) {
             return res.status(400).json({ success: false, message: 'Invalid user ID.' });
         }
-        const conversations = await MessagesOps.getAllConversationsforUserId(userId);
-        if (!conversations || conversations.length === 0) {
-            return res.status(404).json({ success: false, message: 'No conversations found.' });
+        
+        let conversations;
+        try {
+            conversations = await MessagesOps.getAllConversationsforUserId(userId);
+        } catch (dbError) {
+            console.error('Database error:', dbError);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Database error while fetching conversations' 
+            });
         }
-        res.status(200).json({ success: true, data: conversations });
+        if (!conversations) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'No conversations found for this user.' 
+            });
+        }
+        return res.status(200).json({ 
+            success: true, 
+            data: conversations 
+        });
     } catch (error) {
         console.error('Error getting all conversations:', error);
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error' 
+        });
     }
-}
+};

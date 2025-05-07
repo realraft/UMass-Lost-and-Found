@@ -46,7 +46,13 @@ app.use((req, res, next) => {
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
+console.log("✅ Registering /api/conversation routes");
 app.use("/api/conversation", messagesRoutes);
+
+app.use((req, res) => {
+  console.warn(`❌ No matching route for: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ success: false, message: `Route not found: ${req.originalUrl}` });
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

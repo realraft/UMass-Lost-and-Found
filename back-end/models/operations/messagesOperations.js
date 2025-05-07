@@ -1,5 +1,6 @@
 import { Message, Conversation } from '../Messages.js';
 import User from '../User.js';
+import { Op } from 'sequelize';
 
 /**
  * Add a message to a conversation.
@@ -39,7 +40,19 @@ const createConversationByIds = async (postId, user1Id, user2Id) => {
                 post_id: postId,
                 user1_id: user1Id,
                 user2_id: user2Id
-            }
+            },
+            include: [
+                {
+                    model: User,
+                    as: 'User1',
+                    attributes: ['id', 'name']
+                },
+                {
+                    model: User,
+                    as: 'User2',
+                    attributes: ['id', 'name']
+                }
+            ]
         });
 
         if (!conversation) {
@@ -47,6 +60,21 @@ const createConversationByIds = async (postId, user1Id, user2Id) => {
                 post_id: postId,
                 user1_id: user1Id,
                 user2_id: user2Id
+            });
+            conversation = await Conversation.findOne({
+                where: { id: conversation.id },
+                include: [
+                    {
+                        model: User,
+                        as: 'User1',
+                        attributes: ['id', 'name']
+                    },
+                    {
+                        model: User,
+                        as: 'User2',
+                        attributes: ['id', 'name']
+                    }
+                ]
             });
         }
         return conversation;
@@ -62,6 +90,7 @@ const createConversationByIds = async (postId, user1Id, user2Id) => {
  */
 const getAllConversationsforUserId = async (userId) => {
     try {
+        console.log('Fetching conversations for userId:', userId);
         const conversations = await Conversation.findAll({
             where: {
                 [Op.or]: [
@@ -73,29 +102,37 @@ const getAllConversationsforUserId = async (userId) => {
                 {
                     model: User,
                     as: 'User1',
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'username', 'email']
                 },
                 {
                     model: User,
                     as: 'User2',
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'username', 'email']
                 },
                 {
                     model: Message,
-                    attributes: ['id', 'user_id', 'text', 'createdAt']
+                    as: 'messages',
+                    attributes: ['id', 'user_id', 'text', 'createdAt'],
+                    include: [
+                        {
+                            model: User,
+                            as: 'sender',
+                            attributes: ['id', 'username', 'email']
+                        }
+                    ]
                 }
             ],
             order: [
                 ['updatedAt', 'DESC'],
-                [Message, 'createdAt', 'DESC']
+                [{ model: Message, as: 'messages' }, 'createdAt', 'DESC']
             ]
         });
         return conversations;
     } catch (error) {
+        console.error('Error in getAllConversationsforUserId:', error);
         throw new Error(`Error getting the conversation for user ${userId}: ${error.message}`);
     }
 };
-
 export {
     addMessage,
     createConversationByIds,
