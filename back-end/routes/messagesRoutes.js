@@ -3,7 +3,7 @@ import * as messagesController from '../controllers/messagesController.js';
 
 const router = express.Router();
 //create a conversation 
-router.post("/ids/:postId/:user1Id/:user2Id", messagesController.createConversation);
+router.post("/ids/:postid/:user1id/:user2id", messagesController.createConversation);
 
 //add a message
 router.put("/message/:cid/:userid", messagesController.addMessageConversation);

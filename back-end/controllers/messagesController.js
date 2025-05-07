@@ -2,14 +2,14 @@ import * as MessagesOps from "../models/operations/messagesOperations.js";
 
 export const createConversation = async (req, res) => {
     try {
-        const { postId: postIdStr, user1id: user1idStr, user2id: user2idStr } = req.params;
-        const postId = parseInt(postIdStr, 10);
+        const [postidStr, user1idStr, user2idStr] = req.params.conversationId.split('-');
+        const postId = parseInt(postidStr, 10);
         const user1id = parseInt(user1idStr, 10);
         const user2id = parseInt(user2idStr, 10);
         if (isNaN(postId) || isNaN(user1id) || isNaN(user2id)) {
             return res.status(400).json({
                 success: false,
-                message: "Missing or invalid fields: postId, user1id, or user2id"
+                message: "Missing or invalid fields: postid, user1id, or user2id"
             });
         }
         const [firstUser, secondUser] = [user1id, user2id].sort((a, b) => a - b);

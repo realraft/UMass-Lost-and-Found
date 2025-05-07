@@ -129,7 +129,6 @@ const getAllConversationsforUserId = async (userId) => {
         });
         return conversations;
     } catch (error) {
-        console.error('Error in getAllConversationsforUserId:', error);
         throw new Error(`Error getting the conversation for user ${userId}: ${error.message}`);
     }
 };
