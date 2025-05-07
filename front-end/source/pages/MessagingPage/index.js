@@ -66,9 +66,10 @@ export class MessagingPage extends BasePage {
         const newMessage = this.#container.querySelector("#newMessage");
 
         if (send_button && newMessage) {
-            const m = newMessage.value
-            send_button.addEventListener('click', () => {
-                if (m.length > 0) {
+            send_button.addEventListener('click', (e) => {
+                e.preventDefault()
+                const m = newMessage.value
+                if (m.length !== 0) {
                     newMessage.value = "";
                     hub.publish(Events.NewUserMessage, m); //propagate new message text
                 } else {
@@ -168,7 +169,8 @@ export class MessagingPage extends BasePage {
 
     #handleNewMessage(newMessage) { //send to server and render
         this.#renderNewMessage({ text: newMessage, user_id: this.user.id });
-        this.#sendMessagetoServer(newMessage)
+        console.log("message rendered")
+        setTimeout(() => this.#sendMessagetoServer(newMessage), 100000);
     }
 
     #renderNewMessage(messageObj) {
@@ -191,7 +193,7 @@ export class MessagingPage extends BasePage {
 
     async #sendMessagetoServer(message) {
         try {
-            const response = await fetch(`/conversation/message/${this.currentConversation.id}/${this.user.id}`, {
+            const response = await fetch(`/api/conversation/message/${this.currentConversation.id}/${this.user.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
