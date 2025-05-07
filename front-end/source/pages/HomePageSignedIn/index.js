@@ -329,6 +329,7 @@ export class HomePageSignedIn extends BasePage {
 
   async #initializeFilters() {
     try {
+      // Reuse the same data from renderListings to avoid duplicate requests
       const response = await fetch('http://localhost:3000/api/posts');
       
       if (!response.ok) {
@@ -336,15 +337,18 @@ export class HomePageSignedIn extends BasePage {
       }
       
       const responseData = await response.json();
-      const posts = responseData.data || []; // Access the data property from the response
+      if (!responseData.success) {
+        throw new Error(responseData.message || 'Failed to fetch filter data');
+      }
+      
+      const posts = responseData.data || [];
       
       const locations = new Set();
       const tags = new Set();
       
       posts.forEach(post => {
         if (post.location) locations.add(post.location);
-        
-        if (post.tags?.length) {
+        if (Array.isArray(post.tags)) {
           post.tags.forEach(tag => tag && tags.add(tag));
         }
       });
@@ -352,10 +356,12 @@ export class HomePageSignedIn extends BasePage {
       this.#populateFilterOptions('location-filters', Array.from(locations));
       this.#populateFilterOptions('tag-filters', Array.from(tags));
       
+      // Add event listeners to filter checkboxes
       document.querySelectorAll('.filter-option input[type="checkbox"]')
         .forEach(checkbox => checkbox.addEventListener('change', () => this.#applyFilters()));
     } catch (error) {
       console.error('Error fetching filter data:', error);
+      // Don't throw the error - just log it and let the UI continue without filters
     }
   }
 
@@ -465,7 +471,7 @@ export class HomePageSignedIn extends BasePage {
       const dateB = new Date(b.querySelector('.date')?.textContent || b.getAttribute('data-date') || 0);
       return dateB - dateA;
     });
-    
+
     listings.forEach(listing => listingContainer.appendChild(listing));
   }
     
@@ -514,7 +520,12 @@ export class HomePageSignedIn extends BasePage {
       }
       
       const responseData = await response.json();
-      const posts = responseData.data || []; // Access the data property from the response
+      
+      if (!responseData.success) {
+        throw new Error(responseData.message || 'Failed to fetch listings');
+      }
+      
+      const posts = responseData.data || [];
       
       if (this.#listingContainer) {
         const loadingIndicator = this.#listingContainer.querySelector('.loading-indicator');
@@ -529,6 +540,12 @@ export class HomePageSignedIn extends BasePage {
       // If no posts are found
       if (posts.length === 0 && this.#listingContainer) {
         this.#listingContainer.innerHTML = '<div class="no-posts-message">No posts found.</div>';
+      }
+
+      // Remove loading indicator after posts are rendered
+      const loadingIndicator = this.#listingContainer?.querySelector('.loading-indicator');
+      if (loadingIndicator) {
+        loadingIndicator.remove();
       }
     } catch (error) {
       console.error("Error rendering listings:", error);
@@ -567,11 +584,11 @@ export class HomePageSignedIn extends BasePage {
     });
 
     // Add image if available
-    if (post.image) {
+    if (post.imageUrl) {
       const imageContainer = document.createElement("div");
       imageContainer.className = "image-container";
       const img = document.createElement("img");
-      img.src = post.image;
+      img.src = post.imageUrl;
       img.alt = post.title || "Posted item";
       imageContainer.appendChild(img);
       listing.appendChild(imageContainer);
@@ -579,11 +596,12 @@ export class HomePageSignedIn extends BasePage {
 
     const elements = [
       { tag: "h3", className: "title", text: post.title || "Not Supplied" },
-      { tag: "p", label: "Date found: ", className: "date", text: post.date || "Not supplied" },
+      { tag: "p", label: "Date found: ", className: "date", 
+        text: post.date ? new Date(post.date).toLocaleDateString() : "Not supplied" },
       { tag: "p", label: "Description: ", className: "description", text: post.description || "Not supplied" },
-      { tag: "p", label: "Tags: ", className: "tags", 
-        text: post.tags?.length > 0 ? post.tags.join(", ") : "Not supplied" },
-      { tag: "p", label: "Location: ", className: "location", text: post.location || "Not supplied" }
+      { tag: "p", label: "Location: ", className: "location", text: post.location || "Not supplied" },
+      { tag: "p", label: "Posted by: ", className: "user", 
+        text: post.user ? post.user.username : (post.anonymous ? "Anonymous" : "Unknown") }
     ];
     
     elements.forEach(el => {
@@ -600,7 +618,10 @@ export class HomePageSignedIn extends BasePage {
     const reportBtn = document.createElement("button");
     reportBtn.classList.add("report-button");
     reportBtn.textContent = "Report Listing";
-    reportBtn.addEventListener('click', () => this.#openReportModal(post.title));
+    reportBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.#openReportModal(post.title);
+    });
     listing.appendChild(reportBtn);
     
     if (addToBeginning && this.#listingContainer.firstChild) {
