@@ -4,7 +4,7 @@ import { BasePage } from "../BasePage/BasePage.js";
 
 export class MessagingPage extends BasePage {
     #container = null;
-    userId = null;
+    user = null;
     conversations = null
     currentConversation = null;
 
@@ -109,10 +109,7 @@ export class MessagingPage extends BasePage {
         const hub = EventHub.getEventHubInstance()
         hub.subscribe(Events.NewUserMessage, (message) => {
             this.#handleNewMessage(message) //subscribe sending message to server and rendering it
-            }).catch((error) => {
-                console.error("Error sending message:", error);
-            });
-
+            })
     }
 
     async #renderSideBar() {
