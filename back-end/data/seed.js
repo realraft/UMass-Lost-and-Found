@@ -172,6 +172,9 @@ async function seedDatabase() {
         text: "Thanks! I'll go check there."
       }
     ];
+
+    const createdMessages = await Message.bulkCreate(messageData);
+    console.log(`Created ${createdMessages.length} messages`);
     
     console.log('Database seeded successfully!');
 
