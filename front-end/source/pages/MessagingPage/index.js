@@ -32,18 +32,16 @@ export class MessagingPage extends BasePage {
 
     #getTemplate() { //html template 
         return `
-            <div class="messaging-page-container">
-                <div class="posts-container"></div>        
-                <div class="message-container">
-                    <div class="messages-content"></div>
-                    <form id="messageForm">
-                        <div>
-                            <label for="newMessage">Message: </label>
-                            <input id="newMessage" type="text" />
-                            <input id="send-message" type="submit" value="=>" />
-                        </div>
-                    </form>
-                </div>
+            <div class="posts-container"></div>        
+            <div class="message-container">
+                <div class="messages-content"></div>
+                <form id="messageForm">
+                    <div>
+                        <label for="newMessage">Message: </label>
+                        <input id="newMessage" type="text" />
+                        <input id="send-message" type="submit" value="=>" />
+                    </div>
+                </form>
             </div>
         `;
     }
