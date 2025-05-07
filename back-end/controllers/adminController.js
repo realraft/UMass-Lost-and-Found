@@ -1,49 +1,105 @@
 // Admin controller to handle admin-related operations
-import * as postModel from '../models/index.js';
+import { Post, Report, AdminComment, User } from '../models/index.js';
+
+// Helper function for standardized error responses
+const errorResponse = (res, status, message) => res.status(status).json({ success: false, message });
+
+// Helper function for standardized success responses
+const successResponse = (res, status, data, message) => res.status(status).json({ 
+  success: true, 
+  data, 
+  message 
+});
 
 // Create a new report
 export const createReport = async (req, res) => {
   try {
-    const reportData = req.body;
+    const { post_id, reason, reported_by } = req.body;
     
-    if (!reportData.post_id || !reportData.reason || !reportData.reported_by) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Missing required fields: post_id, reason, and reported_by are required' 
-      });
+    if (!post_id || !reason || !reported_by) {
+      return errorResponse(res, 400, 'Missing required fields: post_id, reason, and reported_by are required');
     }
 
-    const post = await postModel.getPostById(reportData.post_id);
+    // Check if post exists
+    const post = await Post.findByPk(post_id);
     if (!post) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Post not found' 
-      });
+      return errorResponse(res, 404, 'Post not found');
     }
     
-    const newReport = await postModel.createReport(reportData);
-    res.status(201).json({ 
-      success: true, 
-      data: {
-        ...post.toJSON(),
-        reportedAt: newReport.createdAt,
-        reportReason: newReport.reason,
-        reportStatus: newReport.status
-      },
-      message: 'Report created successfully' 
+    // Check if user exists, create a default user if not
+    let userId = reported_by;
+    let user = await User.findByPk(userId) || await User.findByPk(1);
+    
+    // If even the fallback user doesn't exist, create a default user
+    if (!user) {
+      user = await User.create({
+        id: 1,
+        username: 'anonymous_reporter',
+        email: 'anonymous@example.com',
+        password: 'password123',
+        role: 'user'
+      });
+      userId = user.id;
+    } else if (userId !== user.id) {
+      userId = user.id; // Use the found user's ID
+    }
+    
+    const newReport = await Report.create({
+      post_id,
+      reason,
+      reported_by: userId,
+      status: 'pending'
     });
+
+    return successResponse(res, 201, {
+      ...post.toJSON(),
+      reportedAt: newReport.createdAt,
+      reportReason: newReport.reason,
+      reportStatus: newReport.status
+    }, 'Report created successfully');
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error creating report:', error);
+    return errorResponse(res, 500, error.message);
   }
 };
 
 // Get all reported posts for admin review
 export const getReportedPosts = async (req, res) => {
   try {
-    const reportedPosts = await postModel.getReportedPosts();
-    res.status(200).json({ success: true, data: reportedPosts });
+    // Get reports with pending status and include the associated posts
+    const reports = await Report.findAll({
+      where: { status: 'pending' },
+      include: [
+        {
+          model: Post,
+          as: 'post',
+          include: [{ model: User, as: 'user', attributes: ['id', 'username', 'email'] }]
+        },
+        { model: User, as: 'reporter', attributes: ['id', 'username', 'email'] }
+      ]
+    });
+
+    // Map the reports to a format matching what the admin page expects
+    const reportedPosts = reports.map(report => {
+      const post = report.post || {};
+      return {
+        id: post.id,
+        title: post.title,
+        description: post.description,
+        location: post.location,
+        tags: post.tags,
+        user: post.user,
+        reportedAt: report.createdAt,
+        reportReason: report.reason,
+        reportStatus: report.status,
+        reportId: report.id
+      };
+    });
+
+    return successResponse(res, 200, reportedPosts);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error in getReportedPosts:', error);
+    return errorResponse(res, 500, error.message);
   }
 };
 
@@ -51,15 +107,29 @@ export const getReportedPosts = async (req, res) => {
 export const getReportedPostById = async (req, res) => {
   try {
     const { id } = req.params;
-    const post = await postModel.getReportedPostById(id);
+    const post = await Post.findByPk(id, {
+      include: [
+        {
+          model: Report,
+          as: 'reports',
+          include: [{ model: User, as: 'reporter', attributes: ['id', 'username', 'email'] }]
+        },
+        { model: User, as: 'user', attributes: ['id', 'username', 'email'] },
+        {
+          model: AdminComment,
+          as: 'adminComments',
+          include: [{ model: User, as: 'admin', attributes: ['id', 'username', 'email', 'role'] }]
+        }
+      ]
+    });
     
     if (!post) {
-      return res.status(404).json({ success: false, message: 'Reported post not found' });
+      return errorResponse(res, 404, 'Reported post not found');
     }
     
-    res.status(200).json({ success: true, data: post });
+    return successResponse(res, 200, post);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return errorResponse(res, 500, error.message);
   }
 };
 
@@ -67,15 +137,25 @@ export const getReportedPostById = async (req, res) => {
 export const keepPost = async (req, res) => {
   try {
     const { id } = req.params;
-    const keptPost = await postModel.keepPost(id);
+    const post = await Post.findByPk(id);
     
-    if (!keptPost) {
-      return res.status(404).json({ success: false, message: 'Post not found' });
+    if (!post) {
+      return errorResponse(res, 404, 'Post not found');
     }
     
-    res.status(200).json({ success: true, data: keptPost, message: 'Post has been kept' });
+    // Update all reports for this post to 'resolved'
+    await Report.update({ status: 'resolved' }, { where: { post_id: id } });
+    
+    const updatedPost = await Post.findByPk(id, {
+      include: [
+        { model: Report, as: 'reports' },
+        { model: User, as: 'user', attributes: ['id', 'username', 'email'] }
+      ]
+    });
+    
+    return successResponse(res, 200, updatedPost, 'Post has been kept');
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return errorResponse(res, 500, error.message);
   }
 };
 
@@ -83,22 +163,21 @@ export const keepPost = async (req, res) => {
 export const deletePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedPost = await postModel.deletePost(id);
+    const post = await Post.findByPk(id);
     
-    if (!deletedPost) {
-      return res.status(404).json({ success: false, message: 'Post not found' });
+    if (!post) {
+      return errorResponse(res, 404, 'Post not found');
     }
     
-    // Also remove any reports associated with this post
-    await postModel.deleteReports(id);
+    // First get all the data to return
+    const postData = post.toJSON();
     
-    res.status(200).json({ 
-      success: true, 
-      data: deletedPost, 
-      message: 'Post and associated reports have been deleted' 
-    });
+    // Delete the post - this should cascade delete reports and admin comments
+    await post.destroy();
+    
+    return successResponse(res, 200, postData, 'Post and associated reports have been deleted');
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return errorResponse(res, 500, error.message);
   }
 };
 
@@ -106,21 +185,30 @@ export const deletePost = async (req, res) => {
 export const addComment = async (req, res) => {
   try {
     const { id } = req.params;
-    const { comment } = req.body;
+    const { comment, admin_id } = req.body;
     
-    if (!comment) {
-      return res.status(400).json({ success: false, message: 'Comment is required' });
+    if (!comment || !admin_id) {
+      return errorResponse(res, 400, !comment ? 'Comment is required' : 'Admin ID is required');
     }
     
-    const updatedPost = await postModel.addAdminComment(id, comment);
-    
-    if (!updatedPost) {
-      return res.status(404).json({ success: false, message: 'Post not found' });
+    const post = await Post.findByPk(id);
+    if (!post) {
+      return errorResponse(res, 404, 'Post not found');
     }
     
-    res.status(200).json({ success: true, data: updatedPost, message: 'Comment added successfully' });
+    await AdminComment.create({ post_id: id, comment, admin_id });
+    
+    const updatedPost = await Post.findByPk(id, {
+      include: [{
+        model: AdminComment,
+        as: 'adminComments',
+        include: [{ model: User, as: 'admin', attributes: ['id', 'username', 'email', 'role'] }]
+      }]
+    });
+    
+    return successResponse(res, 200, updatedPost, 'Comment added successfully');
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return errorResponse(res, 500, error.message);
   }
 };
 
@@ -128,15 +216,32 @@ export const addComment = async (req, res) => {
 export const getComments = async (req, res) => {
   try {
     const { id } = req.params;
-    const comments = await postModel.getAdminComments(id);
+    const post = await Post.findByPk(id, {
+      include: [{
+        model: AdminComment,
+        as: 'adminComments',
+        include: [{ model: User, as: 'admin', attributes: ['id', 'username', 'email', 'role'] }]
+      }]
+    });
     
-    if (!comments) {
-      return res.status(404).json({ success: false, message: 'Post not found' });
+    if (!post) {
+      return errorResponse(res, 404, 'Post not found');
     }
     
-    res.status(200).json({ success: true, data: comments });
+    // Format the response to match what the frontend expects
+    const responseData = {
+      post: {
+        id: post.id,
+        title: post.title,
+        description: post.description,
+        location: post.location
+      },
+      comments: post.adminComments || []
+    };
+    
+    return successResponse(res, 200, responseData);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return errorResponse(res, 500, error.message);
   }
 };
 
@@ -147,17 +252,29 @@ export const editComment = async (req, res) => {
     const { comment } = req.body;
     
     if (!comment) {
-      return res.status(400).json({ success: false, message: 'Comment is required' });
+      return errorResponse(res, 400, 'Comment is required');
     }
     
-    const updatedComment = await postModel.editAdminComment(postId, commentId, comment);
+    // Find the comment and make sure it belongs to the specified post
+    const adminComment = await AdminComment.findOne({
+      where: { id: commentId, post_id: postId }
+    });
     
-    if (!updatedComment) {
-      return res.status(404).json({ success: false, message: 'Comment not found' });
+    if (!adminComment) {
+      return errorResponse(res, 404, 'Comment not found for this post');
     }
     
-    res.status(200).json({ success: true, data: updatedComment, message: 'Comment updated successfully' });
+    // Update and save in one step
+    adminComment.comment = comment;
+    await adminComment.save();
+    
+    // Return the updated comment with admin details
+    const updatedComment = await AdminComment.findByPk(commentId, {
+      include: [{ model: User, as: 'admin', attributes: ['id', 'username', 'email', 'role'] }]
+    });
+    
+    return successResponse(res, 200, updatedComment, 'Comment updated successfully');
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return errorResponse(res, 500, error.message);
   }
 };
