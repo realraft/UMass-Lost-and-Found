@@ -109,10 +109,7 @@ export class MessagingPage extends BasePage {
         const hub = EventHub.getEventHubInstance()
         hub.subscribe(Events.NewUserMessage, (message) => {
             this.#handleNewMessage(message) //subscribe sending message to server and rendering it
-            }).catch((error) => {
-                console.error("Error sending message:", error);
-            });
-
+            })
     }
 
     async #renderSideBar() {
