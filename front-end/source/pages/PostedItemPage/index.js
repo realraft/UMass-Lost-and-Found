@@ -125,8 +125,8 @@ export class PostedItemPage extends BasePage {
             contactButton.textContent = 'Starting...';
         
             try {
-                const userId = localStorage.getItem('userId') || '101';
-                const response = await fetch(`/api/conversation/ids/${this.#currentPost.id}/${userId}/${this.#currentPost.user_id}`, {
+                const userId = localStorage.getItem('userId') || '101'; //change later
+                const response = await fetch(`/api/conversation/ids/${this.#currentPost.id}/${101}/${this.#currentPost.user_id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                 });
