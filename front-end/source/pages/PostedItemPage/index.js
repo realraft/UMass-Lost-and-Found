@@ -116,35 +116,27 @@ export class PostedItemPage extends BasePage {
 
         // Contact button
         const contactButton = document.createElement('button');
-        contactButton.className = 'contact-button';
-        contactButton.textContent = 'Contact Finder';
+        contactButton.className = 'contact-button'
+        contactButton.textContent = 'Contact Finder'
         contactButton.addEventListener('click', async () => {
-            contactButton.disabled = true;
-            contactButton.textContent = 'Starting...';
-        
             try {
-                const userId = localStorage.getItem('userId') || '101'; // current user
-                const response = await fetch(`http://localhost:3000/api/conversation/ids/${this.#currentPost.id}/${userId}/${this.#currentPost.user_id}`, {
+                const response = await fetch(`/api/conversation/ids/${this.#currentPost.id}/${2}/${this.#currentPost.user_id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                 });
-        
+
                 const responseData = await response.json();
                 if (!response.ok) {
                     throw new Error(responseData.message || 'Failed to create conversation');
                 }
-        
                 const conversation = responseData.conversation || responseData.newConversation;
                 if (!conversation) {
                     throw new Error('Conversation creation failed');
                 }
-        
                 const hub = EventHub.getEventHubInstance();
                 hub.publish(Events.NavigateTo, '/MessagingPage');
             } catch (error) {
                 console.error('Error creating conversation:', error);
-                contactButton.disabled = false;
-                contactButton.textContent = 'Contact Finder';
                 alert('Failed to start conversation. Please try again.');
             }
         });
