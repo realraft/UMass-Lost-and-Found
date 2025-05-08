@@ -22,17 +22,27 @@ export const createReport = async (req, res) => {
     }
     
     const newReport = await postModel.createReport(reportData);
+    
+    // Create a safe response object without depending on toJSON()
+    const responseData = {
+      id: post.id,
+      title: post.title,
+      description: post.description,
+      location: post.location,
+      date: post.date,
+      tags: post.tags,
+      reportedAt: newReport.createdAt,
+      reportReason: newReport.reason,
+      reportStatus: newReport.status
+    };
+    
     res.status(201).json({ 
       success: true, 
-      data: {
-        ...post.toJSON(),
-        reportedAt: newReport.createdAt,
-        reportReason: newReport.reason,
-        reportStatus: newReport.status
-      },
+      data: responseData,
       message: 'Report created successfully' 
     });
   } catch (error) {
+    console.error('Error in createReport controller:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -83,14 +93,35 @@ export const keepPost = async (req, res) => {
 export const deletePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedPost = await postModel.deletePost(id);
+    console.log(`[ADMIN CONTROLLER] Attempting to delete post with ID: ${id}, type: ${typeof id}`);
+    
+    // Ensure we have a valid integer ID
+    const postId = parseInt(id, 10);
+    
+    if (isNaN(postId)) {
+      console.log(`[ADMIN CONTROLLER] Invalid post ID format: ${id}`);
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid post ID format' 
+      });
+    }
+    
+    console.log(`[ADMIN CONTROLLER] Parsed post ID for deletion: ${postId}`);
+    
+    // Use the imported postModel functions instead of direct model access
+    const deletedPost = await postModel.deletePost(postId);
     
     if (!deletedPost) {
-      return res.status(404).json({ success: false, message: 'Post not found' });
+      console.log(`[ADMIN CONTROLLER] Post with ID ${postId} not found for deletion`);
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Post not found' 
+      });
     }
     
     // Also remove any reports associated with this post
-    await postModel.deleteReports(id);
+    await postModel.deleteReports(postId);
+    console.log(`[ADMIN CONTROLLER] All reports for post ${postId} deleted`);
     
     res.status(200).json({ 
       success: true, 
@@ -98,6 +129,7 @@ export const deletePost = async (req, res) => {
       message: 'Post and associated reports have been deleted' 
     });
   } catch (error) {
+    console.error('[ADMIN CONTROLLER] Error in deletePost controller:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

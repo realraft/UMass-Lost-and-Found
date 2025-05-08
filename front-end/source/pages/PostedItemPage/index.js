@@ -26,6 +26,7 @@ export class PostedItemPage extends BasePage {
         this.#container = document.createElement("div");
         this.#container.className = "posted-item-page";
         
+        // Create initial structure
         this.#updateContent();
         
         return this.#container;
@@ -52,14 +53,16 @@ export class PostedItemPage extends BasePage {
         title.textContent = this.#currentPost.title || 'Untitled Item';
         postContent.appendChild(title);
 
-        // Image container (if image is available)
+        // Image container (if images are available)
         if (this.#currentPost.image) {
             const imageContainer = document.createElement('div');
             imageContainer.className = 'image-container';
+            
             const img = document.createElement('img');
             img.src = this.#currentPost.image;
-            img.alt = this.#currentPost.title || "Posted item";
+            img.alt = this.#currentPost.title || 'Posted item';
             imageContainer.appendChild(img);
+            
             postContent.appendChild(imageContainer);
         }
 
@@ -70,7 +73,7 @@ export class PostedItemPage extends BasePage {
         // Date Found
         const dateFound = document.createElement('p');
         dateFound.innerHTML = '<strong>Date Found:</strong> ' + 
-            (this.#currentPost.date ? new Date(this.#currentPost.date).toLocaleDateString() : 'Not specified');
+            (this.#currentPost.date || 'Not specified');
         details.appendChild(dateFound);
 
         // Location
@@ -85,6 +88,7 @@ export class PostedItemPage extends BasePage {
         const descriptionTitle = document.createElement('h3');
         descriptionTitle.textContent = 'Description';
         description.appendChild(descriptionTitle);
+        
         const descriptionText = document.createElement('p');
         descriptionText.className = 'description-text';
         descriptionText.textContent = this.#currentPost.description || 'No description available';
@@ -95,9 +99,7 @@ export class PostedItemPage extends BasePage {
         if (this.#currentPost.tags && this.#currentPost.tags.length > 0) {
             const tags = document.createElement('div');
             tags.className = 'tags';
-            const tagsTitle = document.createElement('h3');
-            tagsTitle.textContent = 'Tags';
-            tags.appendChild(tagsTitle);
+            tags.innerHTML = '<h3>Tags</h3>';
             
             const tagList = document.createElement('div');
             tagList.className = 'tag-list';
@@ -112,38 +114,41 @@ export class PostedItemPage extends BasePage {
             details.appendChild(tags);
         }
 
-        // Posted by
-        const postedBy = document.createElement('p');
-        postedBy.innerHTML = '<strong>Posted by:</strong> ' + 
-            (this.#currentPost.anonymous ? 'Anonymous' : (this.#currentPost.user?.username || 'Unknown user'));
-        details.appendChild(postedBy);
-
         // Contact button
         const contactButton = document.createElement('button');
-        contactButton.className = 'contact-button'
-        contactButton.textContent = 'Contact Finder'
+        contactButton.className = 'contact-button';
+        contactButton.textContent = 'Contact Finder';
         contactButton.addEventListener('click', async () => {
+            contactButton.disabled = true;
+            contactButton.textContent = 'Starting...';
+        
             try {
-                const response = await fetch(`/api/conversation/ids/${this.#currentPost.id}/${2}/${this.#currentPost.user_id}`, {
+                const userId = localStorage.getItem('userId') || '101'; // current user
+                const response = await fetch(`http://localhost:3000/api/conversation/ids/${this.#currentPost.id}/${userId}/${this.#currentPost.user_id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                 });
-
+        
                 const responseData = await response.json();
                 if (!response.ok) {
                     throw new Error(responseData.message || 'Failed to create conversation');
                 }
+        
                 const conversation = responseData.conversation || responseData.newConversation;
                 if (!conversation) {
                     throw new Error('Conversation creation failed');
                 }
+        
                 const hub = EventHub.getEventHubInstance();
                 hub.publish(Events.NavigateTo, '/MessagingPage');
             } catch (error) {
                 console.error('Error creating conversation:', error);
+                contactButton.disabled = false;
+                contactButton.textContent = 'Contact Finder';
                 alert('Failed to start conversation. Please try again.');
             }
         });
+        
         details.appendChild(contactButton);
         postContent.appendChild(details);
         this.#container.appendChild(postContent);

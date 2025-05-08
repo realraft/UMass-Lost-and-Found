@@ -27,11 +27,8 @@ export class PostItemPage extends BasePage {
   }
 
   #setupMainContent() {
-    // Change from div to form element
-    const formContainer = document.createElement("form");
+    const formContainer = document.createElement("div");
     formContainer.className = "form-container";
-    // Prevent default form submission
-    formContainer.addEventListener('submit', (e) => e.preventDefault());
 
     // Title
     const titleGroup = document.createElement("div");
@@ -132,7 +129,7 @@ export class PostItemPage extends BasePage {
     const submitBtn = document.createElement("button");
     submitBtn.className = "submit-button";
     submitBtn.textContent = "Create Post";
-    submitBtn.type = "submit"; // Change to submit type
+    submitBtn.type = "button";
 
     formContainer.append(
       titleGroup,
@@ -197,144 +194,58 @@ export class PostItemPage extends BasePage {
     });
 
     // Submit handling
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    const submitBtn = form.querySelector(".submit-button");
+    submitBtn.addEventListener("click", async () => {
       const titleInput = form.querySelector('.form-group:nth-child(1) input');
       const descInput = form.querySelector('.description-box');
       const dateInput = form.querySelector('input[type="date"]');
       const locationInput = form.querySelector('.form-group:nth-child(5) input');
       const anonInput = form.querySelector('#anonymousCheck');
-      const submitBtn = form.querySelector(".submit-button");
 
-      // Validate required fields
-      if (!titleInput.value.trim()) {
-        alert('Please enter a title');
-        titleInput.focus();
-        return;
-      }
+      // Create the post object with initial data
+      const newPost = {
+        title: titleInput.value,
+        description: descInput.value,
+        date: dateInput.value,
+        location: locationInput.value,
+        tags: this.#tags,
+        anonymous: anonInput.checked,
+        user_id: localStorage.getItem('userId') || '101'
+      };
 
-      if (!descInput.value.trim()) {
-        alert('Please enter a description');
-        descInput.focus();
-        return;
-      }
-
-      if (!dateInput.value) {
-        alert('Please select a date');
-        dateInput.focus();
-        return;
-      }
-
-      if (!locationInput.value.trim()) {
-        alert('Please enter a location');
-        locationInput.focus();
-        return;
-      }
-
-      const initialUserId = parseInt(localStorage.getItem('userId')) || 101;
-      
       try {
-        // First ensure user exists
-        const userResponse = await fetch(`http://localhost:3000/api/users/${initialUserId}`);
-        let userId = initialUserId;
-
-        if (!userResponse.ok) {
-          // User doesn't exist, create them
-          const createUserResponse = await fetch('http://localhost:3000/api/users/register', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              username: `user${initialUserId}`,
-              email: `user${initialUserId}@umass.edu`,
-              password: 'password123'
-            })
-          });
-
-          const createUserResult = await createUserResponse.json();
-          
-          if (!createUserResponse.ok && createUserResult.message !== 'User with this email already exists') {
-            throw new Error(createUserResult.message || 'Failed to create user account');
-          }
-
-          // If registration successful, use the new user's ID
-          if (createUserResponse.ok && createUserResult.success) {
-            userId = createUserResult.data.id;
-          } else {
-            // If user exists, get their ID
-            const existingUserResponse = await fetch(`http://localhost:3000/api/users/login`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                email: `user${initialUserId}@umass.edu`,
-                password: 'password123'
-              })
-            });
-            
-            const existingUserResult = await existingUserResponse.json();
-            if (existingUserResponse.ok && existingUserResult.success) {
-              userId = existingUserResult.data.id;
-            }
-          }
-        }
-
-        // Now create the post with the correct user ID
-        const newPost = {
-          title: titleInput.value.trim(),
-          description: descInput.value.trim(),
-          date: dateInput.value,
-          location: locationInput.value.trim(),
-          tags: this.#tags,
-          anonymous: anonInput.checked,
-          user_id: userId,
-          imageUrl: null
-        };
-
         // Disable the button while sending data
         submitBtn.disabled = true;
         submitBtn.textContent = "Creating Post...";
         
-        // Send the post to the server
+        // Send the post to the server first
         const response = await fetch('http://localhost:3000/api/posts', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(newPost)
         });
 
-        const result = await response.json();
-
         if (!response.ok) {
-          throw new Error(result.message || `Failed to create post: ${response.status} ${response.statusText}`);
+          throw new Error(`Failed to create post: ${response.status} ${response.statusText}`);
         }
 
-        if (!result.success) {
-          throw new Error(result.message || 'Failed to create post');
-        }
-
-        // Take the saved post from the server response
+        const result = await response.json();
         const savedPost = result.data;
 
-        // Reset form
-        form.reset();
-        this.#tags = [];
-        this.#renderTags(tagContainer);
-        imagePreview.style.display = "none";
-        this.#imageFile = null;
+        // If we have an image, add it to the result object
+        // In a real app, you'd upload this to a server/CDN 
+        if (this.#imageFile) {
+          savedPost.image = URL.createObjectURL(this.#imageFile);
+        }
 
-        //new changes
         // Now publish event with the server-returned data (that has a proper ID)
         hub.publish(Events.NewPost, savedPost);
         hub.publish(Events.NavigateTo, "/HomePageSignedIn");
-        alert('Post created successfully!');
       } catch (error) {
         console.error("Error creating post:", error);
-        alert(error.message || "Failed to create post. Please try again.");
-      } finally {
+        alert("Failed to create post. Please try again.");
         submitBtn.disabled = false;
         submitBtn.textContent = "Create Post";
       }
