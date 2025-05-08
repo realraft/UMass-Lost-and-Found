@@ -286,13 +286,14 @@ export class EditPostPage extends BasePage {
         body: JSON.stringify(updatedPost)
       });
 
-      if (response.ok) {
-        const result = await response.json();
+      const result = await response.json();
+      
+      if (response.ok && result.success) {
         EventHub.getEventHubInstance().publish(Events.PostUpdated, result.data);
         EventHub.getEventHubInstance().publish(Events.NavigateTo, "/PostManagerPage");
         alert('Post updated successfully!');
       } else {
-        console.error('Failed to update post');
+        console.error('Failed to update post:', result.message || 'Unknown error');
         alert('Failed to update post. Please try again later.');
       }
     } catch (error) {
