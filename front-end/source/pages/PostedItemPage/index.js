@@ -39,7 +39,7 @@ export class PostedItemPage extends BasePage {
         this.#container.innerHTML = '';
 
         if (!this.#currentPost) {
-            this.#container.innerHTML = '<div class="posted-item-page error-message">No item data available</div>';
+            this.#container.innerHTML = '<div class="error-message">No item data available</div>';
             return;
         }
 
@@ -54,16 +54,14 @@ export class PostedItemPage extends BasePage {
         postContent.appendChild(title);
 
         // Image container (if images are available)
-        if (this.#currentPost.images && this.#currentPost.images.length > 0) {
+        if (this.#currentPost.image) {
             const imageContainer = document.createElement('div');
             imageContainer.className = 'image-container';
             
-            this.#currentPost.images.forEach(imageSrc => {
-                const img = document.createElement('img');
-                img.src = imageSrc;
-                img.alt = this.#currentPost.title;
-                imageContainer.appendChild(img);
-            });
+            const img = document.createElement('img');
+            img.src = this.#currentPost.image;
+            img.alt = this.#currentPost.title || 'Posted item';
+            imageContainer.appendChild(img);
             
             postContent.appendChild(imageContainer);
         }
@@ -118,15 +116,15 @@ export class PostedItemPage extends BasePage {
 
         // Contact button
         const contactButton = document.createElement('button');
-        contactButton.className = 'contact-button'
-        contactButton.textContent = 'Contact Finder'
+        contactButton.className = 'contact-button';
+        contactButton.textContent = 'Contact Finder';
         contactButton.addEventListener('click', async () => {
             contactButton.disabled = true;
             contactButton.textContent = 'Starting...';
         
             try {
-                const userId = localStorage.getItem('userId') || '101'; //change later
-                const response = await fetch(`/api/conversation/ids/${this.#currentPost.id}/${101}/${this.#currentPost.user_id}`, {
+                const userId = localStorage.getItem('userId') || '101'; // current user
+                const response = await fetch(`http://localhost:3000/api/conversation/ids/${this.#currentPost.id}/${userId}/${this.#currentPost.user_id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                 });
@@ -145,8 +143,14 @@ export class PostedItemPage extends BasePage {
                 hub.publish(Events.NavigateTo, '/MessagingPage');
             } catch (error) {
                 console.error('Error creating conversation:', error);
+                contactButton.disabled = false;
+                contactButton.textContent = 'Contact Finder';
                 alert('Failed to start conversation. Please try again.');
             }
         });
+        
+        details.appendChild(contactButton);
+        postContent.appendChild(details);
+        this.#container.appendChild(postContent);
     }
 }
