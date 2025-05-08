@@ -133,7 +133,6 @@ export class PostedItemPage extends BasePage {
                 if (!response.ok) {
                     throw new Error(responseData.message || 'Failed to create conversation');
                 }
-
                 const conversation = responseData.conversation || responseData.newConversation;
                 if (!conversation) {
                     throw new Error('Conversation creation failed');
