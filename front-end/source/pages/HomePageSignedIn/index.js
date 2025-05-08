@@ -113,6 +113,8 @@ export class HomePageSignedIn extends BasePage {
       const post_id = postElement.id;
       const reported_by = localStorage.getItem('userId') || '101';
 
+      console.log('Submitting report with data:', { post_id, reason, reported_by });
+
       // Send report to server
       fetch('http://localhost:3000/api/admin/reports', {
         method: 'POST',
@@ -126,12 +128,17 @@ export class HomePageSignedIn extends BasePage {
         })
       })
       .then(response => {
+        console.log('Report response status:', response.status);
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          return response.text().then(text => {
+            console.error('Response error text:', text);
+            throw new Error('Network response was not ok: ' + text);
+          });
         }
         return response.json();
       })
       .then(data => {
+        console.log('Report success response:', data);
         if (data.success) {
           // Publish the NewReport event with the report data
           EventHub.getEventHubInstance().publish(Events.NewReport, data.data);

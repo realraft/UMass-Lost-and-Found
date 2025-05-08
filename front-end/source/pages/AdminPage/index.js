@@ -615,19 +615,33 @@ export class AdminPage extends BasePage {
 
   async #deletePost(reportId) {
     try {
-      // First delete the post itself through the regular posts API
-      const response = await fetch(`http://localhost:3000/api/posts/${reportId}`, {
+      console.log(`Attempting to delete post with ID: ${reportId}`);
+      
+      // Delete the post through the admin API endpoint
+      const response = await fetch(`http://localhost:3000/api/admin/reports/${reportId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
         }
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to delete post: ${response.status} ${response.statusText}`);
+      // Log the response for debugging
+      const responseText = await response.text();
+      console.log(`Delete response status: ${response.status}, response:`, responseText);
+      
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (e) {
+        console.error("Error parsing response JSON:", e);
+        throw new Error(`Failed to delete post: Invalid server response`);
       }
 
-      // Publish event to update HomePageSignedIn before removing from admin view
+      if (!response.ok || !responseData.success) {
+        throw new Error(responseData.message || `Failed to delete post: ${response.status}`);
+      }
+
+      // Publish event to update HomePageSignedIn
       EventHub.getEventHubInstance().publish(Events.PostUpdated);
 
       const listingElement = document.getElementById(reportId);
@@ -635,7 +649,7 @@ export class AdminPage extends BasePage {
         listingElement.remove();
       }
 
-      if (this.#listingContainer && this.#listingContainer.children.length === 0) {
+      if (this.#listingContainer && this.#listingContainer.querySelectorAll('.listing').length === 0) {
         this.#listingContainer.innerHTML = '<div class="no-posts-message">No reported posts to review.</div>';
       }
 
