@@ -2,29 +2,27 @@ import * as MessagesOps from "../models/operations/messagesOperations.js";
 
 export const createConversation = async (req, res) => {
     try {
-        const [postidStr, user1idStr, user2idStr] = req.params.conversationId.split('-');
-        const postId = parseInt(postidStr, 10);
-        const user1id = parseInt(user1idStr, 10);
-        const user2id = parseInt(user2idStr, 10);
-        if (isNaN(postId) || isNaN(user1id) || isNaN(user2id)) {
+        const { postid, user1id, user2id } = req.params;
+        const postId = parseInt(postid, 10);
+        const user1Id = parseInt(user1id, 10);
+        const user2Id = parseInt(user2id, 10);
+        if (isNaN(postId) || isNaN(user1Id) || isNaN(user2Id)) {
             return res.status(400).json({
                 success: false,
                 message: "Missing or invalid fields: postid, user1id, or user2id"
             });
         }
-        const [firstUser, secondUser] = [user1id, user2id].sort((a, b) => a - b);
-        const conversation = await MessagesOps.getAllConversationsforUserId(user1id).filter(c => c.post_id === postId && c.user1_id === firstUser && c.user2_id === secondUser)[0];
-        if (conversation) {
-            return res.status(200).json({ success: true, conversation });
-        } else {
-            const newConversation = await MessagesOps.createConversationByIds(postId, firstUser, secondUser);
-            return res.status(201).json({ success: true, newConversation });        
-        }
+        const [firstUser, secondUser] = [user1Id, user2Id].sort((a, b) => a - b);
+        const conversation = await MessagesOps.createConversationByIds(postId, firstUser, secondUser);
+        return res.status(conversation.createdAt === conversation.updatedAt ? 201 : 200).json({ //may already exist 
+            success: true,
+            conversation
+        });
     } catch (error) {
         console.error('Error in createConversation:', error);
         return res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 export const addMessageConversation = async (req, res) => {
     try {

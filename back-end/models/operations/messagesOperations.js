@@ -124,7 +124,7 @@ const getAllConversationsforUserId = async (userId) => {
             ],
             order: [
                 ['updatedAt', 'DESC'],
-                [{ model: Message, as: 'messages' }, 'createdAt', 'DESC']
+                [{ model: Message, as: 'messages' }, 'createdAt', 'ASC']
             ]
         });
         return conversations;

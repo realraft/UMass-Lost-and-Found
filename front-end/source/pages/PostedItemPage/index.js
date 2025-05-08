@@ -118,44 +118,34 @@ export class PostedItemPage extends BasePage {
             (this.#currentPost.anonymous ? 'Anonymous' : (this.#currentPost.user?.username || 'Unknown user'));
         details.appendChild(postedBy);
 
-        // Contact button (only show if the post is not by the current user)
-        const currentUserId = localStorage.getItem('userId');
-        if (currentUserId && this.#currentPost.user_id !== parseInt(currentUserId)) {
-            const contactButton = document.createElement('button');
-            contactButton.className = 'contact-button';
-            contactButton.textContent = 'Contact Finder';
-            contactButton.addEventListener('click', async () => {
-                contactButton.disabled = true;
-                contactButton.textContent = 'Starting conversation...';
-            
-                try {
-                    const response = await fetch(`http://localhost:3000/api/conversations`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            post_id: this.#currentPost.id,
-                            finder_id: this.#currentPost.user_id,
-                            finder_name: this.#currentPost.user?.username || 'Anonymous',
-                            claimer_id: currentUserId
-                        })
-                    });
-            
-                    if (!response.ok) {
-                        throw new Error('Failed to create conversation');
-                    }
-            
-                    const hub = EventHub.getEventHubInstance();
-                    hub.publish(Events.NavigateTo, '/MessagingPage');
-                } catch (error) {
-                    console.error('Error creating conversation:', error);
-                    alert('Failed to start conversation. Please try again.');
-                    contactButton.disabled = false;
-                    contactButton.textContent = 'Contact Finder';
-                }
-            });
-            details.appendChild(contactButton);
-        }
+        // Contact button
+        const contactButton = document.createElement('button');
+        contactButton.className = 'contact-button'
+        contactButton.textContent = 'Contact Finder'
+        contactButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch(`/api/conversation/ids/${this.#currentPost.id}/${2}/${this.#currentPost.user_id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
 
+                const responseData = await response.json();
+                if (!response.ok) {
+                    throw new Error(responseData.message || 'Failed to create conversation');
+                }
+
+                const conversation = responseData.conversation || responseData.newConversation;
+                if (!conversation) {
+                    throw new Error('Conversation creation failed');
+                }
+                const hub = EventHub.getEventHubInstance();
+                hub.publish(Events.NavigateTo, '/MessagingPage');
+            } catch (error) {
+                console.error('Error creating conversation:', error);
+                alert('Failed to start conversation. Please try again.');
+            }
+        });
+        details.appendChild(contactButton);
         postContent.appendChild(details);
         this.#container.appendChild(postContent);
     }
