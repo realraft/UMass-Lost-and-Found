@@ -159,17 +159,22 @@ export class MessagingPage extends BasePage {
             eventhub.publish(Events.ViewPost, post);
         });
 
-        postMessagesButton.addEventListener("click", () => {
-            console.log("Clicked postMessagesButton for conversation:", conversation);
+        postMessagesButton.addEventListener("click", async () => {
             this.#clearMessages_content();
-            this.currentConversation = conversation
-            this.#renderConversation(conversation);
+            this.conversations = await this.#getConversations();
+            const updatedConversation = this.conversations.find(c => c.id === conversation.id);
+            if (updatedConversation) {
+                this.currentConversation = updatedConversation;
+                this.#renderConversation(updatedConversation);
+            } else {
+                console.warn("Conversation not found or has been deleted.");
+            }
         });
     }
 
     #handleNewMessage(newMessage) { //send to server and render
         this.#renderNewMessage({ text: newMessage, user_id: this.user.id });
-        this.#sendMessagetoServer(newMessage).catch(error => console.error('Failed to send message:', error));
+        setTimeout(() => this.#sendMessagetoServer(newMessage), 500) 
     }
 
     #renderNewMessage(messageObj) {

@@ -45,12 +45,12 @@ const createConversationByIds = async (postId, user1Id, user2Id) => {
                 {
                     model: User,
                     as: 'User1',
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'username']
                 },
                 {
                     model: User,
                     as: 'User2',
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'username']
                 }
             ]
         });
@@ -67,12 +67,12 @@ const createConversationByIds = async (postId, user1Id, user2Id) => {
                     {
                         model: User,
                         as: 'User1',
-                        attributes: ['id', 'name']
+                        attributes: ['id', 'username']
                     },
                     {
                         model: User,
                         as: 'User2',
-                        attributes: ['id', 'name']
+                        attributes: ['id', 'username']
                     }
                 ]
             });
@@ -124,7 +124,7 @@ const getAllConversationsforUserId = async (userId) => {
             ],
             order: [
                 ['updatedAt', 'DESC'],
-                [{ model: Message, as: 'messages' }, 'createdAt', 'DESC']
+                [{ model: Message, as: 'messages' }, 'createdAt', 'ASC']
             ]
         });
         return conversations;
