@@ -85,7 +85,7 @@ const createConversationByIds = async (postId, user1Id, user2Id) => {
 
 /**
  * Get all conversations for a user.
- * @param {number} id - conversation ID
+ * @param {number} userId - user ID
  * @returns {Promise<Object[]>} Conversation object[]
  */
 const getAllConversationsforUserId = async (userId) => {
@@ -132,6 +132,7 @@ const getAllConversationsforUserId = async (userId) => {
         throw new Error(`Error getting the conversation for user ${userId}: ${error.message}`);
     }
 };
+
 export {
     addMessage,
     createConversationByIds,
